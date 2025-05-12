@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Shipment Management</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<style>
+/* Global Reset */
+{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+/* Header */
+header {
+  background-color: #00253a;
+  padding: 20px;
+  text-align: center;
+  color: #fff;
+}
+
+header .logo img {
+  max-width: 120px;
+  margin-bottom: 10px;
+}
+
+nav ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+nav ul li a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+nav ul li a:hover,
+nav ul li a.active {
+  text-decoration: underline;
+}
+
+/* Main Layout */
+main {
+  padding: 20px;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Headings */
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #00253a;
+}
+
+/* Form Styling */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.form-group input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+/* Submit Button */
+form button {
+  padding: 12px;
+  background-color: #00253a;
+  color: #fff;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+form button:hover {
+  background-color: #004f7c;
+}
+
+/* Footer */
+footer {
+  background-color: #00253a;
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+  margin-top: 30px;
+  font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .container {
+    padding: 15px;
+  }
+
+  nav ul {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  form button {
+    font-size: 14px;
+  }
+}
+</style>
+
+  <header>
+    <div class="logo">
+      <img src="un.jpeg" alt="United Nation Cargo Express">
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="status.html">Tracking</a></li>
+        <li><a href="admin.html" class="active">Admin</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="container">
+    
+      <form id="shipmentForm">
+        <div class="form-group">
+          <label for="trackingNumber">Tracking Number</label>
+          <input type="text" id="trackingNumber" name="trackingNumber" required placeholder="Enter Tracking Number">
+        </div>
+
+        <div class="form-group">
+          <label for="status">Status</label>
+          <input type="text" id="status" name="status" required placeholder="Enter Shipment Status">
+        </div>
+
+        <div class="form-group">
+          <label for="mode">Mode</label>
+          <input type="text" id="mode" name="mode" required placeholder="Enter Mode of Shipment">
+        </div>
+
+        <div class="form-group">
+          <label for="product">Product</label>
+          <input type="text" id="product" name="product" required placeholder="Enter Product Description">
+        </div>
+
+        <div class="form-group">
+          <label for="quantity">Quantity</label>
+          <input type="number" id="quantity" name="quantity" required placeholder="Enter Quantity">
+        </div>
+
+        <div class="form-group">
+          <label for="payment">Payment</label>
+          <input type="text" id="payment" name="payment" required placeholder="Enter Payment Status">
+        </div>
+
+        <div class="form-group">
+          <label for="totalFreight">Total Freight</label>
+          <input type="text" id="totalFreight" name="totalFreight" required placeholder="Enter Total Freight">
+        </div>
+
+        <div class="form-group">
+          <label for="expectedDelivery">Expected Delivery Date</label>
+          <input type="date" id="expectedDelivery" name="expectedDelivery" required>
+        </div>
+
+        <div class="form-group">
+          <label for="pickDate">Pick-Up Date</label>
+          <input type="date" id="pickDate" name="pickDate" required>
+        </div>
+
+        <div class="form-group">
+          <label for="pickUpTime">Pick-Up Time</label>
+          <input type="time" id="pickUpTime" name="pickUpTime" required>
+        </div>
+
+        <div class="form-group">
+          <label for="shipperName">Shipper Name</label>
+          <input type="text" id="shipperName" name="shipperName" required placeholder="Enter Shipper Name">
+        </div>
+
+        <div class="form-group">
+          <label for="shipperAddress">Shipper Address</label>
+          <input type="text" id="shipperAddress" name="shipperAddress" required placeholder="Enter Shipper Address">
+        </div>
+
+        <div class="form-group">
+          <label for="shipperPhone">Shipper Phone</label>
+          <input type="text" id="shipperPhone" name="shipperPhone" required placeholder="Enter Shipper Phone">
+        </div>
+
+        <div class="form-group">
+          <label for="shipperEmail">Shipper Email</label>
+          <input type="email" id="shipperEmail" name="shipperEmail" required placeholder="Enter Shipper Email">
+        </div>
+
+        <div class="form-group">
+          <label for="receiverName">Receiver Name</label>
+          <input type="text" id="receiverName" name="receiverName" required placeholder="Enter Receiver Name">
+        </div>
+
+        <div class="form-group">
+          <label for="receiverAddress">Receiver Address</label>
+          <input type="text" id="receiverAddress" name="receiverAddress" required placeholder="Enter Receiver Address">
+        </div>
+
+        <div class="form-group">
+          <label for="receiverPhone">Receiver Phone</label>
+          <input type="text" id="receiverPhone" name="receiverPhone" required placeholder="Enter Receiver Phone">
+        </div>
+
+        <div class="form-group">
+          <label for="receiverEmail">Receiver Email</label>
+          <input type="email" id="receiverEmail" name="receiverEmail" required placeholder="Enter Receiver Email">
+        </div>
+
+        <button type="submit">Save Shipment Data</button>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 United Nation Cargo Express</p>
+  </footer>
+
+  <script>
+    document.getElementById('shipmentForm').addEventListener('submit', async function(event) {
+      event.preventDefault();  // Prevent form from refreshing the page
+
+      // Gather form data
+      const formData = new FormData(this);
+      const data = {};
+      formData.forEach((value, key) => {
+        data[key] = value;  // Store the form data as key-value pairs
+      });
+
+      try {
+        // Send data to Google Apps Script API
+        const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',  // Ensure the API understands the data format
+          },
+          body: JSON.stringify(data),  // Send form data as JSON
+        });
+
+        // Parse the response from Google Apps Script
+        const result = await response.json();
+        
+        if (result.success) {
+          alert('Shipment data saved successfully!');  // Inform user of success
+          document.getElementById('shipmentForm').reset();  // Reset form fields after successful submission
+        } else {
+          alert('Error saving shipment data. Please try again.');  // Error if the data wasn't saved successfully
+        }
+      } catch (error) {
+        console.error('Error submitting form:', error);  // Log error if the API call fails
+        alert('Error submitting form. Please try again later.');  // Inform user of the issue
+      }
+    });
+  </script>
+
+</body>
+</html>
