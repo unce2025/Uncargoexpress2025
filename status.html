@@ -345,7 +345,8 @@
 
           const data = result.shipment;
 
-          document.getElementById('barcodeImage').src = https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&imagetype=Gif;
+         document.getElementById('barcodeImage').src = `https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&imagetype=Gif`;
+
 
           document.getElementById('shipperName').textContent = data.shipperName || '';
           document.getElementById('shipperAddress').textContent = data.shipperAddress || '';
@@ -371,7 +372,7 @@ document.getElementById('totalFreight').textContent = data.totalFreight || '';
           (data.log || []).forEach(entry => {
             const div = document.createElement('div');
             div.classList.add('timeline-entry');
-            div.innerHTML = <h4>${entry.status} - ${entry.date}, ${entry.time}</h4><p>${entry.location}</p>;
+           div.innerHTML = `<h4>${entry.status} - ${entry.date}, ${entry.time}</h4><p>${entry.location}</p>`;
             timeline.appendChild(div);
           });
 
@@ -380,7 +381,7 @@ document.getElementById('totalFreight').textContent = data.totalFreight || '';
           historyTable.innerHTML = '';
           (data.history || []).forEach(entry => {
             const row = document.createElement('tr');
-            row.innerHTML = <td>${entry.date}</td><td>${entry.time}</td><td>${entry.location}</td><td>${entry.status}</td><td>${entry.updatedBy}</td><td>${entry.remarks}</td>;
+           row.innerHTML = `<td>${entry.date}</td><td>${entry.time}</td><td>${entry.location}</td><td>${entry.status}</td><td>${entry.updatedBy}</td><td>${entry.remarks}</td>`;
             historyTable.appendChild(row);
           });
 
@@ -389,12 +390,12 @@ document.getElementById('totalFreight').textContent = data.totalFreight || '';
           packageTable.innerHTML = '';
           (data.packages || []).forEach(entry => {
             const row = document.createElement('tr');
-            row.innerHTML = <td>${entry.qty}</td><td>${entry.pieceType}</td><td>${entry.description}</td><td>${entry.length}</td><td>${entry.width}</td><td>${entry.height}</td><td>${entry.weight}</td>;
+           row.innerHTML = `<td>${entry.qty}</td><td>${entry.pieceType}</td><td>${entry.description}</td><td>${entry.length}</td><td>${entry.width}</td><td>${entry.height}</td><td>${entry.weight}</td>`;
             packageTable.appendChild(row);
           });
 
           // Status
-          document.querySelector('.status-indicator').textContent = SHIPMENT STATUS: ${data.status};
+          document.querySelector('.status-indicator').textContent = `SHIPMENT STATUS: ${data.status}`;
         } catch (error) {
           console.error('Error:', error);
           alert('Error fetching tracking info.');
