@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Panel - Shipment Management</title>
-    <style>
+   <style>
     * {
       margin: 0;
       padding: 0;
@@ -202,24 +202,24 @@ footer {
       </div>
 
       <form id="shipmentForm">
-        <div class="form-group"><label for="trackingNumber">Tracking Number</label><input type="text" id="trackingNumber" name="trackingNumber" required /></div>
-        <div class="form-group"><label for="status">Status</label><input type="text" id="status" name="status" required /></div>
-        <div class="form-group"><label for="mode">Mode</label><input type="text" id="mode" name="mode" required /></div>
-        <div class="form-group"><label for="product">Product</label><input type="text" id="product" name="product" required /></div>
-        <div class="form-group"><label for="quantity">Quantity</label><input type="number" id="quantity" name="quantity" required /></div>
-        <div class="form-group"><label for="payment">Payment</label><input type="text" id="payment" name="payment" required /></div>
-        <div class="form-group"><label for="totalFreight">Total Freight</label><input type="text" id="totalFreight" name="totalFreight" required /></div>
-        <div class="form-group"><label for="expectedDelivery">Expected Delivery Date</label><input type="date" id="expectedDelivery" name="expectedDelivery" required /></div>
-        <div class="form-group"><label for="pickDate">Pick-Up Date</label><input type="date" id="pickDate" name="pickDate" required /></div>
-        <div class="form-group"><label for="pickUpTime">Pick-Up Time</label><input type="time" id="pickUpTime" name="pickUpTime" required /></div>
-        <div class="form-group"><label for="shipperName">Shipper Name</label><input type="text" id="shipperName" name="shipperName" required /></div>
-        <div class="form-group"><label for="shipperAddress">Shipper Address</label><input type="text" id="shipperAddress" name="shipperAddress" required /></div>
-        <div class="form-group"><label for="shipperPhone">Shipper Phone</label><input type="text" id="shipperPhone" name="shipperPhone" required /></div>
-        <div class="form-group"><label for="shipperEmail">Shipper Email</label><input type="email" id="shipperEmail" name="shipperEmail" required /></div>
-        <div class="form-group"><label for="receiverName">Receiver Name</label><input type="text" id="receiverName" name="receiverName" required /></div>
-        <div class="form-group"><label for="receiverAddress">Receiver Address</label><input type="text" id="receiverAddress" name="receiverAddress" required /></div>
-        <div class="form-group"><label for="receiverPhone">Receiver Phone</label><input type="text" id="receiverPhone" name="receiverPhone" required /></div>
-        <div class="form-group"><label for="receiverEmail">Receiver Email</label><input type="email" id="receiverEmail" name="receiverEmail" required /></div>
+        <div class="form-group"><label>Tracking Number</label><input type="text" id="trackingNumber" name="TrackingNumber" required /></div>
+        <div class="form-group"><label>Status</label><input type="text" id="status" name="Status" required /></div>
+        <div class="form-group"><label>Mode</label><input type="text" id="mode" name="Mode" required /></div>
+        <div class="form-group"><label>Product</label><input type="text" id="product" name="Product" required /></div>
+        <div class="form-group"><label>Quantity</label><input type="number" id="quantity" name="Quantity" required /></div>
+        <div class="form-group"><label>Payment</label><input type="text" id="payment" name="Payment" required /></div>
+        <div class="form-group"><label>Total Freight</label><input type="text" id="totalFreight" name="TotalFreight" required /></div>
+        <div class="form-group"><label>Expected Delivery Date</label><input type="date" id="expectedDelivery" name="EstimatedDeliveryDate" required /></div>
+        <div class="form-group"><label>Pick-Up Date</label><input type="date" id="pickDate" name="ShippedDate" required /></div>
+        <div class="form-group"><label>Pick-Up Time</label><input type="text" id="pickUpTime" name="PickUpTime" required /></div>
+        <div class="form-group"><label>Shipper Name</label><input type="text" id="shipperName" name="ShipperName" required /></div>
+        <div class="form-group"><label>Shipper Address</label><input type="text" id="shipperAddress" name="ShipperAddress" required /></div>
+        <div class="form-group"><label>Shipper Phone</label><input type="text" id="shipperPhone" name="ShipperPhone" required /></div>
+        <div class="form-group"><label>Shipper Email</label><input type="email" id="shipperEmail" name="ShipperEmail" required /></div>
+        <div class="form-group"><label>Receiver Name</label><input type="text" id="receiverName" name="ReceiverName" required /></div>
+        <div class="form-group"><label>Receiver Address</label><input type="text" id="receiverAddress" name="ReceiverAddress" required /></div>
+        <div class="form-group"><label>Receiver Phone</label><input type="text" id="receiverPhone" name="ReceiverPhone" required /></div>
+        <div class="form-group"><label>Receiver Email</label><input type="email" id="receiverEmail" name="ReceiverEmail" required /></div>
         <button type="submit">Save Shipment Data</button>
       </form>
     </div>
@@ -230,7 +230,7 @@ footer {
   </footer>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbxDKwV5eMh7kZUs6WkQ2HRfAqgv2YwZ8eo3lSka76CFJlQdfSkxQh2R99o2E-SasiI/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyH4LsG7tTgQGnl2AWuzswDLllmtOjILnO0WWvsPVqn9fM56Z4QuzsVKGI_zCW2vdA/exec";
 
     document.getElementById('searchButton').addEventListener('click', async function () {
       const trackingNumber = document.getElementById('searchTracking').value;
@@ -244,25 +244,25 @@ footer {
         const data = await response.json();
 
         if (data.success) {
-          const shipment = data.shipment;
-          document.getElementById('trackingNumber').value = shipment.trackingNumber;
-          document.getElementById('status').value = shipment.status;
-          document.getElementById('mode').value = shipment.mode;
-          document.getElementById('product').value = shipment.product;
-          document.getElementById('quantity').value = shipment.quantity;
-          document.getElementById('payment').value = shipment.payment;
-          document.getElementById('totalFreight').value = shipment.totalFreight;
-          document.getElementById('expectedDelivery').value = shipment.estimatedDeliveryDate;
-          document.getElementById('pickDate').value = shipment.shippedDate;
-          document.getElementById('pickUpTime').value = shipment.pickUpTime;
-          document.getElementById('shipperName').value = shipment.shipperName;
-          document.getElementById('shipperAddress').value = shipment.shipperAddress;
-          document.getElementById('shipperPhone').value = shipment.shipperPhone;
-          document.getElementById('shipperEmail').value = shipment.shipperEmail;
-          document.getElementById('receiverName').value = shipment.receiverName;
-          document.getElementById('receiverAddress').value = shipment.receiverAddress;
-          document.getElementById('receiverPhone').value = shipment.receiverPhone;
-          document.getElementById('receiverEmail').value = shipment.receiverEmail;
+          const s = data.shipment;
+          document.getElementById('trackingNumber').value = s.TrackingNumber;
+          document.getElementById('status').value = s.Status;
+          document.getElementById('mode').value = s.Mode;
+          document.getElementById('product').value = s.Product;
+          document.getElementById('quantity').value = s.Quantity;
+          document.getElementById('payment').value = s.Payment;
+          document.getElementById('totalFreight').value = s.TotalFreight;
+          document.getElementById('expectedDelivery').value = s.EstimatedDeliveryDate;
+          document.getElementById('pickDate').value = s.ShippedDate;
+          document.getElementById('pickUpTime').value = s.PickUpTime;
+          document.getElementById('shipperName').value = s.ShipperName;
+          document.getElementById('shipperAddress').value = s.ShipperAddress;
+          document.getElementById('shipperPhone').value = s.ShipperPhone;
+          document.getElementById('shipperEmail').value = s.ShipperEmail;
+          document.getElementById('receiverName').value = s.ReceiverName;
+          document.getElementById('receiverAddress').value = s.ReceiverAddress;
+          document.getElementById('receiverPhone').value = s.ReceiverPhone;
+          document.getElementById('receiverEmail').value = s.ReceiverEmail;
         } else {
           alert("Tracking number not found.");
         }
@@ -277,9 +277,7 @@ footer {
       const formData = new FormData(this);
       const data = {};
       formData.forEach((value, key) => {
-        if (key === "expectedDelivery") data["estimatedDeliveryDate"] = value;
-        else if (key === "pickDate") data["shippedDate"] = value;
-        else data[key] = value;
+        data[key] = value;
       });
 
       data.log = [];
