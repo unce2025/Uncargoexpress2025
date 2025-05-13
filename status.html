@@ -355,6 +355,15 @@
           document.getElementById('receiverAddress').textContent = data.receiverAddress || '';
           document.getElementById('receiverEmail').textContent = data.receiverEmail || '';
           document.getElementById('receiverPhone').textContent = data.receiverPhone || '';
+          document.getElementById('estimatedDeliveryDate').textContent = data.estimatedDeliveryDate || '';
+document.getElementById('shippedDate').textContent = data.shippedDate || '';
+document.getElementById('pickupTime').textContent = data.pickUpTime || '';
+document.getElementById('departureTime').textContent = data.departure || '';
+document.getElementById('mode').textContent = data.mode || '';
+document.getElementById('product').textContent = data.product || '';
+document.getElementById('quantity').textContent = data.quantity || '';
+document.getElementById('payment').textContent = data.payment || '';
+document.getElementById('totalFreight').textContent = data.totalFreight || '';
 
           // Timeline
           const timeline = document.querySelector('.timeline');
@@ -394,15 +403,7 @@
 
       fetchShipmentData();
     });
-document.getElementById('estimatedDeliveryDate').textContent = data.estimatedDeliveryDate || '';
-document.getElementById('shippedDate').textContent = data.shippedDate || '';
-document.getElementById('pickupTime').textContent = data.pickUpTime || '';
-document.getElementById('departureTime').textContent = data.departure || '';
-document.getElementById('mode').textContent = data.mode || '';
-document.getElementById('product').textContent = data.product || '';
-document.getElementById('quantity').textContent = data.quantity || '';
-document.getElementById('payment').textContent = data.payment || '';
-document.getElementById('totalFreight').textContent = data.totalFreight || '';
+
 
   </script>
 </body>
