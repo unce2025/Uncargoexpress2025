@@ -1,27 +1,21 @@
 async function getTracking(trackingNumber) {
+  if (!trackingNumber || trackingNumber.trim() === "") {
+    alert("Please enter a valid tracking number.");
+    return;
+  }
+
   try {
-    const response = await fetch(`https://script.google.com/macros/s/AKfycbwB9vHCf1xFtusl-uJ7xb6lXvmMpn0QKLXBL3BqUh5PwFQ14Rc_tKD07nkCsuM9B2I/exec?tracking=${trackingNumber}`);
+    const url = `https://script.google.com/macros/s/AKfycbydL4HSiIZ-xaC5x3iPiMzvslPS7LGOfSMMrmO8EXfBSTW_ZkM-aRl0lPjQT1C84r4/exec?tracking=${encodeURIComponent(trackingNumber.trim())}`;
+    const response = await fetch(url);
     const result = await response.json();
 
     if (result.success) {
-      console.log(result.shipment);
-      displayShipment(result.shipment);
+      displayShipment(result.shipment); // You must define this function in your page
     } else {
-      alert('Tracking number not found.');
+      alert("Tracking number not found.");
     }
   } catch (error) {
-    console.error(error);
-    alert('Error retrieving tracking info.');
+    console.error("Error fetching tracking info:", error);
+    alert("An error occurred while retrieving tracking information.");
   }
-}
-
-// Sample function — customize this for your page
-function displayShipment(shipment) {
-  document.getElementById('status').textContent = shipment.status;
-  document.getElementById('shipperName').textContent = shipment.shipperName;
-  document.getElementById('receiverName').textContent = shipment.receiverName;
-  document.getElementById('estimatedDeliveryDate').textContent = shipment.estimatedDeliveryDate;
-  document.getElementById('shippedDate').textContent = shipment.shippedDate;
-  document.getElementById('pickUpTime').textContent = shipment.pickUpTime;
-  // Add other fields as needed
 }
