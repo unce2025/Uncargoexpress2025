@@ -214,7 +214,7 @@
   </footer>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbz8okv_GWquFqm6bUwFNIEKuIB66psJMT3alNiYJ_O_CX8JQhKXm5u_4CJqHBDrDrQ/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbw18rP-lR8Ivcy5Jeno6m6UV6tir-U8ng3QrGJvb8wpOOaYPA-vi6BWKEM_ol-HmSM/exec";
 
     document.getElementById('searchButton').addEventListener('click', async function () {
       const trackingNumber = document.getElementById('searchTracking').value;
@@ -222,7 +222,7 @@
         alert("Please enter a tracking number to search.");
         return;
       }
-
+  console.log(trackingNumber);  
       const response = await fetch(`${scriptURL}?tracking=${trackingNumber}`);
       const data = await response.json();
 
