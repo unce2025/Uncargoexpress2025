@@ -6,6 +6,7 @@
   <title>Admin Panel - Shipment Management</title>
   <link rel="stylesheet" href="admin.css" />
   <style>
+    /* Your existing styling here (unchanged) */
     * {
       margin: 0;
       padding: 0;
@@ -222,32 +223,36 @@
         alert("Please enter a tracking number to search.");
         return;
       }
-  console.log(trackingNumber);  
-      const response = await fetch(`${scriptURL}?tracking=${trackingNumber}`);
-      const data = await response.json();
 
-      if (data.success) {
-        const shipment = data.shipment;
-        document.getElementById('trackingNumber').value = shipment.trackingNumber;
-        document.getElementById('status').value = shipment.status;
-        document.getElementById('mode').value = shipment.mode;
-        document.getElementById('product').value = shipment.product;
-        document.getElementById('quantity').value = shipment.quantity;
-        document.getElementById('payment').value = shipment.payment;
-        document.getElementById('totalFreight').value = shipment.totalFreight;
-        document.getElementById('expectedDelivery').value = shipment.estimatedDeliveryDate;
-        document.getElementById('pickDate').value = shipment.shippedDate;
-        document.getElementById('pickUpTime').value = shipment.pickUpTime;
-        document.getElementById('shipperName').value = shipment.shipperName;
-        document.getElementById('shipperAddress').value = shipment.shipperAddress;
-        document.getElementById('shipperPhone').value = shipment.shipperPhone;
-        document.getElementById('shipperEmail').value = shipment.shipperEmail;
-        document.getElementById('receiverName').value = shipment.receiverName;
-        document.getElementById('receiverAddress').value = shipment.receiverAddress;
-        document.getElementById('receiverPhone').value = shipment.receiverPhone;
-        document.getElementById('receiverEmail').value = shipment.receiverEmail;
-      } else {
-        alert("Tracking number not found.");
+      try {
+        const response = await fetch(`${scriptURL}?tracking=${trackingNumber}`);
+        const data = await response.json();
+
+        if (data.success) {
+          const shipment = data.shipment;
+          document.getElementById('trackingNumber').value = shipment.trackingNumber;
+          document.getElementById('status').value = shipment.status;
+          document.getElementById('mode').value = shipment.mode;
+          document.getElementById('product').value = shipment.product;
+          document.getElementById('quantity').value = shipment.quantity;
+          document.getElementById('payment').value = shipment.payment;
+          document.getElementById('totalFreight').value = shipment.totalFreight;
+          document.getElementById('expectedDelivery').value = shipment.estimatedDeliveryDate;
+          document.getElementById('pickDate').value = shipment.shippedDate;
+          document.getElementById('pickUpTime').value = shipment.pickUpTime;
+          document.getElementById('shipperName').value = shipment.shipperName;
+          document.getElementById('shipperAddress').value = shipment.shipperAddress;
+          document.getElementById('shipperPhone').value = shipment.shipperPhone;
+          document.getElementById('shipperEmail').value = shipment.shipperEmail;
+          document.getElementById('receiverName').value = shipment.receiverName;
+          document.getElementById('receiverAddress').value = shipment.receiverAddress;
+          document.getElementById('receiverPhone').value = shipment.receiverPhone;
+          document.getElementById('receiverEmail').value = shipment.receiverEmail;
+        } else {
+          alert("Tracking number not found.");
+        }
+      } catch (error) {
+        alert("Error loading shipment: " + error.message);
       }
     });
 
@@ -276,10 +281,10 @@
         if (result.success) {
           alert("Shipment data saved successfully!");
         } else {
-          alert("Failed to save shipment data.");
+          alert("Failed to save shipment data: " + (result.error || "Unknown error"));
         }
       } catch (error) {
-        alert("Error submitting form.");
+        alert("Error submitting form: " + error.message);
       }
     });
   </script>
