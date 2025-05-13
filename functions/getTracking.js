@@ -1,6 +1,6 @@
 async function getTracking(trackingNumber) {
   try {
-    const response = await fetch(`https://script.google.com/macros/s/AKfycbzb7XBZBOgHMraxXI3W8MG95hq7OU8087ns08eyrg0mcpuhGPIt-0lap5AMZXMU_Fs/exec?tracking=${trackingNumber}`);
+    const response = await fetch(`https://script.google.com/macros/s/AKfycbwB9vHCf1xFtusl-uJ7xb6lXvmMpn0QKLXBL3BqUh5PwFQ14Rc_tKD07nkCsuM9B2I/exec?tracking=${trackingNumber}`);
     const result = await response.json();
 
     if (result.success) {
