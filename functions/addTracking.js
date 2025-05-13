@@ -1,23 +1,23 @@
 async function addTracking(data) {
   try {
-    const response = await fetch('https://script.google.com/macros/s/AKfycbwB9vHCf1xFtusl-uJ7xb6lXvmMpn0QKLXBL3BqUh5PwFQ14Rc_tKD07nkCsuM9B2I/exec', {
+    const response = await fetch('https://script.google.com/macros/s/AKfycbydL4HSiIZ-xaC5x3iPiMzvslPS7LGOfSMMrmO8EXfBSTW_ZkM-aRl0lPjQT1C84r4/exec', {
       method: 'POST',
-      body: JSON.stringify(data), // Send the actual data passed to the function
       headers: {
         'Content-Type': 'application/json'
-      }
+      },
+      body: JSON.stringify(data)
     });
 
-    const result = await response.json(); // Parse the response as JSON
-    console.log(result);
+    const result = await response.json();
+    console.log("Response from server:", result);
 
     if (result.success) {
-      alert('Shipment saved successfully!');
+      alert("Shipment saved successfully!");
     } else {
-      alert('Error: ' + result.message);
+      alert("Failed to save shipment: " + (result.message || "Unknown error"));
     }
   } catch (error) {
-    console.error(error);
-    alert('An error occurred while saving shipment.');
+    console.error("Error submitting tracking data:", error);
+    alert("An error occurred while saving the shipment.");
   }
 }
