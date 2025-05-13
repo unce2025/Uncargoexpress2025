@@ -1,6 +1,6 @@
 async function addTracking(data) {
   try {
-    const response = await fetch('https://script.google.com/macros/s/AKfycbydL4HSiIZ-xaC5x3iPiMzvslPS7LGOfSMMrmO8EXfBSTW_ZkM-aRl0lPjQT1C84r4/exec', {
+    const response = await fetch('https://script.google.com/macros/s/AKfycbz2IUSg1XEhVcb6aQYPcFyUBynOkt9G70Lk6b9ZHzv_wa1C3MJ9u3gVNn03rXSJ0YE/exec', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
