@@ -793,34 +793,7 @@
         });
       });
 
-      const form = document.getElementById('trackingForm');
-      const input = document.getElementById('trackingNumber');
-      const pageLoading = document.getElementById('pageLoading');
-
-      form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const value = input.value.trim();
-        
-        input.classList.remove('error', 'shake');
-        
-        if (value === '') {
-          input.classList.add('error', 'shake');
-          input.placeholder = 'Fill out this field';
-          return;
-        }
-
-        if (value !== 'UN123CE456') {
-          alert('The tracking number entered does not match our records. Kindly verify the number and try again.');
-          input.classList.add('error');
-          input.value = '';
-          return;
-        }
-
-        pageLoading.style.display = 'flex';
-        setTimeout(() => {
-          window.location.href = 'status.html';
-        }, 1500);
-      });
+      
 
       input.addEventListener('input', () => {
         input.classList.remove('error');
@@ -859,6 +832,39 @@ fetch('/.netlify/functions/addTracking', {
   body: JSON.stringify(data)
 });
  </script>
+<script>
+  const form = document.getElementById('trackingForm');
+  const input = document.getElementById('trackingNumber');
+  const pageLoading = document.getElementById('pageLoading');
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const value = input.value.trim();
+
+    input.classList.remove('error', 'shake');
+
+    if (value === '') {
+      input.classList.add('error', 'shake');
+      input.placeholder = 'Fill out this field';
+      return;
+    }
+
+    // Optional: Remove this if you want to allow dynamic tracking numbers
+    if (value !== 'UN123CE456') {
+      alert('The tracking number entered does not match our records. Kindly verify the number and try again.');
+      input.classList.add('error');
+      input.value = '';
+      return;
+    }
+
+    pageLoading.style.display = 'flex';
+
+    // FIXED: Add tracking number to the redirect URL
+    setTimeout(() => {
+      window.location.href = `status.html?tracking=${encodeURIComponent(value)}`;
+    }, 1500);
+  });
+</script>
 
 
 </html>
