@@ -1,50 +1,24 @@
-const fs = require('fs');
-const path = require('path');
-
-const dataFile = path.join(__dirname, 'shipments.json');
-
-exports.handler = async (event) => {
-  if (event.httpMethod !== 'GET') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
-  }
-
-  const tracking = event.queryStringParameters?.tracking;
-
-  if (!tracking) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ success: false, message: "Tracking number is required." }),
-    };
-  }
-
+async function getTracking(trackingNumber) {
   try {
-    if (!fs.existsSync(dataFile)) {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ success: false, message: "Shipment not found." }),
-      };
+    const response = await fetch(`https://script.google.com/macros/s/YOUR_DEPLOYED_SCRIPT_URL/exec?tracking=${trackingNumber}`);
+    const result = await response.json();
+
+    if (result.success) {
+      console.log(result.shipment);
+      displayShipment(result.shipment);
+    } else {
+      alert('Tracking number not found.');
     }
-
-    const shipments = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
-
-    if (!shipments[tracking]) {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ success: false, message: "Shipment not found." }),
-      };
-    }
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        success: true,
-        shipment: shipments[tracking],
-      }),
-    };
   } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ success: false, message: "Error retrieving shipment", error: error.message }),
-    };
+    console.error(error);
+    alert('Error retrieving tracking info.');
   }
-};
+}
+
+// Sample function — customize this for your page
+function displayShipment(shipment) {
+  document.getElementById('status').textContent = shipment.Status;
+  document.getElementById('shipperName').textContent = shipment.ShipperName;
+  document.getElementById('receiverName').textContent = shipment.ReceiverName;
+  // Add other fields as needed
+}
