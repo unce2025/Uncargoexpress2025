@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 
-// Path to the JSON data file
 const dataFile = path.join(__dirname, 'shipments.json');
 
 exports.handler = async (event) => {
@@ -9,22 +8,22 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  const data = JSON.parse(event.body);
-  const trackingNumber = data.tracking;
-
-  if (!trackingNumber) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ message: "Tracking number is required." }),
-    };
-  }
-
   try {
-    // Load existing data or initialize
+    const data = JSON.parse(event.body);
+    const trackingNumber = data.trackingNumber;
+
+    if (!trackingNumber) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: "Tracking number is required." }),
+      };
+    }
+
+    // Load existing data
     let shipments = {};
     if (fs.existsSync(dataFile)) {
-      const content = fs.readFileSync(dataFile);
-      shipments = JSON.parse(content);
+      const fileContent = fs.readFileSync(dataFile, 'utf8');
+      shipments = JSON.parse(fileContent || '{}');
     }
 
     // Save or update the shipment
@@ -35,12 +34,12 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Shipment saved successfully!" }),
+      body: JSON.stringify({ success: true, message: "Shipment saved successfully!" }),
     };
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: "Failed to save shipment", error: error.message }),
+      body: JSON.stringify({ success: false, message: "Failed to save shipment", error: error.message }),
     };
   }
 };
