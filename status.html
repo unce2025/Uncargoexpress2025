@@ -5,6 +5,7 @@
   <title>Shipment Label</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
+    /* --- your entire CSS remains unchanged --- */
     body {
       margin: 0;
       padding: 20px;
@@ -18,7 +19,7 @@
       position: absolute;
       inset: 0;
       background: url('status.jpeg') center center no-repeat;
-      background-size: 400px; /* adjust size */
+      background-size: 400px;
       opacity: 0.08;
       z-index: 0;
     }
@@ -58,7 +59,7 @@
 
     .logo img {
       height: auto;
-      max-width: 250px; /* Optional: control width if needed */
+      max-width: 250px;
     }
 
     .tracking-box {
@@ -168,7 +169,6 @@
       background: #00172e;
     }
 
-    /* Timeline Styles */
     .timeline {
       margin: 30px 0;
       border-left: 3px solid #00253a;
@@ -241,42 +241,39 @@
       <div class="tracking-box">
         <h2>Shipment Tracking</h2>
         <div class="barcode">
-          <img id="barcodeImage" src="https://barcode.tec-it.com/barcode.ashx?data=UN123CE456&code=Code128&imagetype=Gif" alt="Barcode">
+          <img id="barcodeImage" src="" alt="Barcode">
         </div>
       </div>
     </div>
 
-    <!-- Shipper / Receiver -->
+    <!-- Info -->
     <div class="info-background">
       <div class="info-grid">
         <div class="info-column">
           <div class="section-title">Shipper Information</div>
-          <p><strong id="shipperName">Don Charles</strong></p>
-          <p id="shipperAddress">United Kingdom</p>
-          <p id="shipperEmail">dondoncharles404@gmail.com</p>
-          <p id="shipperPhone">09934604219</p>
+          <p><strong id="shipperName"></strong></p>
+          <p id="shipperAddress"></p>
+          <p id="shipperEmail"></p>
+          <p id="shipperPhone"></p>
         </div>
         <div class="info-column">
           <div class="section-title">Receiver Information</div>
-          <p><strong id="receiverName">ELIZABETH D. AQUINO</strong></p>
-          <p id="receiverAddress">PUROK 8 SALVACION, PANABO CITY, DAVAO DEL NORTE 8112</p>
-          <p id="receiverPhone">09934604219</p>
-          <p id="receiverEmail">elizabethaquino0408199@gmail.com</p>
+          <p><strong id="receiverName"></strong></p>
+          <p id="receiverAddress"></p>
+          <p id="receiverPhone"></p>
+          <p id="receiverEmail"></p>
         </div>
       </div>
     </div>
 
-    <!-- Shipment Log Timeline -->
+    <!-- Log -->
     <div class="section-title">Shipment Log</div>
-    <div class="timeline">
-      <!-- Timeline entries will be dynamically inserted here -->
-    </div>
+    <div class="timeline"></div>
 
-    <div class="status-indicator">
-      SHIPMENT STATUS: ON HOLD – Customs clearance is pending. Action is required to avoid further delay.
-    </div>
+    <!-- Status -->
+    <div class="status-indicator">SHIPMENT STATUS: ...</div>
 
-    <!-- Shipment History -->
+    <!-- History -->
     <div class="section-title">Shipment History</div>
     <div class="table-wrapper">
       <table class="shipment-table">
@@ -290,13 +287,11 @@
             <th>Remarks</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Shipment history entries will be dynamically inserted here -->
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
 
-    <!-- Package Info -->
+    <!-- Package -->
     <div class="section-title">Packages</div>
     <div class="table-wrapper">
       <table class="package-table">
@@ -311,12 +306,11 @@
             <th>Weight (kg)</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Package info entries will be dynamically inserted here -->
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
 
+    <!-- Script -->
     <script>
       document.addEventListener('DOMContentLoaded', function () {
         const urlParams = new URLSearchParams(window.location.search);
@@ -329,9 +323,8 @@
 
         const fetchShipmentData = async () => {
           try {
-          const response = await fetch("https://script.google.com/macros/s/AKfycbzE0ijdSqXslHL9SEfpennRELwVnncVGCxxDXYqDs1hFoF2F_gRUF7dn0qWPIBhylA/exec?tracking=UN123CE456");
-    const result = await response.json();
-           
+            const response = await fetch(`https://script.google.com/macros/s/AKfycbzE0ijdSqXslHL9SEfpennRELwVnncVGCxxDXYqDs1hFoF2F_gRUF7dn0qWPIBhylA/exec?tracking=${trackingNumber}`);
+            const result = await response.json();
 
             if (!result.success) {
               alert('Tracking number not found.');
@@ -340,10 +333,8 @@
 
             const data = result.shipment;
 
-            // Update barcode image
             document.getElementById('barcodeImage').src = `https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&imagetype=Gif`;
 
-            // Fill shipper and receiver info
             document.getElementById('shipperName').textContent = data.ShipperName || '';
             document.getElementById('shipperAddress').textContent = data.ShipperAddress || '';
             document.getElementById('shipperEmail').textContent = data.ShipperEmail || '';
@@ -353,51 +344,29 @@
             document.getElementById('receiverEmail').textContent = data.ReceiverEmail || '';
             document.getElementById('receiverPhone').textContent = data.ReceiverPhone || '';
 
-            // Fill shipment log
             const timeline = document.querySelector('.timeline');
             data.log.forEach(entry => {
               const div = document.createElement('div');
               div.classList.add('timeline-entry');
-              div.innerHTML = `
-                <h4>${entry.status} - ${entry.date}, ${entry.time}</h4>
-                <p>${entry.location}</p>
-              `;
+              div.innerHTML = `<h4>${entry.status} - ${entry.date}, ${entry.time}</h4><p>${entry.location}</p>`;
               timeline.appendChild(div);
             });
 
-            // Fill shipment history
             const historyTable = document.querySelector('.shipment-table tbody');
             data.history.forEach(entry => {
               const row = document.createElement('tr');
-              row.innerHTML = `
-                <td>${entry.date}</td>
-                <td>${entry.time}</td>
-                <td>${entry.location}</td>
-                <td>${entry.status}</td>
-                <td>${entry.updatedBy}</td>
-                <td>${entry.remarks}</td>
-              `;
+              row.innerHTML = `<td>${entry.date}</td><td>${entry.time}</td><td>${entry.location}</td><td>${entry.status}</td><td>${entry.updatedBy}</td><td>${entry.remarks}</td>`;
               historyTable.appendChild(row);
             });
 
-            // Fill packages
             const packageTable = document.querySelector('.package-table tbody');
             data.packages.forEach(entry => {
               const row = document.createElement('tr');
-              row.innerHTML = `
-                <td>${entry.qty}</td>
-                <td>${entry.pieceType}</td>
-                <td>${entry.description}</td>
-                <td>${entry.length}</td>
-                <td>${entry.width}</td>
-                <td>${entry.height}</td>
-                <td>${entry.weight}</td>
-              `;
+              row.innerHTML = `<td>${entry.qty}</td><td>${entry.pieceType}</td><td>${entry.description}</td><td>${entry.length}</td><td>${entry.width}</td><td>${entry.height}</td><td>${entry.weight}</td>`;
               packageTable.appendChild(row);
             });
 
-            // Fill status
-            document.querySelector('.status-indicator').textContent = `SHIPMENT STATUS: ${data.Status} – ${data.statusMessage}`;
+            document.querySelector('.status-indicator').textContent = `SHIPMENT STATUS: ${data.Status} – ${data.statusMessage || ''}`;
           } catch (error) {
             console.error('Error fetching shipment data:', error);
           }
@@ -407,7 +376,7 @@
       });
     </script>
 
-    <a href="#" class="back-btn">Back to Home</a>
+    <a href="index.html" class="back-btn">Back to Home</a>
   </div>
 </body>
 </html>
