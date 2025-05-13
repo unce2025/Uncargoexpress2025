@@ -335,14 +335,16 @@
 
         document.getElementById('barcodeImage').src = `https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&imagetype=Gif`;
 
-        document.getElementById('shipperName').textContent = data.ShipperName || '';
-        document.getElementById('shipperAddress').textContent = data.ShipperAddress || '';
-        document.getElementById('shipperEmail').textContent = data.ShipperEmail || '';
-        document.getElementById('shipperPhone').textContent = data.ShipperPhone || '';
-        document.getElementById('receiverName').textContent = data.ReceiverName || '';
-        document.getElementById('receiverAddress').textContent = data.ReceiverAddress || '';
-        document.getElementById('receiverEmail').textContent = data.ReceiverEmail || '';
-        document.getElementById('receiverPhone').textContent = data.ReceiverPhone || '';
+       document.getElementById('shipperName').textContent = data.shipperName || '';
+document.getElementById('shipperAddress').textContent = data.shipperAddress || '';
+document.getElementById('shipperEmail').textContent = data.shipperEmail || '';
+document.getElementById('shipperPhone').textContent = data.shipperPhone || '';
+document.getElementById('receiverName').textContent = data.receiverName || '';
+document.getElementById('receiverAddress').textContent = data.receiverAddress || '';
+document.getElementById('receiverEmail').textContent = data.receiverEmail || '';
+document.getElementById('receiverPhone').textContent = data.receiverPhone || '';
+
+
 
         const timeline = document.querySelector('.timeline');
         timeline.innerHTML = '';
@@ -369,7 +371,8 @@
           packageTable.appendChild(row);
         });
 
-        document.querySelector('.status-indicator').textContent = `SHIPMENT STATUS: ${data.Status} – ${data.statusMessage || ''}`;
+        document.querySelector('.status-indicator').textContent = `SHIPMENT STATUS: ${data.status}`;
+
       } catch (error) {
         console.error('Error fetching shipment data:', error);
         alert('Failed to fetch tracking data. Please try again.');
