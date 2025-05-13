@@ -1,6 +1,6 @@
 async function getTracking(trackingNumber) {
   try {
-    const response = await fetch(`https://script.google.com/macros/s/YOUR_DEPLOYED_SCRIPT_URL/exec?tracking=${trackingNumber}`);
+    const response = await fetch(`https://script.google.com/macros/s/AKfycbzE0ijdSqXslHL9SEfpennRELwVnncVGCxxDXYqDs1hFoF2F_gRUF7dn0qWPIBhylA/exec?tracking=${trackingNumber}`);
     const result = await response.json();
 
     if (result.success) {
@@ -17,8 +17,11 @@ async function getTracking(trackingNumber) {
 
 // Sample function — customize this for your page
 function displayShipment(shipment) {
-  document.getElementById('status').textContent = shipment.Status;
-  document.getElementById('shipperName').textContent = shipment.ShipperName;
-  document.getElementById('receiverName').textContent = shipment.ReceiverName;
+  document.getElementById('status').textContent = shipment.status;
+  document.getElementById('shipperName').textContent = shipment.shipperName;
+  document.getElementById('receiverName').textContent = shipment.receiverName;
+  document.getElementById('estimatedDeliveryDate').textContent = shipment.estimatedDeliveryDate;
+  document.getElementById('shippedDate').textContent = shipment.shippedDate;
+  document.getElementById('pickUpTime').textContent = shipment.pickUpTime;
   // Add other fields as needed
 }
