@@ -1,4 +1,4 @@
-`<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -47,14 +47,14 @@
 
     <form id="searchForm">
       <label for="trackingSearch">Enter Tracking Number:</label>
-      <input type="text" id="TrackingNumber" name="trackingSearch" required />
+      <input type="text" id="trackingSearch" name="trackingSearch" required />
       <button type="submit" id="searchBtn">Search</button>
     </form>
 
     <form id="shipmentForm">
       <h2>Edit Shipment</h2>
       <label>Tracking Number:</label>
-      <input type="text" id="TrackingNumber" name="trackingNumber" required />
+      <input type="text" id="shipmentTrackingNumber" name="trackingNumber" required />
 
       <label>Status:</label>
       <input type="text" id="Status" name="status" required />
@@ -166,7 +166,7 @@
         const shipment = result.shipment;
 
         // Format dates before displaying
-        document.getElementById('TrackingNumber').value = shipment.trackingNumber || '';
+        document.getElementById('shipmentTrackingNumber').value = shipment.trackingNumber || '';
         document.getElementById('Status').value = shipment.status || '';
         document.getElementById('ShipperName').value = shipment.shipperName || '';
         document.getElementById('ShipperPhone').value = shipment.shipperPhone || '';
@@ -202,47 +202,4 @@
   // Adding event listeners when the page is loaded
   document.addEventListener('DOMContentLoaded', () => {
     // Submit tracking data
-    document.getElementById('submitBtn').addEventListener('click', (e) => {
-      e.preventDefault();
-      const formData = {
-        trackingNumber: document.getElementById('TrackingNumber').value,
-        status: document.getElementById('Status').value,
-        shipperName: document.getElementById('ShipperName').value,
-        shipperPhone: document.getElementById('ShipperPhone').value,
-        shipperAddress: document.getElementById('ShipperAddress').value,
-        shipperEmail: document.getElementById('ShipperEmail').value,
-        receiverName: document.getElementById('ReceiverName').value,
-        receiverPhone: document.getElementById('ReceiverPhone').value,
-        receiverAddress: document.getElementById('ReceiverAddress').value,
-        receiverEmail: document.getElementById('ReceiverEmail').value,
-        estimatedDeliveryDate: document.getElementById('EstimatedDeliveryDate').value,
-        shippedDate: document.getElementById('ShippedDate').value,
-        pickUpTime: document.getElementById('PickUpTime').value,
-        departure: document.getElementById('Departure').value,
-        mode: document.getElementById('Mode').value,
-        product: document.getElementById('Product').value,
-        quantity: document.getElementById('Quantity').value,
-        payment: document.getElementById('Payment').value,
-        totalFreight: document.getElementById('TotalFreight').value,
-        log: JSON.parse(document.getElementById('log').value || '[]'),
-        history: JSON.parse(document.getElementById('history').value || '[]')
-      };
-
-      addTracking(formData);
-    });
-
-    // Search for tracking info by tracking number
-    document.getElementById('searchBtn').addEventListener('click', (e) => {
-      e.preventDefault();
-      const trackingNumber = document.getElementById('TrackingNumber').value.trim();
-      if (trackingNumber) {
-        loadTracking(trackingNumber);
-      } else {
-        alert("Please enter a tracking number.");
-      }
-    });
-  });
-</script>
-
-</body>
-</html>
+    document.getElementById('submitBtn').addEventListener('
