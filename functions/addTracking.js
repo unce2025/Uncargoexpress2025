@@ -1,5 +1,3 @@
-// addtracking.js
-
 async function addTracking(data) {
   try {
     const response = await fetch('https://script.google.com/macros/s/AKfycbyvPVPtDNm1TMin6iBDMrjyzjnKs_FdtePxSNcfEWMGXAILYoEP-ws0pouaBvRXsiE/exec', {
