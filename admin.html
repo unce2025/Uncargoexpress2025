@@ -120,7 +120,7 @@
     </form>
   </div>
 
- <script>
+<script>
   async function addTracking(data) {
     try {
       const response = await fetch('https://script.google.com/macros/s/AKfycbyvPVPtDNm1TMin6iBDMrjyzjnKs_FdtePxSNcfEWMGXAILYoEP-ws0pouaBvRXsiE/exec', {
@@ -142,6 +142,43 @@
     } catch (error) {
       console.error("Error submitting tracking data:", error);
       alert("An error occurred while saving the shipment.");
+    }
+  }
+
+  async function loadTracking(trackingNumber) {
+    try {
+      const response = await fetch(`https://script.google.com/macros/s/AKfycbyvPVPtDNm1TMin6iBDMrjyzjnKs_FdtePxSNcfEWMGXAILYoEP-ws0pouaBvRXsiE/exec?tracking=${trackingNumber}`);
+      const result = await response.json();
+
+      if (result.success && result.shipment) {
+        const shipment = result.shipment;
+        document.getElementById('TrackingNumber').value = shipment.trackingNumber || '';
+        document.getElementById('ShipperName').value = shipment.shipperName || '';
+        document.getElementById('ShipperPhone').value = shipment.shipperPhone || '';
+        document.getElementById('ShipperAddress').value = shipment.shipperAddress || '';
+        document.getElementById('ShipperEmail').value = shipment.shipperEmail || '';
+        document.getElementById('ReceiverName').value = shipment.receiverName || '';
+        document.getElementById('ReceiverPhone').value = shipment.receiverPhone || '';
+        document.getElementById('ReceiverAddress').value = shipment.receiverAddress || '';
+        document.getElementById('ReceiverEmail').value = shipment.receiverEmail || '';
+        document.getElementById('EstimatedDeliveryDate').value = shipment.estimatedDeliveryDate || '';
+        document.getElementById('ShippedDate').value = shipment.shippedDate || '';
+        document.getElementById('PickUpTime').value = shipment.pickUpTime || '';
+        document.getElementById('Departure').value = shipment.departure || '';
+        document.getElementById('Mode').value = shipment.mode || '';
+        document.getElementById('Product').value = shipment.product || '';
+        document.getElementById('Quantity').value = shipment.quantity || '';
+        document.getElementById('Payment').value = shipment.payment || '';
+        document.getElementById('TotalFreight').value = shipment.totalFreight || '';
+        document.getElementById('log').value = JSON.stringify(shipment.log || [], null, 2);
+        document.getElementById('history').value = JSON.stringify(shipment.history || [], null, 2);
+        document.getElementById('Status').value = shipment.status || '';
+      } else {
+        alert("Tracking number not found.");
+      }
+    } catch (error) {
+      console.error("Error loading tracking data:", error);
+      alert("An error occurred while fetching the tracking data.");
     }
   }
 
@@ -172,6 +209,15 @@
       };
 
       addTracking(formData);
+    });
+
+    document.getElementById('searchBtn').addEventListener('click', () => {
+      const trackingNumber = document.getElementById('TrackingNumber').value.trim();
+      if (trackingNumber) {
+        loadTracking(trackingNumber);
+      } else {
+        alert("Please enter a tracking number.");
+      }
     });
   });
 </script>
