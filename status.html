@@ -322,7 +322,7 @@
     <a href="index.html" class="back-btn">Back to Home</a>
   </div>
 
-   <script>
+  <script>
   document.addEventListener('DOMContentLoaded', function () {
     const urlParams = new URLSearchParams(window.location.search);
     const trackingNumber = urlParams.get('tracking');
@@ -332,27 +332,46 @@
       return;
     }
 
-   const formatTime = (dateTimeStr) => {
-  if (!dateTimeStr) return '';
-  const date = new Date(dateTimeStr);
-  if (isNaN(date)) return dateTimeStr; // fallback if invalid
-  return date.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-};
+    const formatDate = (dateStr) => {
+      const d = new Date(dateStr);
+      if (isNaN(d)) return dateStr;
+      return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    };
 
+    const formatTime = (value) => {
+      if (!value) return '';
 
-    const formatTime = (timeStr) => {
-  if (!timeStr) return '';
-  const t = new Date(`1970-01-01T${timeStr}`);
-  if (isNaN(t)) return timeStr; // Fallback to raw if still invalid
-  return t.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-};
+      // Case 1: Excel numeric time (e.g., 0.05417)
+      if (!isNaN(value) && typeof value === 'number') {
+        const seconds = Math.round(value * 24 * 60 * 60);
+        const date = new Date(0);
+        date.setSeconds(seconds);
+        return date.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+      }
 
+      // Case 2: ISO datetime string (e.g., 1899-12-30T01:18:00.000Z)
+      const date = new Date(value);
+      if (!isNaN(date)) {
+        return date.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+      }
+
+      // Case 3: plain time string (e.g., 01:18)
+      const tryTime = new Date(`1970-01-01T${value}`);
+      if (!isNaN(tryTime)) {
+        return tryTime.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+      }
+
+      return value; // fallback
+    };
 
     const fetchShipmentData = async () => {
       const loading = document.getElementById('loadingMessage');
@@ -372,16 +391,17 @@
         const data = result.shipment;
         if (loading) loading.style.display = 'none';
 
-        // Update barcode
+        // Barcode
         const barcodeImage = document.getElementById('barcodeImage');
         if (barcodeImage) barcodeImage.src = `https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&imagetype=Gif`;
 
-        // Fill in details
+        // Helper
         const setText = (id, value) => {
           const el = document.getElementById(id);
           if (el) el.textContent = value || '';
         };
 
+        // Shipper & Receiver
         setText('shipperName', data.shipperName);
         setText('shipperAddress', data.shipperAddress);
         setText('shipperEmail', data.shipperEmail);
@@ -392,11 +412,13 @@
         setText('receiverEmail', data.receiverEmail);
         setText('receiverPhone', data.receiverPhone);
 
+        // Dates and Times
         setText('estimatedDeliveryDate', formatDate(data.estimatedDeliveryDate));
         setText('shippedDate', formatDate(data.shippedDate));
         setText('pickupTime', formatTime(data.pickUpTime));
         setText('departureTime', formatTime(data.departure));
 
+        // Shipment Details
         setText('mode', data.mode);
         setText('product', data.product);
         setText('quantity', data.quantity);
@@ -407,7 +429,7 @@
         const statusIndicator = document.querySelector('.status-indicator');
         if (statusIndicator) statusIndicator.textContent = `SHIPMENT STATUS: ${data.status}`;
 
-        // Lock status
+        // Lock
         const lockStatus = document.getElementById('lockStatus');
         if (lockStatus) {
           if (data.locked === true || data.status?.toLowerCase() === 'delivered') {
@@ -430,7 +452,7 @@
           });
         }
 
-        // History Table
+        // History
         const historyTable = document.querySelector('.shipment-table tbody');
         if (historyTable) {
           historyTable.innerHTML = '';
@@ -458,6 +480,7 @@
     fetchShipmentData();
   });
 </script>
+
 
 
 </body>
