@@ -361,9 +361,10 @@
         const data = result.shipment;
         document.getElementById('loadingMessage').style.display = 'none';
 
-        // ✅ Basic shipment info
+        // ✅ Barcode
         document.getElementById('barcodeImage').src = `https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&imagetype=Gif`;
 
+        // ✅ Shipper & Receiver
         document.getElementById('shipperName').textContent = data.shipperName || '';
         document.getElementById('shipperAddress').textContent = data.shipperAddress || '';
         document.getElementById('shipperEmail').textContent = data.shipperEmail || '';
@@ -372,21 +373,32 @@
         document.getElementById('receiverAddress').textContent = data.receiverAddress || '';
         document.getElementById('receiverEmail').textContent = data.receiverEmail || '';
         document.getElementById('receiverPhone').textContent = data.receiverPhone || '';
-        
-        // ✅ Format and display dates/times
+
+        // ✅ Dates & Times
         document.getElementById('estimatedDeliveryDate').textContent = formatDate(data.estimatedDeliveryDate) || '';
         document.getElementById('shippedDate').textContent = formatDate(data.shippedDate) || '';
         document.getElementById('pickupTime').textContent = formatTime(data.pickUpTime) || '';
         document.getElementById('departureTime').textContent = formatTime(data.departure) || '';
-        
+
+        // ✅ Shipment Details
         document.getElementById('mode').textContent = data.mode || '';
         document.getElementById('product').textContent = data.product || '';
         document.getElementById('quantity').textContent = data.quantity || '';
         document.getElementById('payment').textContent = data.payment || '';
         document.getElementById('totalFreight').textContent = `$${data.totalFreight || ''}`;
 
-        // ✅ Status
+        // ✅ Shipment Status
         document.querySelector('.status-indicator').textContent = `SHIPMENT STATUS: ${data.status}`;
+
+        // ✅ Locking Message
+        if (data.locked === true || data.status?.toLowerCase() === 'delivered') {
+          document.getElementById('lockStatus').textContent = '🔒 This shipment is locked and cannot be modified.';
+          
+          // Optional: Disable form elements if any (admin-style)
+          document.querySelectorAll('input, textarea, select, button').forEach(el => el.disabled = true);
+        } else {
+          document.getElementById('lockStatus').textContent = '';
+        }
 
         // ✅ Timeline
         const timeline = document.querySelector('.timeline');
@@ -398,7 +410,7 @@
           timeline.appendChild(div);
         });
 
-        // ✅ History table
+        // ✅ History Table
         const historyTable = document.querySelector('.shipment-table tbody');
         historyTable.innerHTML = '';
         (data.history || []).forEach(entry => {
@@ -414,7 +426,7 @@
           historyTable.appendChild(row);
         });
 
-        // ✅ Packages (optional)
+        // ✅ Package Table
         const packageTable = document.querySelector('.package-table tbody');
         packageTable.innerHTML = '';
         (data.packages || []).forEach(entry => {
@@ -441,6 +453,7 @@
     fetchShipmentData();
   });
 </script>
+
 
 
 </body>
