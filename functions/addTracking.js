@@ -1,5 +1,5 @@
 async function addTracking(data) {
-  try {
+  try { 
     const response = await fetch('https://script.google.com/macros/s/AKfycbygtvLShQWiCzAU0L1Jh9vgxcwBcZWuzE1f8gMSPOS6gzPNJ9DIFszL2CvseZ_Ekdg/exec', {
       method: 'POST',
       headers: {
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
       totalFreight: document.getElementById('TotalFreight').value,
       log: JSON.parse(document.getElementById('log').value || '[]'),
       history: JSON.parse(document.getElementById('history').value || '[]'),
-      packages: JSON.parse(document.getElementById('packages').value || '[]'),
+     
       status: document.getElementById('Status').value
     };
 
