@@ -322,7 +322,7 @@
     <a href="index.html" class="back-btn">Back to Home</a>
   </div>
 
-  <script>
+ <script>
   document.addEventListener('DOMContentLoaded', function () {
     const urlParams = new URLSearchParams(window.location.search);
     const trackingNumber = urlParams.get('tracking');
@@ -341,36 +341,29 @@
     const formatTime = (value) => {
       if (!value) return '';
 
-      // Case 1: Excel numeric time (e.g., 0.05417)
+      // Case 1: Excel numeric time (e.g., 0.375 for 9:00 AM)
       if (!isNaN(value) && typeof value === 'number') {
-        const seconds = Math.round(value * 24 * 60 * 60);
-        const date = new Date(0);
-        date.setSeconds(seconds);
-        return date.toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-        });
+        const totalMinutes = Math.round(value * 24 * 60);
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const formattedHour = hours % 12 || 12;
+        return `${String(formattedHour).padStart(2, '0')}:${String(minutes).padStart(2, '0')} ${ampm}`;
       }
 
-      // Case 2: ISO datetime string (e.g., 1899-12-30T01:18:00.000Z)
-      const date = new Date(value);
-      if (!isNaN(date)) {
-        return date.toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-        });
+      // Case 2: Plain time string (e.g., "09:00", "9:00", "13:45")
+      if (typeof value === 'string' && value.includes(':')) {
+        const parts = value.split(':');
+        if (parts.length >= 2) {
+          let hours = parseInt(parts[0], 10);
+          const minutes = parseInt(parts[1], 10);
+          const ampm = hours >= 12 ? 'PM' : 'AM';
+          hours = hours % 12 || 12;
+          return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')} ${ampm}`;
+        }
       }
 
-      // Case 3: plain time string (e.g., 01:18)
-      const tryTime = new Date(`1970-01-01T${value}`);
-      if (!isNaN(tryTime)) {
-        return tryTime.toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-        });
-      }
-
-      return value; // fallback
+      return value; // fallback if unrecognized
     };
 
     const fetchShipmentData = async () => {
@@ -447,7 +440,7 @@
           (data.log || []).forEach(entry => {
             const div = document.createElement('div');
             div.classList.add('timeline-entry');
-            div.innerHTML = `<h4>${entry.status} - ${entry.date}, ${entry.time}</h4><p>${entry.location}</p>`;
+            div.innerHTML = `<h4>${entry.status} - ${entry.date}, ${formatTime(entry.time)}</h4><p>${entry.location}</p>`;
             timeline.appendChild(div);
           });
         }
