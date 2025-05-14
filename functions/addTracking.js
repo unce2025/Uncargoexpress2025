@@ -1,27 +1,3 @@
-async function addTracking(data) {
-  try {
-    const response = await fetch('https://script.google.com/macros/s/AKfycbyF_0D4wOY3TwtkLYaD50DcpEZjv5JlJJ4IWMEvRYTOeO6GtIK18JfyBt0Ofd5Q4mQ/exec', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    });
-
-    const result = await response.json();
-    console.log("Response from server:", result);
-
-    if (result.success) {
-      alert("Shipment saved successfully!");
-    } else {
-      alert("Failed to save shipment: " + (result.message || "Unknown error"));
-    }
-  } catch (error) {
-    console.error("Error submitting tracking data:", error);
-    alert("An error occurred while saving the shipment:\n" + error.message);
-  }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('submitBtn').addEventListener('click', () => {
     let logData = [];
@@ -47,6 +23,22 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    // Required fields validation
+    const requiredFields = [
+      'TrackingNumber', 'Status', 'ShipperName', 'ReceiverName', 
+      'EstimatedDeliveryDate', 'ShippedDate', 'PickUpTime', 'Departure', 
+      'Mode', 'Product', 'Quantity', 'Payment', 'TotalFreight'
+    ];
+
+    // Check if any required field is empty
+    for (let field of requiredFields) {
+      if (!document.getElementById(field).value.trim()) {
+        alert(`Please fill in the ${field} field.`);
+        return;
+      }
+    }
+
+    // Gather the form data
     const formData = {
       trackingNumber: document.getElementById('TrackingNumber').value,
       status: document.getElementById('Status').value,
@@ -71,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
       history: historyData
     };
 
+    // Submit the form data
     addTracking(formData);
   });
 });
