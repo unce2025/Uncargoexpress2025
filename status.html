@@ -332,15 +332,16 @@
       return;
     }
 
-    const formatDate = (dateStr) => {
-      if (!dateStr) return '';
-      const d = new Date(dateStr);
-      return d.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-    };
+   const formatTime = (dateTimeStr) => {
+  if (!dateTimeStr) return '';
+  const date = new Date(dateTimeStr);
+  if (isNaN(date)) return dateTimeStr; // fallback if invalid
+  return date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
 
     const formatTime = (timeStr) => {
   if (!timeStr) return '';
