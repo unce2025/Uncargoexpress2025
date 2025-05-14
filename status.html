@@ -322,7 +322,7 @@
     <a href="index.html" class="back-btn">Back to Home</a>
   </div>
 
-<script>
+   <script>
   document.addEventListener('DOMContentLoaded', function () {
     const urlParams = new URLSearchParams(window.location.search);
     const trackingNumber = urlParams.get('tracking');
@@ -333,102 +333,120 @@
     }
 
     const formatDate = (dateStr) => {
+      if (!dateStr) return '';
       const d = new Date(dateStr);
-      return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      return d.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
     };
 
     const formatTime = (timeStr) => {
-      const t = new Date(timeStr);
-      return t.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      if (!timeStr) return '';
+      const t = new Date(`1970-01-01T${timeStr}`);
+      return t.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
     };
 
     const fetchShipmentData = async () => {
-      document.getElementById('loadingMessage').style.display = 'block';
+      const loading = document.getElementById('loadingMessage');
+      if (loading) loading.style.display = 'block';
 
       try {
         const response = await fetch(`https://script.google.com/macros/s/AKfycbyvPVPtDNm1TMin6iBDMrjyzjnKs_FdtePxSNcfEWMGXAILYoEP-ws0pouaBvRXsiE/exec?tracking=${encodeURIComponent(trackingNumber)}`);
         const result = await response.json();
-
-        console.log('API response:', result); // ✅ For debug
+        console.log('API response:', result);
 
         if (!result.success || !result.shipment) {
-          document.getElementById('loadingMessage').style.display = 'none';
+          if (loading) loading.style.display = 'none';
           alert('Tracking number not found.');
           return;
         }
 
         const data = result.shipment;
-        document.getElementById('loadingMessage').style.display = 'none';
+        if (loading) loading.style.display = 'none';
 
-        // ✅ Barcode
-        document.getElementById('barcodeImage').src = `https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&imagetype=Gif`;
+        // Update barcode
+        const barcodeImage = document.getElementById('barcodeImage');
+        if (barcodeImage) barcodeImage.src = `https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&imagetype=Gif`;
 
-        // ✅ Shipper & Receiver
-        document.getElementById('shipperName').textContent = data.shipperName || '';
-        document.getElementById('shipperAddress').textContent = data.shipperAddress || '';
-        document.getElementById('shipperEmail').textContent = data.shipperEmail || '';
-        document.getElementById('shipperPhone').textContent = data.shipperPhone || '';
-        document.getElementById('receiverName').textContent = data.receiverName || '';
-        document.getElementById('receiverAddress').textContent = data.receiverAddress || '';
-        document.getElementById('receiverEmail').textContent = data.receiverEmail || '';
-        document.getElementById('receiverPhone').textContent = data.receiverPhone || '';
+        // Fill in details
+        const setText = (id, value) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = value || '';
+        };
 
-        // ✅ Dates & Times
-        document.getElementById('estimatedDeliveryDate').textContent = formatDate(data.estimatedDeliveryDate) || '';
-        document.getElementById('shippedDate').textContent = formatDate(data.shippedDate) || '';
-        document.getElementById('pickupTime').textContent = formatTime(data.pickUpTime) || '';
-        document.getElementById('departureTime').textContent = formatTime(data.departure) || '';
+        setText('shipperName', data.shipperName);
+        setText('shipperAddress', data.shipperAddress);
+        setText('shipperEmail', data.shipperEmail);
+        setText('shipperPhone', data.shipperPhone);
 
-        // ✅ Shipment Details
-        document.getElementById('mode').textContent = data.mode || '';
-        document.getElementById('product').textContent = data.product || '';
-        document.getElementById('quantity').textContent = data.quantity || '';
-        document.getElementById('payment').textContent = data.payment || '';
-        document.getElementById('totalFreight').textContent = `$${data.totalFreight || ''}`;
+        setText('receiverName', data.receiverName);
+        setText('receiverAddress', data.receiverAddress);
+        setText('receiverEmail', data.receiverEmail);
+        setText('receiverPhone', data.receiverPhone);
 
-        // ✅ Shipment Status
-        document.querySelector('.status-indicator').textContent = `SHIPMENT STATUS: ${data.status}`;
+        setText('estimatedDeliveryDate', formatDate(data.estimatedDeliveryDate));
+        setText('shippedDate', formatDate(data.shippedDate));
+        setText('pickupTime', formatTime(data.pickUpTime));
+        setText('departureTime', formatTime(data.departure));
 
-        // ✅ Locking Message
-        if (data.locked === true || data.status?.toLowerCase() === 'delivered') {
-          document.getElementById('lockStatus').textContent = '🔒 This shipment is locked and cannot be modified.';
-          
-          // Optional: Disable form elements if any (admin-style)
-          document.querySelectorAll('input, textarea, select, button').forEach(el => el.disabled = true);
-        } else {
-          document.getElementById('lockStatus').textContent = '';
+        setText('mode', data.mode);
+        setText('product', data.product);
+        setText('quantity', data.quantity);
+        setText('payment', data.payment);
+        setText('totalFreight', `$${data.totalFreight || ''}`);
+
+        // Shipment Status
+        const statusIndicator = document.querySelector('.status-indicator');
+        if (statusIndicator) statusIndicator.textContent = `SHIPMENT STATUS: ${data.status}`;
+
+        // Lock status
+        const lockStatus = document.getElementById('lockStatus');
+        if (lockStatus) {
+          if (data.locked === true || data.status?.toLowerCase() === 'delivered') {
+            lockStatus.textContent = '🔒 This shipment is locked and cannot be modified.';
+            document.querySelectorAll('input, textarea, select, button').forEach(el => el.disabled = true);
+          } else {
+            lockStatus.textContent = '';
+          }
         }
 
-        // ✅ Timeline
+        // Timeline
         const timeline = document.querySelector('.timeline');
-        timeline.innerHTML = '';
-        (data.log || []).forEach(entry => {
-          const div = document.createElement('div');
-          div.classList.add('timeline-entry');
-          div.innerHTML = `<h4>${entry.status} - ${entry.date}, ${entry.time}</h4><p>${entry.location}</p>`;
-          timeline.appendChild(div);
-        });
+        if (timeline) {
+          timeline.innerHTML = '';
+          (data.log || []).forEach(entry => {
+            const div = document.createElement('div');
+            div.classList.add('timeline-entry');
+            div.innerHTML = `<h4>${entry.status} - ${entry.date}, ${entry.time}</h4><p>${entry.location}</p>`;
+            timeline.appendChild(div);
+          });
+        }
 
-        // ✅ History Table
+        // History Table
         const historyTable = document.querySelector('.shipment-table tbody');
-        historyTable.innerHTML = '';
-        (data.history || []).forEach(entry => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${formatDate(entry.date)}</td>
-            <td>${formatTime(entry.time)}</td>
-            <td>${entry.location}</td>
-            <td>${entry.status}</td>
-            <td>${entry.UpdatedBy || entry.updatedBy || ''}</td>
-            <td>${entry.remarks}</td>
-          `;
-          historyTable.appendChild(row);
-        });
-
-       
+        if (historyTable) {
+          historyTable.innerHTML = '';
+          (data.history || []).forEach(entry => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${formatDate(entry.date)}</td>
+              <td>${formatTime(entry.time)}</td>
+              <td>${entry.location}</td>
+              <td>${entry.status}</td>
+              <td>${entry.UpdatedBy || entry.updatedBy || ''}</td>
+              <td>${entry.remarks}</td>
+            `;
+            historyTable.appendChild(row);
+          });
+        }
 
       } catch (error) {
-        document.getElementById('loadingMessage').style.display = 'none';
+        if (loading) loading.style.display = 'none';
         console.error('Fetch failed or invalid response:', error);
         alert('Could not connect to server or invalid response.');
       }
@@ -437,7 +455,6 @@
     fetchShipmentData();
   });
 </script>
-
 
 
 </body>
