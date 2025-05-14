@@ -1,180 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel - Shipment Management</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel - United Nation Cargo Express</title>
   <style>
-    /* Add your CSS here for styling */
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
+      background: #f5f5f5;
     }
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    input {
+    h1 {
+      color: #003366;
+    }
+    input, textarea, select {
       width: 100%;
       padding: 8px;
-      margin: 5px 0;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      margin: 5px 0 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
     button {
-      padding: 10px 20px;
-      background-color: #007BFF;
+      background-color: #003366;
       color: white;
+      padding: 10px 20px;
       border: none;
-      border-radius: 4px;
+      border-radius: 5px;
       cursor: pointer;
     }
     button:hover {
-      background-color: #0056b3;
-    }
-    .form-container {
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #f9f9f9;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    .search-container {
-      margin-bottom: 20px;
+      background-color: #0055a5;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h1>Shipment Admin Panel</h1>
 
-  <div class="form-container">
-    <h2>Shipment Management - Admin Panel</h2>
+    <form id="searchForm">
+      <label for="trackingSearch">Enter Tracking Number:</label>
+      <input type="text" id="trackingSearch" name="trackingSearch" required />
+      <button type="submit">Search</button>
+    </form>
 
-    <!-- Search Section -->
-    <div class="search-container">
-      <label for="searchTracking">Search Tracking Number:</label>
-      <input type="text" id="searchTracking" placeholder="Enter tracking number">
-      <button type="button" id="searchButton">Search</button>
-    </div>
-
-    <!-- Shipment Form -->
     <form id="shipmentForm">
-      <label for="trackingNumber">Tracking Number:</label>
-      <input type="text" id="trackingNumber" name="trackingNumber" readonly>
-
-      <label for="status">Status:</label>
-      <input type="text" id="status" name="status">
-
-      <label for="mode">Mode:</label>
-      <input type="text" id="mode" name="mode">
-
-      <label for="product">Product:</label>
-      <input type="text" id="product" name="product">
-
-      <label for="quantity">Quantity:</label>
-      <input type="number" id="quantity" name="quantity">
-
-      <label for="payment">Payment:</label>
-      <input type="text" id="payment" name="payment">
-
-      <label for="totalFreight">Total Freight:</label>
-      <input type="text" id="totalFreight" name="totalFreight">
-
-      <label for="expectedDelivery">Expected Delivery:</label>
-      <input type="date" id="expectedDelivery" name="estimatedDeliveryDate">
-
-      <label for="pickDate">Shipped Date:</label>
-      <input type="date" id="pickDate" name="shippedDate">
-
-      <label for="pickUpTime">Pick-Up Time:</label>
-      <input type="time" id="pickUpTime" name="pickUpTime">
-
-      <label for="shipperName">Shipper Name:</label>
-      <input type="text" id="shipperName" name="shipperName">
-
-      <label for="shipperAddress">Shipper Address:</label>
-      <input type="text" id="shipperAddress" name="shipperAddress">
-
-      <label for="shipperPhone">Shipper Phone:</label>
-      <input type="tel" id="shipperPhone" name="shipperPhone">
-
-      <label for="shipperEmail">Shipper Email:</label>
-      <input type="email" id="shipperEmail" name="shipperEmail">
-
-      <label for="receiverName">Receiver Name:</label>
-      <input type="text" id="receiverName" name="receiverName">
-
-      <label for="receiverAddress">Receiver Address:</label>
-      <input type="text" id="receiverAddress" name="receiverAddress">
-
-      <label for="receiverPhone">Receiver Phone:</label>
-      <input type="tel" id="receiverPhone" name="receiverPhone">
-
-      <label for="receiverEmail">Receiver Email:</label>
-      <input type="email" id="receiverEmail" name="receiverEmail">
+      <h2>Edit Shipment</h2>
+      <label>Tracking Number:</label>
+      <input type="text" name="trackingNumber" required />
+      
+      <label>Status:</label>
+      <input type="text" name="status" required />
+      
+      <label>Shipper Name:</label>
+      <input type="text" name="shipperName" />
+      
+      <label>Shipper Phone:</label>
+      <input type="text" name="shipperPhone" />
+      
+      <label>Shipper Address:</label>
+      <input type="text" name="shipperAddress" />
+      
+      <label>Shipper Email:</label>
+      <input type="email" name="shipperEmail" />
+      
+      <label>Receiver Name:</label>
+      <input type="text" name="receiverName" />
+      
+      <label>Receiver Phone:</label>
+      <input type="text" name="receiverPhone" />
+      
+      <label>Receiver Address:</label>
+      <input type="text" name="receiverAddress" />
+      
+      <label>Receiver Email:</label>
+      <input type="email" name="receiverEmail" />
+      
+      <label>Estimated Delivery Date:</label>
+      <input type="date" name="estimatedDeliveryDate" />
+      
+      <label>Shipped Date:</label>
+      <input type="date" name="shippedDate" />
+      
+      <label>Pick Up Time:</label>
+      <input type="text" name="pickUpTime" />
+      
+      <label>Departure:</label>
+      <input type="text" name="departure" />
+      
+      <label>Mode:</label>
+      <input type="text" name="mode" />
+      
+      <label>Product:</label>
+      <input type="text" name="product" />
+      
+      <label>Quantity:</label>
+      <input type="text" name="quantity" />
+      
+      <label>Payment:</label>
+      <input type="text" name="payment" />
+      
+      <label>Total Freight:</label>
+      <input type="text" name="totalFreight" />
+      
+      <label>Log (JSON array):</label>
+      <textarea name="log" rows="4"></textarea>
+      
+      <label>History (JSON array):</label>
+      <textarea name="history" rows="4"></textarea>
 
       <button type="submit">Save Shipment</button>
     </form>
   </div>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyvPVPtDNm1TMin6iBDMrjyzjnKs_FdtePxSNcfEWMGXAILYoEP-ws0pouaBvRXsiE/exec";  // Replace with your Google Apps Script Web App URL
+    const scriptURL = 'YOUR_GOOGLE_APPS_SCRIPT_URL'; // 🔁 Replace with your actual Web App URL
 
-    // Search shipment by tracking number
-    document.getElementById('searchButton').addEventListener('click', async function () {
-      const trackingNumber = document.getElementById('searchTracking').value;
-      if (!trackingNumber) {
-        alert("Please enter a tracking number to search.");
-        return;
-      }
+    document.getElementById('searchForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const trackingNumber = document.getElementById('trackingSearch').value.trim();
+      if (!trackingNumber) return alert("Please enter a tracking number.");
 
       try {
-        // Fetch shipment data
         const response = await fetch(`${scriptURL}?tracking=${trackingNumber}`);
-        const data = await response.json();
+        const result = await response.json();
 
-        if (data.success) {
-          const s = data.shipment;
-          document.getElementById('trackingNumber').value = s.trackingNumber || '';
-          document.getElementById('status').value = s.status || '';
-          document.getElementById('mode').value = s.mode || '';
-          document.getElementById('product').value = s.product || '';
-          document.getElementById('quantity').value = s.quantity || '';
-          document.getElementById('payment').value = s.payment || '';
-          document.getElementById('totalFreight').value = s.totalFreight || '';
-          document.getElementById('expectedDelivery').value = s.estimatedDeliveryDate || '';
-          document.getElementById('pickDate').value = s.shippedDate || '';
-          document.getElementById('pickUpTime').value = s.pickUpTime || '';
-          document.getElementById('shipperName').value = s.shipperName || '';
-          document.getElementById('shipperAddress').value = s.shipperAddress || '';
-          document.getElementById('shipperPhone').value = s.shipperPhone || '';
-          document.getElementById('shipperEmail').value = s.shipperEmail || '';
-          document.getElementById('receiverName').value = s.receiverName || '';
-          document.getElementById('receiverAddress').value = s.receiverAddress || '';
-          document.getElementById('receiverPhone').value = s.receiverPhone || '';
-          document.getElementById('receiverEmail').value = s.receiverEmail || '';
+        if (result.success && result.shipment) {
+          for (let key in result.shipment) {
+            if (document.querySelector(`[name="${key}"]`)) {
+              const value = typeof result.shipment[key] === 'object' ? JSON.stringify(result.shipment[key], null, 2) : result.shipment[key];
+              document.querySelector(`[name="${key}"]`).value = value;
+            }
+          }
         } else {
-          alert("Tracking number not found.");
+          alert("Shipment not found.");
         }
       } catch (error) {
-        alert("Error loading shipment: " + error.message);
+        alert("Failed to fetch shipment: " + error.message);
       }
     });
 
-    // Submit form to save shipment data (create or update)
-    document.getElementById('shipmentForm').addEventListener('submit', async function (event) {
-      event.preventDefault();
-
+    document.getElementById('shipmentForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
       const formData = new FormData(this);
       const data = {};
       formData.forEach((value, key) => {
         data[key] = value;
       });
 
-      // Ensure log and history are initialized as empty arrays if not provided
-      data.log = data.log || [];
-      data.history = data.history || [];
+      try {
+        data.log = JSON.parse(data.log || '[]');
+      } catch {
+        data.log = [];
+      }
+
+      try {
+        data.history = JSON.parse(data.history || '[]');
+      } catch {
+        data.history = [];
+      }
 
       try {
         const response = await fetch(scriptURL, {
@@ -184,10 +175,11 @@
         });
 
         const result = await response.json();
+
         if (result.success) {
           alert("Shipment data saved successfully!");
         } else {
-          alert("Failed to save shipment data: " + (result.error || "Unknown error"));
+          alert("Failed to save: " + (result.message || "Unknown error"));
         }
       } catch (error) {
         alert("Error submitting form: " + error.message);
