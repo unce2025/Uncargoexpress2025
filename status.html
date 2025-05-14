@@ -341,19 +341,36 @@
     const formatTime = (value) => {
       if (!value) return '';
 
-      // Case 1: If the value is a valid time string (e.g., "9:00:00 AM")
-      const date = new Date(`1970-01-01T${value}Z`); // Treat it as UTC time
-
-      if (!isNaN(date)) {
-        // Convert UTC time to local time
+      // Case 1: Excel numeric time (e.g., 0.37500)
+      if (!isNaN(value) && typeof value === 'number') {
+        const seconds = Math.round(value * 24 * 60 * 60);
+        const date = new Date(0);
+        date.setSeconds(seconds);
         return date.toLocaleTimeString('en-US', {
           hour: '2-digit',
           minute: '2-digit',
-          second: '2-digit', // Include seconds
         });
       }
 
-      return value; // Fallback if invalid
+      // Case 2: ISO datetime string (e.g., 1899-12-30T01:18:00.000Z)
+      const date = new Date(value);
+      if (!isNaN(date)) {
+        return date.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+      }
+
+      // Case 3: plain time string (e.g., 9:00 AM or 9:00:00 AM)
+      const tryTime = new Date(`1970-01-01T${value}`);
+      if (!isNaN(tryTime)) {
+        return tryTime.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+      }
+
+      return value; // fallback if no valid format found
     };
 
     const fetchShipmentData = async () => {
@@ -378,13 +395,13 @@
         const barcodeImage = document.getElementById('barcodeImage');
         if (barcodeImage) barcodeImage.src = `https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&imagetype=Gif`;
 
-        // Helper function to set text content
+        // Helper
         const setText = (id, value) => {
           const el = document.getElementById(id);
           if (el) el.textContent = value || '';
         };
 
-        // Shipper & Receiver Information
+        // Shipper & Receiver
         setText('shipperName', data.shipperName);
         setText('shipperAddress', data.shipperAddress);
         setText('shipperEmail', data.shipperEmail);
@@ -398,8 +415,8 @@
         // Dates and Times
         setText('estimatedDeliveryDate', formatDate(data.estimatedDeliveryDate));
         setText('shippedDate', formatDate(data.shippedDate));
-        setText('pickupTime', formatTime(data.pickUpTime));  // Corrected
-        setText('departureTime', formatTime(data.departure));  // Corrected
+        setText('pickupTime', formatTime(data.pickUpTime));
+        setText('departureTime', formatTime(data.departure));
 
         // Shipment Details
         setText('mode', data.mode);
@@ -412,7 +429,7 @@
         const statusIndicator = document.querySelector('.status-indicator');
         if (statusIndicator) statusIndicator.textContent = `SHIPMENT STATUS: ${data.status}`;
 
-        // Lock Status
+        // Lock
         const lockStatus = document.getElementById('lockStatus');
         if (lockStatus) {
           if (data.locked === true || data.status?.toLowerCase() === 'delivered') {
@@ -423,7 +440,7 @@
           }
         }
 
-        // Timeline Entries
+        // Timeline
         const timeline = document.querySelector('.timeline');
         if (timeline) {
           timeline.innerHTML = '';
@@ -435,7 +452,7 @@
           });
         }
 
-        // Shipment History
+        // History
         const historyTable = document.querySelector('.shipment-table tbody');
         if (historyTable) {
           historyTable.innerHTML = '';
@@ -463,6 +480,7 @@
     fetchShipmentData();
   });
 </script>
+
 
 
 
