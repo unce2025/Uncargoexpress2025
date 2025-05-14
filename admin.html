@@ -229,9 +229,130 @@ footer {
     <p>&copy; 2025 United Nation Cargo Express</p>
   </footer>
 
-  <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyvPVPtDNm1TMin6iBDMrjyzjnKs_FdtePxSNcfEWMGXAILYoEP-ws0pouaBvRXsiE/exec";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Shipment Management</title>
+  <style>
+    /* Add your CSS here for styling */
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .form-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .search-container {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
 
+  <div class="form-container">
+    <h2>Shipment Management - Admin Panel</h2>
+
+    <!-- Search Section -->
+    <div class="search-container">
+      <label for="searchTracking">Search Tracking Number:</label>
+      <input type="text" id="searchTracking" placeholder="Enter tracking number">
+      <button type="button" id="searchButton">Search</button>
+    </div>
+
+    <!-- Shipment Form -->
+    <form id="shipmentForm">
+      <label for="trackingNumber">Tracking Number:</label>
+      <input type="text" id="trackingNumber" name="trackingNumber" readonly>
+
+      <label for="status">Status:</label>
+      <input type="text" id="status" name="status">
+
+      <label for="mode">Mode:</label>
+      <input type="text" id="mode" name="mode">
+
+      <label for="product">Product:</label>
+      <input type="text" id="product" name="product">
+
+      <label for="quantity">Quantity:</label>
+      <input type="number" id="quantity" name="quantity">
+
+      <label for="payment">Payment:</label>
+      <input type="text" id="payment" name="payment">
+
+      <label for="totalFreight">Total Freight:</label>
+      <input type="text" id="totalFreight" name="totalFreight">
+
+      <label for="expectedDelivery">Expected Delivery:</label>
+      <input type="date" id="expectedDelivery" name="estimatedDeliveryDate">
+
+      <label for="pickDate">Shipped Date:</label>
+      <input type="date" id="pickDate" name="shippedDate">
+
+      <label for="pickUpTime">Pick-Up Time:</label>
+      <input type="time" id="pickUpTime" name="pickUpTime">
+
+      <label for="shipperName">Shipper Name:</label>
+      <input type="text" id="shipperName" name="shipperName">
+
+      <label for="shipperAddress">Shipper Address:</label>
+      <input type="text" id="shipperAddress" name="shipperAddress">
+
+      <label for="shipperPhone">Shipper Phone:</label>
+      <input type="tel" id="shipperPhone" name="shipperPhone">
+
+      <label for="shipperEmail">Shipper Email:</label>
+      <input type="email" id="shipperEmail" name="shipperEmail">
+
+      <label for="receiverName">Receiver Name:</label>
+      <input type="text" id="receiverName" name="receiverName">
+
+      <label for="receiverAddress">Receiver Address:</label>
+      <input type="text" id="receiverAddress" name="receiverAddress">
+
+      <label for="receiverPhone">Receiver Phone:</label>
+      <input type="tel" id="receiverPhone" name="receiverPhone">
+
+      <label for="receiverEmail">Receiver Email:</label>
+      <input type="email" id="receiverEmail" name="receiverEmail">
+
+      <button type="submit">Save Shipment</button>
+    </form>
+  </div>
+
+  <script>
+    const scriptURL = "YOUR_GOOGLE_APPS_SCRIPT_URL";  // Replace with your Google Apps Script Web App URL
+
+    // Search shipment by tracking number
     document.getElementById('searchButton').addEventListener('click', async function () {
       const trackingNumber = document.getElementById('searchTracking').value;
       if (!trackingNumber) {
@@ -240,29 +361,30 @@ footer {
       }
 
       try {
+        // Fetch shipment data
         const response = await fetch(`${scriptURL}?tracking=${trackingNumber}`);
         const data = await response.json();
 
         if (data.success) {
           const s = data.shipment;
-          document.getElementById('trackingNumber').value = s.TrackingNumber;
-          document.getElementById('status').value = s.Status;
-          document.getElementById('mode').value = s.Mode;
-          document.getElementById('product').value = s.Product;
-          document.getElementById('quantity').value = s.Quantity;
-          document.getElementById('payment').value = s.Payment;
-          document.getElementById('totalFreight').value = s.TotalFreight;
-          document.getElementById('expectedDelivery').value = s.EstimatedDeliveryDate;
-          document.getElementById('pickDate').value = s.ShippedDate;
-          document.getElementById('pickUpTime').value = s.PickUpTime;
-          document.getElementById('shipperName').value = s.ShipperName;
-          document.getElementById('shipperAddress').value = s.ShipperAddress;
-          document.getElementById('shipperPhone').value = s.ShipperPhone;
-          document.getElementById('shipperEmail').value = s.ShipperEmail;
-          document.getElementById('receiverName').value = s.ReceiverName;
-          document.getElementById('receiverAddress').value = s.ReceiverAddress;
-          document.getElementById('receiverPhone').value = s.ReceiverPhone;
-          document.getElementById('receiverEmail').value = s.ReceiverEmail;
+          document.getElementById('trackingNumber').value = s.trackingNumber || '';
+          document.getElementById('status').value = s.status || '';
+          document.getElementById('mode').value = s.mode || '';
+          document.getElementById('product').value = s.product || '';
+          document.getElementById('quantity').value = s.quantity || '';
+          document.getElementById('payment').value = s.payment || '';
+          document.getElementById('totalFreight').value = s.totalFreight || '';
+          document.getElementById('expectedDelivery').value = s.estimatedDeliveryDate || '';
+          document.getElementById('pickDate').value = s.shippedDate || '';
+          document.getElementById('pickUpTime').value = s.pickUpTime || '';
+          document.getElementById('shipperName').value = s.shipperName || '';
+          document.getElementById('shipperAddress').value = s.shipperAddress || '';
+          document.getElementById('shipperPhone').value = s.shipperPhone || '';
+          document.getElementById('shipperEmail').value = s.shipperEmail || '';
+          document.getElementById('receiverName').value = s.receiverName || '';
+          document.getElementById('receiverAddress').value = s.receiverAddress || '';
+          document.getElementById('receiverPhone').value = s.receiverPhone || '';
+          document.getElementById('receiverEmail').value = s.receiverEmail || '';
         } else {
           alert("Tracking number not found.");
         }
@@ -271,6 +393,7 @@ footer {
       }
     });
 
+    // Submit form to save shipment data (create or update)
     document.getElementById('shipmentForm').addEventListener('submit', async function (event) {
       event.preventDefault();
 
@@ -280,8 +403,9 @@ footer {
         data[key] = value;
       });
 
-      data.log = [];
-      data.history = [];
+      // Ensure log and history are initialized as empty arrays if not provided
+      data.log = data.log || [];
+      data.history = data.history || [];
 
       try {
         const response = await fetch(scriptURL, {
@@ -301,5 +425,8 @@ footer {
       }
     });
   </script>
+</body>
+</html>
+
 </body>
 </html>
