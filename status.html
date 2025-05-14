@@ -1,4 +1,3 @@
-<!-- status.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -426,22 +425,7 @@
           historyTable.appendChild(row);
         });
 
-        // ✅ Package Table
-        const packageTable = document.querySelector('.package-table tbody');
-        packageTable.innerHTML = '';
-        (data.packages || []).forEach(entry => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${entry.qty}</td>
-            <td>${entry.pieceType}</td>
-            <td>${entry.description}</td>
-            <td>${entry.length}</td>
-            <td>${entry.width}</td>
-            <td>${entry.height}</td>
-            <td>${entry.weight}</td>
-          `;
-          packageTable.appendChild(row);
-        });
+       
 
       } catch (error) {
         document.getElementById('loadingMessage').style.display = 'none';
