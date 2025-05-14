@@ -2,144 +2,249 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
-  <title>About Us - United Nation Cargo Express</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel - United Nation Cargo Express</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-    }
-
     body {
-      background-color:  #00253a;
-      color: #333;
+      font-family: Arial, sans-serif;
       padding: 20px;
-      font-size: 16px;
+      background: #f5f5f5;
     }
-
-    main {
-      background-color: #fff;
-      padding: 30px;
-      border-radius: 10px;
+    .container {
       max-width: 900px;
-      margin: 60px auto;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-      position: relative;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-
-     .close-btn {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      font-size: 26px;
-      font-weight: bold;
-      color: #00253a;
+    h1 {
+      color: #003366;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #003366;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
       cursor: pointer;
     }
-
-    h1, h2 {
-      color: #00253a;
-      margin-bottom: 15px;
-    }
-
-    p {
-      margin-bottom: 20px;
-      line-height: 1.6;
-    }
-
-    ul {
-      margin-bottom: 20px;
-      padding-left: 20px;
-    }
-
-    ul li {
-      margin-bottom: 10px;
-    }
-
-    @media (max-width: 600px) {
-      body {
-        font-size: 14px;
-      }
-
-      main {
-        padding: 20px;
-      }
-
-      h1 {
-        font-size: 24px;
-      }
-
-      h2 {
-        font-size: 20px;
-      }
-
-      .close-button {
-        top: 10px;
-        right: 10px;
-        font-size: 20px;
-        width: 28px;
-        height: 28px;
-        line-height: 28px;
-      }
-    }
-
-    @media (max-width: 400px) {
-      h1 {
-        font-size: 20px;
-      }
-
-      h2 {
-        font-size: 18px;
-      }
+    button:hover {
+      background-color: #0055a5;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h1>Shipment Admin Panel</h1>
 
-<main>
-  <span class="close-btn" onclick="window.location.href='index.html'">&times;</span>
+    <!-- Search form -->
+    <form id="searchForm">
+      <label for="trackingSearch">Enter Tracking Number:</label>
+      <input type="text" id="TrackingNumber" name="trackingSearch" required />
+      <button type="submit" id="searchBtn">Search</button>
+    </form>
 
-  <h1>About Us</h1>
-  <p>
-    At <strong>United Nation Cargo Express</strong>, we specialize in fast, reliable, and secure logistics solutions across the globe. 
-    With years of industry experience and a network that spans over 100 countries, we are committed to delivering your parcels and 
-    cargo on time — every time.
-  </p>
+    <!-- Shipment edit form -->
+    <form id="shipmentForm">
+      <h2>Edit Shipment</h2>
+      <label>Tracking Number:</label>
+      <input type="text" id="TrackingNumber" name="trackingNumber" required />
 
-  <h2>Our Mission</h2>
-  <p>
-    To provide efficient, transparent, and customer-focused shipping solutions that connect people and businesses worldwide.
-  </p>
+      <label>Status:</label>
+      <input type="text" id="Status" name="status" required />
 
-  <h2>Why Choose Us?</h2>
-  <ul>
-    <li>Global coverage with trusted delivery partners</li>
-    <li>Real-time tracking of your packages</li>
-    <li>Affordable and flexible shipping rates</li>
-    <li>24/7 customer support</li>
-    <li>Dedicated account managers for business clients</li>
-  </ul>
+      <label>Shipper Name:</label>
+      <input type="text" id="ShipperName" name="shipperName" />
 
-  <h2>Our Values</h2>
-  <p>
-    Integrity, reliability, innovation, and customer satisfaction guide every shipment we handle. We believe in building trust with our clients through transparency, continuous improvement, and unmatched service quality.
-  </p>
+      <label>Shipper Phone:</label>
+      <input type="text" id="ShipperPhone" name="shipperPhone" />
 
-  <h2>What We Offer</h2>
-  <ul>
-    <li>Air, sea, and land freight services</li>
-    <li>Customs clearance and documentation support</li>
-    <li>Warehousing and storage solutions</li>
-    <li>Expedited delivery for urgent shipments</li>
-  </ul>
+      <label>Shipper Address:</label>
+      <input type="text" id="ShipperAddress" name="shipperAddress" />
 
-  <h2>Our Promise</h2>
-  <p>
-    Whether you’re a small business or a large enterprise, we treat every shipment with care. United Nation Cargo Express is not just a logistics provider — we’re your shipping partner.
-  </p>
-</main>
+      <label>Shipper Email:</label>
+      <input type="email" id="ShipperEmail" name="shipperEmail" />
+
+      <label>Receiver Name:</label>
+      <input type="text" id="ReceiverName" name="receiverName" />
+
+      <label>Receiver Phone:</label>
+      <input type="text" id="ReceiverPhone" name="receiverPhone" />
+
+      <label>Receiver Address:</label>
+      <input type="text" id="ReceiverAddress" name="receiverAddress" />
+
+      <label>Receiver Email:</label>
+      <input type="email" id="ReceiverEmail" name="receiverEmail" />
+
+      <label>Estimated Delivery Date:</label>
+      <input type="date" id="EstimatedDeliveryDate" name="estimatedDeliveryDate" />
+
+      <label>Shipped Date:</label>
+      <input type="date" id="ShippedDate" name="shippedDate" />
+
+      <label>Pick Up Time:</label>
+      <input type="text" id="PickUpTime" name="pickUpTime" />
+
+      <label>Departure:</label>
+      <input type="text" id="Departure" name="departure" />
+
+      <label>Mode:</label>
+      <input type="text" id="Mode" name="mode" />
+
+      <label>Product:</label>
+      <input type="text" id="Product" name="product" />
+
+      <label>Quantity:</label>
+      <input type="text" id="Quantity" name="quantity" />
+
+      <label>Payment:</label>
+      <input type="text" id="Payment" name="payment" />
+
+      <label>Total Freight:</label>
+      <input type="text" id="TotalFreight" name="totalFreight" />
+
+      <label>Log (JSON array):</label>
+      <textarea id="log" name="log" rows="4"></textarea>
+
+      <label>History (JSON array):</label>
+      <textarea id="history" name="history" rows="4"></textarea>
+
+      <button type="submit" id="submitBtn">Save Shipment</button>
+    </form>
+  </div>
+
+<script>
+  // Function to format date as yyyy-MM-dd
+  function formatDate(dateStr) {
+    if (!dateStr) return '';  // If no date is provided, return an empty string.
+    return dateStr.split('T')[0];  // Split at 'T' and return only the yyyy-MM-dd part.
+  }
+
+  // Function to add tracking data to Google Sheets
+  async function addTracking(data) {
+    try {
+      // Ensure date fields are in the correct format before sending
+      data.estimatedDeliveryDate = formatDate(data.estimatedDeliveryDate);
+      data.shippedDate = formatDate(data.shippedDate);
+
+      const response = await fetch('https://script.google.com/macros/s/PASTE_YOUR_DEPLOYED_URL_HERE/exec', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+      console.log("Response from server:", result);
+
+      if (result.success) {
+        alert("Shipment saved successfully!");
+      } else {
+        alert("Failed to save shipment: " + (result.message || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Error submitting tracking data:", error);
+      alert("An error occurred while saving the shipment.");
+    }
+  }
+
+  // Function to load tracking data from Google Sheets
+  async function loadTracking(trackingNumber) {
+    try {
+      const response = await fetch('https://script.google.com/macros/s/PASTE_YOUR_DEPLOYED_URL_HERE/exec?tracking=' + trackingNumber);
+      const result = await response.json();
+
+      if (result.success && result.shipment) {
+        const shipment = result.shipment;
+
+        // Format dates before displaying
+        document.getElementById('TrackingNumber').value = shipment.trackingNumber || '';
+        document.getElementById('Status').value = shipment.status || '';
+        document.getElementById('ShipperName').value = shipment.shipperName || '';
+        document.getElementById('ShipperPhone').value = shipment.shipperPhone || '';
+        document.getElementById('ShipperAddress').value = shipment.shipperAddress || '';
+        document.getElementById('ShipperEmail').value = shipment.shipperEmail || '';
+        document.getElementById('ReceiverName').value = shipment.receiverName || '';
+        document.getElementById('ReceiverPhone').value = shipment.receiverPhone || '';
+        document.getElementById('ReceiverAddress').value = shipment.receiverAddress || '';
+        document.getElementById('ReceiverEmail').value = shipment.receiverEmail || '';
+        
+        // Apply formatDate to date fields
+        document.getElementById('EstimatedDeliveryDate').value = formatDate(shipment.estimatedDeliveryDate);
+        document.getElementById('ShippedDate').value = formatDate(shipment.shippedDate);
+        
+        document.getElementById('PickUpTime').value = shipment.pickUpTime || '';
+        document.getElementById('Departure').value = shipment.departure || '';
+        document.getElementById('Mode').value = shipment.mode || '';
+        document.getElementById('Product').value = shipment.product || '';
+        document.getElementById('Quantity').value = shipment.quantity || '';
+        document.getElementById('Payment').value = shipment.payment || '';
+        document.getElementById('TotalFreight').value = shipment.totalFreight || '';
+        document.getElementById('log').value = JSON.stringify(shipment.log || [], null, 2);
+        document.getElementById('history').value = JSON.stringify(shipment.history || [], null, 2);
+      } else {
+        alert("Tracking number not found.");
+      }
+    } catch (error) {
+      console.error("Error loading tracking data:", error);
+      alert("An error occurred while fetching the tracking data.");
+    }
+  }
+
+  // Adding event listeners when the page is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    // Submit tracking data
+    document.getElementById('submitBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      const formData = {
+        trackingNumber: document.getElementById('TrackingNumber').value,
+        status: document.getElementById('Status').value,
+        shipperName: document.getElementById('ShipperName').value,
+        shipperPhone: document.getElementById('ShipperPhone').value,
+        shipperAddress: document.getElementById('ShipperAddress').value,
+        shipperEmail: document.getElementById('ShipperEmail').value,
+        receiverName: document.getElementById('ReceiverName').value,
+        receiverPhone: document.getElementById('ReceiverPhone').value,
+        receiverAddress: document.getElementById('ReceiverAddress').value,
+        receiverEmail: document.getElementById('ReceiverEmail').value,
+        estimatedDeliveryDate: document.getElementById('EstimatedDeliveryDate').value,
+        shippedDate: document.getElementById('ShippedDate').value,
+        pickUpTime: document.getElementById('PickUpTime').value,
+        departure: document.getElementById('Departure').value,
+        mode: document.getElementById('Mode').value,
+        product: document.getElementById('Product').value,
+        quantity: document.getElementById('Quantity').value,
+        payment: document.getElementById('Payment').value,
+        totalFreight: document.getElementById('TotalFreight').value,
+        log: JSON.parse(document.getElementById('log').value || '[]'),
+        history: JSON.parse(document.getElementById('history').value || '[]')
+      };
+
+      addTracking(formData);
+    });
+
+    // Search for tracking info by tracking number
+    document.getElementById('searchBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      const trackingNumber = document.getElementById('TrackingNumber').value.trim();
+      if (trackingNumber) {
+        loadTracking(trackingNumber);
+      } else {
+        alert("Please enter a tracking number.");
+      }
+    });
+  });
+</script>
 
 </body>
 </html>
