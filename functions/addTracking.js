@@ -17,9 +17,10 @@ async function addTracking(data) {
       alert("Failed to save shipment: " + (result.message || "Unknown error"));
     }
   } catch (error) {
-    console.error("Error submitting tracking data:", error);
-    alert("An error occurred while saving the shipment.");
-  }
+  console.error("Error submitting tracking data:", error);  // This logs the real error
+  alert("An error occurred while saving the shipment:\n" + error.message);  // This shows you the error in the alert
+}
+
 }
 
 document.addEventListener('DOMContentLoaded', () => {
