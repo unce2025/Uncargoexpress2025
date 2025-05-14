@@ -333,11 +333,21 @@
       return;
     }
 
+    const formatDate = (dateStr) => {
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    };
+
+    const formatTime = (timeStr) => {
+      const t = new Date(timeStr);
+      return t.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    };
+
     const fetchShipmentData = async () => {
       document.getElementById('loadingMessage').style.display = 'block';
 
       try {
-        const response = await fetch(`https://script.google.com/macros/s/AKfycby895XqLVbDeXnDsZw29Bem45SjMW39ocAFgi8AsLHd9EL7k6ktmMz4CZDeayNyWOw/exec?tracking=${encodeURIComponent(trackingNumber)}`);
+        const response = await fetch(`https://script.google.com/macros/s/AKfycbyvPVPtDNm1TMin6iBDMrjyzjnKs_FdtePxSNcfEWMGXAILYoEP-ws0pouaBvRXsiE/exec?tracking=${encodeURIComponent(trackingNumber)}`);
         const result = await response.json();
 
         console.log('API response:', result); // ✅ For debug
@@ -362,15 +372,18 @@
         document.getElementById('receiverAddress').textContent = data.receiverAddress || '';
         document.getElementById('receiverEmail').textContent = data.receiverEmail || '';
         document.getElementById('receiverPhone').textContent = data.receiverPhone || '';
-        document.getElementById('estimatedDeliveryDate').textContent = data.estimatedDeliveryDate || '';
-        document.getElementById('shippedDate').textContent = data.shippedDate || '';
-        document.getElementById('pickupTime').textContent = data.pickUpTime || '';
-        document.getElementById('departureTime').textContent = data.departure || '';
+        
+        // ✅ Format and display dates/times
+        document.getElementById('estimatedDeliveryDate').textContent = formatDate(data.estimatedDeliveryDate) || '';
+        document.getElementById('shippedDate').textContent = formatDate(data.shippedDate) || '';
+        document.getElementById('pickupTime').textContent = formatTime(data.pickUpTime) || '';
+        document.getElementById('departureTime').textContent = formatTime(data.departure) || '';
+        
         document.getElementById('mode').textContent = data.mode || '';
         document.getElementById('product').textContent = data.product || '';
         document.getElementById('quantity').textContent = data.quantity || '';
         document.getElementById('payment').textContent = data.payment || '';
-        document.getElementById('totalFreight').textContent = data.totalFreight || '';
+        document.getElementById('totalFreight').textContent = `$${data.totalFreight || ''}`;
 
         // ✅ Status
         document.querySelector('.status-indicator').textContent = `SHIPMENT STATUS: ${data.status}`;
@@ -391,8 +404,8 @@
         (data.history || []).forEach(entry => {
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td>${entry.date}</td>
-            <td>${entry.time}</td>
+            <td>${formatDate(entry.date)}</td>
+            <td>${formatTime(entry.time)}</td>
             <td>${entry.location}</td>
             <td>${entry.status}</td>
             <td>${entry.UpdatedBy || entry.updatedBy || ''}</td>
