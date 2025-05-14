@@ -323,146 +323,89 @@
   </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const urlParams = new URLSearchParams(window.location.search);
-    const trackingNumber = urlParams.get('tracking');
+  async function getTrackingData(trackingNumber) {
+    try {
+      const response = await fetch(`https://script.google.com/macros/s/PASTE_YOUR_DEPLOYED_URL_HERE/exec?trackingNumber=${encodeURIComponent(trackingNumber)}`);
+      const result = await response.json();
 
-    if (!trackingNumber) {
-      alert('No tracking number provided.');
-      return;
-    }
+      if (result.error) {
+        alert(result.error);
+        return;
+      }
 
-    const formatDate = (dateStr) => {
-      const d = new Date(dateStr);
-      if (isNaN(d)) return dateStr;
-      return d.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+      const data = result.shipment;
+
+      // Set text content for each span
+      const fields = [
+        "TrackingNumber", "Status", "ShipperName", "ShipperPhone", "ShipperAddress", "ShipperEmail",
+        "ReceiverName", "ReceiverPhone", "ReceiverAddress", "ReceiverEmail", "EstimatedDeliveryDate",
+        "ShippedDate", "PickUpTime", "Departure", "Mode", "Product", "Quantity", "Payment", "TotalFreight"
+      ];
+      fields.forEach(field => {
+        document.getElementById(field).textContent = data[field] || "";
       });
-    };
 
-    const formatTime = (value) => {
-      if (!value) return '';
-
-      // Treat value as plain time string (e.g., "9:00 AM")
-      const tryTime = new Date(`1970-01-01T${value}`);
-      if (!isNaN(tryTime)) {
-        return tryTime.toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
+      // Timeline log
+      const timeline = document.querySelector('.timeline');
+      if (timeline) {
+        timeline.innerHTML = '';
+        (data.log || []).forEach(entry => {
+          const item = document.createElement('div');
+          item.className = 'timeline-item';
+          item.innerHTML = `<div class="timeline-content"><strong>${entry.date || ''}</strong>: ${entry.description || ''}</div>`;
+          timeline.appendChild(item);
         });
       }
 
-      return value; // fallback
-    };
-
-    const fetchShipmentData = async () => {
-      const loading = document.getElementById('loadingMessage');
-      if (loading) loading.style.display = 'block';
-
-      try {
-        const response = await fetch(`https://script.google.com/macros/s/AKfycbyF_0D4wOY3TwtkLYaD50DcpEZjv5JlJJ4IWMEvRYTOeO6GtIK18JfyBt0Ofd5Q4mQ/exec?tracking=${encodeURIComponent(trackingNumber)}`);
-        const result = await response.json();
-        console.log('API response:', result);
-
-        if (!result.success || !result.shipment) {
-          if (loading) loading.style.display = 'none';
-          alert('Tracking number not found.');
-          return;
-        }
-
-        const data = result.shipment;
-        if (loading) loading.style.display = 'none';
-
-        // Barcode
-        const barcodeImage = document.getElementById('barcodeImage');
-        if (barcodeImage) barcodeImage.src = `https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&imagetype=Gif`;
-
-        // Helper
-        const setText = (id, value) => {
-          const el = document.getElementById(id);
-          if (el) el.textContent = value || '';
-        };
-
-        // Shipper & Receiver
-        setText('shipperName', data.shipperName);
-        setText('shipperAddress', data.shipperAddress);
-        setText('shipperEmail', data.shipperEmail);
-        setText('shipperPhone', data.shipperPhone);
-
-        setText('receiverName', data.receiverName);
-        setText('receiverAddress', data.receiverAddress);
-        setText('receiverEmail', data.receiverEmail);
-        setText('receiverPhone', data.receiverPhone);
-
-        // Dates and Times
-        setText('estimatedDeliveryDate', formatDate(data.estimatedDeliveryDate));
-        setText('shippedDate', formatDate(data.shippedDate));
-        setText('pickupTime', formatTime(data.pickUpTime));
-        setText('departureTime', formatTime(data.departure));
-
-        // Shipment Details
-        setText('mode', data.mode);
-        setText('product', data.product);
-        setText('quantity', data.quantity);
-        setText('payment', data.payment);
-        setText('totalFreight', `$${data.totalFreight || ''}`);
-
-        // Shipment Status
-        const statusIndicator = document.querySelector('.status-indicator');
-        if (statusIndicator) statusIndicator.textContent = `SHIPMENT STATUS: ${data.status}`;
-
-        // Lock
-        const lockStatus = document.getElementById('lockStatus');
-        if (lockStatus) {
-          if (data.locked === true || data.status?.toLowerCase() === 'delivered') {
-            lockStatus.textContent = '🔒 This shipment is locked and cannot be modified.';
-            document.querySelectorAll('input, textarea, select, button').forEach(el => el.disabled = true);
-          } else {
-            lockStatus.textContent = '';
-          }
-        }
-
-        // Timeline
-        const timeline = document.querySelector('.timeline');
-        if (timeline) {
-          timeline.innerHTML = '';
-          (data.log || []).forEach(entry => {
-            const div = document.createElement('div');
-            div.classList.add('timeline-entry');
-            div.innerHTML = `<h4>${entry.status} - ${entry.date}, ${entry.time}</h4><p>${entry.location}</p>`;
-            timeline.appendChild(div);
-          });
-        }
-
-        // History
-        const historyTable = document.querySelector('.shipment-table tbody');
-        if (historyTable) {
-          historyTable.innerHTML = '';
-          (data.history || []).forEach(entry => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-              <td>${formatDate(entry.date)}</td>
-              <td>${formatTime(entry.time)}</td>
-              <td>${entry.location}</td>
-              <td>${entry.status}</td>
-              <td>${entry.UpdatedBy || entry.updatedBy || ''}</td>
-              <td>${entry.remarks}</td>
-            `;
-            historyTable.appendChild(row);
-          });
-        }
-
-      } catch (error) {
-        if (loading) loading.style.display = 'none';
-        console.error('Fetch failed or invalid response:', error);
-        alert('Could not connect to server or invalid response.');
+      // Shipment history table
+      const historyTable = document.querySelector('.history-table tbody');
+      if (historyTable) {
+        historyTable.innerHTML = '';
+        (data.history || []).forEach(entry => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${entry.date || ''}</td>
+            <td>${entry.time || ''}</td>
+            <td>${entry.location || ''}</td>
+            <td>${entry.status || ''}</td>
+            <td>${entry.updatedBy || ''}</td>
+            <td>${entry.remarks || ''}</td>
+          `;
+          historyTable.appendChild(row);
+        });
       }
-    };
 
-    fetchShipmentData();
-  });
+      // Package details table
+      const packageTable = document.querySelector('.package-table tbody');
+      if (packageTable) {
+        packageTable.innerHTML = '';
+        (data.packages || []).forEach(pkg => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${pkg.qty || ''}</td>
+            <td>${pkg.type || ''}</td>
+            <td>${pkg.desc || ''}</td>
+            <td>${pkg.length || ''}</td>
+            <td>${pkg.width || ''}</td>
+            <td>${pkg.height || ''}</td>
+            <td>${pkg.weight || ''}</td>
+          `;
+          packageTable.appendChild(row);
+        });
+      }
+
+    } catch (error) {
+      console.error('Error fetching tracking data:', error);
+      alert("There was an error retrieving the tracking information.");
+    }
+  }
+
+  // Get tracking number from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const trackingNumber = urlParams.get('trackingNumber');
+  if (trackingNumber) {
+    getTrackingData(trackingNumber);
+  }
 </script>
 
 
