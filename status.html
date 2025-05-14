@@ -341,36 +341,23 @@
     const formatTime = (value) => {
       if (!value) return '';
 
-      // Case 1: Excel numeric time (e.g., 0.37500)
-      if (!isNaN(value) && typeof value === 'number') {
-        const seconds = Math.round(value * 24 * 60 * 60);
+      // If already in a valid time format (e.g., "9:00:00 AM"), return as-is
+      if (typeof value === 'string' && /\d{1,2}:\d{2}(:\d{2})?\s?(AM|PM)/i.test(value)) {
+        return value.trim();
+      }
+
+      // If it's a number (Excel decimal time), convert to time string
+      if (!isNaN(value)) {
+        const totalSeconds = Math.round(value * 24 * 60 * 60);
         const date = new Date(0);
-        date.setSeconds(seconds);
+        date.setSeconds(totalSeconds);
         return date.toLocaleTimeString('en-US', {
           hour: '2-digit',
           minute: '2-digit',
         });
       }
 
-      // Case 2: ISO datetime string (e.g., 1899-12-30T01:18:00.000Z)
-      const date = new Date(value);
-      if (!isNaN(date)) {
-        return date.toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-        });
-      }
-
-      // Case 3: plain time string (e.g., 9:00 AM or 9:00:00 AM)
-      const tryTime = new Date(`1970-01-01T${value}`);
-      if (!isNaN(tryTime)) {
-        return tryTime.toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-        });
-      }
-
-      return value; // fallback if no valid format found
+      return value; // fallback
     };
 
     const fetchShipmentData = async () => {
@@ -393,9 +380,11 @@
 
         // Barcode
         const barcodeImage = document.getElementById('barcodeImage');
-        if (barcodeImage) barcodeImage.src = `https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&imagetype=Gif`;
+        if (barcodeImage) {
+          barcodeImage.src = `https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&imagetype=Gif`;
+        }
 
-        // Helper
+        // Helper function
         const setText = (id, value) => {
           const el = document.getElementById(id);
           if (el) el.textContent = value || '';
@@ -427,9 +416,11 @@
 
         // Shipment Status
         const statusIndicator = document.querySelector('.status-indicator');
-        if (statusIndicator) statusIndicator.textContent = `SHIPMENT STATUS: ${data.status}`;
+        if (statusIndicator) {
+          statusIndicator.textContent = `SHIPMENT STATUS: ${data.status}`;
+        }
 
-        // Lock
+        // Lock status
         const lockStatus = document.getElementById('lockStatus');
         if (lockStatus) {
           if (data.locked === true || data.status?.toLowerCase() === 'delivered') {
@@ -440,7 +431,7 @@
           }
         }
 
-        // Timeline
+        // Timeline entries
         const timeline = document.querySelector('.timeline');
         if (timeline) {
           timeline.innerHTML = '';
@@ -452,7 +443,7 @@
           });
         }
 
-        // History
+        // Shipment History Table
         const historyTable = document.querySelector('.shipment-table tbody');
         if (historyTable) {
           historyTable.innerHTML = '';
