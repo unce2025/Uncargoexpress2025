@@ -335,23 +335,20 @@
     const formatDate = (dateStr) => {
       const d = new Date(dateStr);
       if (isNaN(d)) return dateStr;
-      return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      return d.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
     };
 
     const formatTime = (value) => {
       if (!value) return '';
 
-      // If already in a valid time format (e.g., "9:00:00 AM"), return as-is
-      if (typeof value === 'string' && /\d{1,2}:\d{2}(:\d{2})?\s?(AM|PM)/i.test(value)) {
-        return value.trim();
-      }
-
-      // If it's a number (Excel decimal time), convert to time string
-      if (!isNaN(value)) {
-        const totalSeconds = Math.round(value * 24 * 60 * 60);
-        const date = new Date(0);
-        date.setSeconds(totalSeconds);
-        return date.toLocaleTimeString('en-US', {
+      // Treat value as plain time string (e.g., "9:00 AM")
+      const tryTime = new Date(`1970-01-01T${value}`);
+      if (!isNaN(tryTime)) {
+        return tryTime.toLocaleTimeString('en-US', {
           hour: '2-digit',
           minute: '2-digit',
         });
@@ -380,11 +377,9 @@
 
         // Barcode
         const barcodeImage = document.getElementById('barcodeImage');
-        if (barcodeImage) {
-          barcodeImage.src = `https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&imagetype=Gif`;
-        }
+        if (barcodeImage) barcodeImage.src = `https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&imagetype=Gif`;
 
-        // Helper function
+        // Helper
         const setText = (id, value) => {
           const el = document.getElementById(id);
           if (el) el.textContent = value || '';
@@ -416,11 +411,9 @@
 
         // Shipment Status
         const statusIndicator = document.querySelector('.status-indicator');
-        if (statusIndicator) {
-          statusIndicator.textContent = `SHIPMENT STATUS: ${data.status}`;
-        }
+        if (statusIndicator) statusIndicator.textContent = `SHIPMENT STATUS: ${data.status}`;
 
-        // Lock status
+        // Lock
         const lockStatus = document.getElementById('lockStatus');
         if (lockStatus) {
           if (data.locked === true || data.status?.toLowerCase() === 'delivered') {
@@ -431,7 +424,7 @@
           }
         }
 
-        // Timeline entries
+        // Timeline
         const timeline = document.querySelector('.timeline');
         if (timeline) {
           timeline.innerHTML = '';
@@ -443,7 +436,7 @@
           });
         }
 
-        // Shipment History Table
+        // History
         const historyTable = document.querySelector('.shipment-table tbody');
         if (historyTable) {
           historyTable.innerHTML = '';
