@@ -1,5 +1,5 @@
 async function addTracking(data) {
-  try { 
+  try {
     const response = await fetch('https://script.google.com/macros/s/AKfycbyj5igU7mpUkPROwW2FrUcSw32ZIff4WyXNYmjZw14_bRh8OMmMvao-1KkmnDgHlzA/exec', {
       method: 'POST',
       headers: {
@@ -24,8 +24,32 @@ async function addTracking(data) {
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('submitBtn').addEventListener('click', () => {
+    let logData = [];
+    let historyData = [];
+
+    // Safely parse log
+    try {
+      const rawLog = document.getElementById('log').value;
+      logData = rawLog ? JSON.parse(rawLog) : [];
+    } catch (e) {
+      alert("Log field contains invalid JSON format. Please fix it.");
+      console.error("Invalid log JSON:", document.getElementById('log').value);
+      return;
+    }
+
+    // Safely parse history
+    try {
+      const rawHistory = document.getElementById('history').value;
+      historyData = rawHistory ? JSON.parse(rawHistory) : [];
+    } catch (e) {
+      alert("History field contains invalid JSON format. Please fix it.");
+      console.error("Invalid history JSON:", document.getElementById('history').value);
+      return;
+    }
+
     const formData = {
       trackingNumber: document.getElementById('TrackingNumber').value,
+      status: document.getElementById('Status').value,
       shipperName: document.getElementById('ShipperName').value,
       shipperPhone: document.getElementById('ShipperPhone').value,
       shipperAddress: document.getElementById('ShipperAddress').value,
@@ -43,10 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
       quantity: document.getElementById('Quantity').value,
       payment: document.getElementById('Payment').value,
       totalFreight: document.getElementById('TotalFreight').value,
-      log: JSON.parse(document.getElementById('log').value || '[]'),
-      history: JSON.parse(document.getElementById('history').value || '[]'),
-     
-      status: document.getElementById('Status').value
+      log: logData,
+      history: historyData
     };
 
     addTracking(formData);
