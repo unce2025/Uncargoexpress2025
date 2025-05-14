@@ -5,7 +5,7 @@ async function getTracking(trackingNumber) {
   }
 
   try {
-    const url = `https://script.google.com/macros/s/AKfycbzJxWIxsrKvSKKoSxXa6R4q2Wbn9oiC9JzVAdT4zZjL48PBlIwqzD8pLO8BCH9Bmb8/exec?tracking=${encodeURIComponent(trackingNumber.trim())}`;
+    const url = `https://script.google.com/macros/s/AKfycby895XqLVbDeXnDsZw29Bem45SjMW39ocAFgi8AsLHd9EL7k6ktmMz4CZDeayNyWOw/exec?tracking=${encodeURIComponent(trackingNumber.trim())}`;
 
 
 
