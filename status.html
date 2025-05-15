@@ -361,11 +361,12 @@
         }
       });
 
-      // Populate log timeline
+      // Parse and display timeline log
       const timeline = document.querySelector('.timeline');
       if (timeline) {
         timeline.innerHTML = '';
-        (data.log || []).forEach(entry => {
+        const parsedLog = JSON.parse(data.log || '[]');
+        parsedLog.forEach(entry => {
           const item = document.createElement('div');
           item.className = 'timeline-item';
           item.innerHTML = `<div class="timeline-content"><strong>${formatDate(entry.date) || ''}</strong>: ${entry.description || ''}</div>`;
@@ -373,11 +374,12 @@
         });
       }
 
-      // Populate history table
+      // Parse and display history table
       const historyTable = document.querySelector('.history-table tbody');
       if (historyTable) {
         historyTable.innerHTML = '';
-        (data.history || []).forEach(entry => {
+        const parsedHistory = JSON.parse(data.history || '[]');
+        parsedHistory.forEach(entry => {
           const row = document.createElement('tr');
           row.innerHTML = `
             <td>${formatDate(entry.date) || ''}</td>
