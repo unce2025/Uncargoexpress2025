@@ -1,13 +1,17 @@
 {
-  "name": "united-nation-cargo-express",
+  "name": "netlify-functions-proxy",
   "version": "1.0.0",
-  "description": "Netlify functions dependencies for United Nation Cargo Express",
-  "main": "index.js",
+  "description": "Proxy function to handle CORS for Google Apps Script",
+  "main": "proxy.js",
+  "scripts": {
+    "start": "netlify dev"
+  },
   "dependencies": {
     "node-fetch": "^3.3.1"
   },
   "engines": {
     "node": "16"
   },
+  "author": "",
   "license": "MIT"
 }
