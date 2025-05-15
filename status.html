@@ -332,14 +332,13 @@
       const data = await response.json();
 
       if (!data.success) {
-        console.error('Shipment not found');
         alert('Shipment not found. Please check your tracking number.');
         return;
       }
 
       const shipment = data.shipment;
 
-      // Display basic shipment info
+      // Display basic info
       document.getElementById('shipperName').textContent = shipment.ShipperName || 'N/A';
       document.getElementById('shipperAddress').textContent = shipment.ShipperAddress || 'N/A';
       document.getElementById('shipperEmail').textContent = shipment.ShipperEmail || 'N/A';
@@ -361,24 +360,27 @@
       document.getElementById('payment').textContent = shipment.Payment || 'N/A';
       document.getElementById('totalFreight').textContent = shipment.TotalFreight || 'N/A';
 
-      // Update shipment status indicator
-      const statusIndicator = document.getElementById('statusIndicator');
-      statusIndicator.textContent = `SHIPMENT STATUS: ${shipment.Status || 'N/A'}`;
+      document.getElementById('statusIndicator').textContent = `SHIPMENT STATUS: ${shipment.Status || 'N/A'}`;
 
-      // Display logs as timeline
-      const logArray = JSON.parse(shipment.log || '[]');
+      // Barcode
+      if (shipment.TrackingNumber) {
+        document.getElementById('barcodeImage').src = `https://barcode.tec-it.com/barcode.ashx?data=${shipment.TrackingNumber}&code=Code128&dpi=96`;
+      }
+
+      // Log
       const logContainer = document.getElementById('logContainer');
+      const logArray = JSON.parse(shipment.log || '[]');
       logContainer.innerHTML = '';
       logArray.forEach(entry => {
-        const entryDiv = document.createElement('div');
-        entryDiv.classList.add('timeline-entry');
-        entryDiv.innerHTML = `<h4>${entry.date || ''}</h4><p>${entry.description || ''}</p>`;
-        logContainer.appendChild(entryDiv);
+        const div = document.createElement('div');
+        div.className = 'timeline-entry';
+        div.innerHTML = `<h4>${entry.date || ''}</h4><p>${entry.description || ''}</p>`;
+        logContainer.appendChild(div);
       });
 
-      // Display shipment history in table
-      const historyArray = JSON.parse(shipment.history || '[]');
+      // History
       const historyTableBody = document.getElementById('historyTableBody');
+      const historyArray = JSON.parse(shipment.history || '[]');
       historyTableBody.innerHTML = '';
       historyArray.forEach(item => {
         const row = document.createElement('tr');
@@ -393,15 +395,15 @@
         historyTableBody.appendChild(row);
       });
 
-      // Display packages in table
-      const packagesArray = JSON.parse(shipment.packages || '[]');
+      // Packages
       const packagesTableBody = document.getElementById('packagesTableBody');
+      const packagesArray = JSON.parse(shipment.packages || '[]');
       packagesTableBody.innerHTML = '';
       packagesArray.forEach(pkg => {
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td>${pkg.quantity || ''}</td>
-          <td>${pkg.pieceType || ''}</td>
+          <td>${pkg.qty || ''}</td>
+          <td>${pkg.type || ''}</td>
           <td>${pkg.description || ''}</td>
           <td>${pkg.length || ''}</td>
           <td>${pkg.width || ''}</td>
@@ -411,29 +413,18 @@
         packagesTableBody.appendChild(row);
       });
 
-      // Set barcode image src (use any barcode generator API or base64 image)
-      // For demo, we show tracking number as text in the barcode image alt
-      document.getElementById('barcodeImage').alt = 'Barcode for ' + (shipment.TrackingNumber || 'N/A');
-      // If you have a barcode image URL or generate dynamically, set it here:
-      // document.getElementById('barcodeImage').src = `https://barcode-generator-url/${shipment.TrackingNumber}.png`;
-
+    } catch (error) {
+      console.error('Error fetching shipment data:', error);
+      alert('Error loading shipment data.');
     }
-catch (error) {
-console.error('Error fetching shipment data:', error);
-alert('Failed to fetch shipment data. Please try again later.');
-}
-}
+  }
 
-// On page load, get tracking number from URL query string and fetch shipment
-window.addEventListener('DOMContentLoaded', () => {
-const params = new URLSearchParams(window.location.search);
-const trackingNumber = params.get('tracking');
-if (!trackingNumber) {
-alert('No tracking number provided.');
-return;
-}
-fetchShipmentData(trackingNumber);
-});
+  // Automatically fetch data if tracking number is passed via URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const trackingNumber = urlParams.get('tracking');
+  if (trackingNumber) {
+    fetchShipmentData(trackingNumber);
+  }
 </script>
-
-</body> </html> 
+</body>
+</html>
