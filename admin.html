@@ -91,11 +91,11 @@
       <label>Shipped Date:</label>
       <input type="date" id="ShippedDate" name="shippedDate" />
 
-      <label>Pick Up Time:</label>
-      <input type="text" id="PickUpTime" name="pickUpTime" />
+      <label>Flight Number:</label>
+      <input type="text" id="FlightNumber" name="flightNumber" />
 
-      <label>Departure:</label>
-      <input type="text" id="Departure" name="departure" />
+      <label>Package Weight:</label>
+      <input type="text" id="PackageWeight" name="packageWeight" />
 
       <label>Mode:</label>
       <input type="text" id="Mode" name="mode" />
@@ -192,8 +192,8 @@
         document.getElementById('ReceiverEmail').value = s.receiverEmail || '';
         document.getElementById('EstimatedDeliveryDate').value = formatDate(s.estimatedDeliveryDate);
         document.getElementById('ShippedDate').value = formatDate(s.shippedDate);
-        document.getElementById('PickUpTime').value = s.pickUpTime || '';
-        document.getElementById('Departure').value = s.departure || '';
+        document.getElementById('FlightNumber').value = s.flightNumber || '';
+        document.getElementById('PackageWeight').value = s.packageWeight || '';
         document.getElementById('Mode').value = s.mode || '';
         document.getElementById('Product').value = s.product || '';
         document.getElementById('Quantity').value = s.quantity || '';
