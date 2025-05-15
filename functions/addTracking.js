@@ -36,25 +36,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const formData = {
-      trackingNumber: document.getElementById('TrackingNumber').value.trim(),
-      status: document.getElementById('Status').value.trim(),
-      shipperName: document.getElementById('ShipperName').value.trim(),
-      shipperPhone: document.getElementById('ShipperPhone').value.trim(),
-      shipperAddress: document.getElementById('ShipperAddress').value.trim(),
-      shipperEmail: document.getElementById('ShipperEmail').value.trim(),
-      receiverName: document.getElementById('ReceiverName').value.trim(),
-      receiverPhone: document.getElementById('ReceiverPhone').value.trim(),
-      receiverAddress: document.getElementById('ReceiverAddress').value.trim(),
-      receiverEmail: document.getElementById('ReceiverEmail').value.trim(),
-      estimatedDeliveryDate: document.getElementById('EstimatedDeliveryDate').value.trim(),
-      shippedDate: document.getElementById('ShippedDate').value.trim(),
-      pickUpTime: document.getElementById('PickUpTime').value.trim(),
-      departure: document.getElementById('Departure').value.trim(),
-      mode: document.getElementById('Mode').value.trim(),
-      product: document.getElementById('Product').value.trim(),
-      quantity: document.getElementById('Quantity').value.trim(),
-      payment: document.getElementById('Payment').value.trim(),
-      totalFreight: document.getElementById('TotalFreight').value.trim(),
+      TrackingNumber: document.getElementById('TrackingNumber').value.trim(),
+      Status: document.getElementById('Status').value.trim(),
+      ShipperName: document.getElementById('ShipperName').value.trim(),
+      ShipperPhone: document.getElementById('ShipperPhone').value.trim(),
+      ShipperAddress: document.getElementById('ShipperAddress').value.trim(),
+      ShipperEmail: document.getElementById('ShipperEmail').value.trim(),
+      ReceiverName: document.getElementById('ReceiverName').value.trim(),
+      ReceiverPhone: document.getElementById('ReceiverPhone').value.trim(),
+      ReceiverAddress: document.getElementById('ReceiverAddress').value.trim(),
+      ReceiverEmail: document.getElementById('ReceiverEmail').value.trim(),
+      EstimatedDeliveryDate: document.getElementById('EstimatedDeliveryDate').value.trim(),
+      ShippedDate: document.getElementById('ShippedDate').value.trim(),
+      PickUpTime: document.getElementById('PickUpTime').value.trim(),
+      Departure: document.getElementById('Departure').value.trim(),
+      Mode: document.getElementById('Mode').value.trim(),
+      Product: document.getElementById('Product').value.trim(),
+      Quantity: document.getElementById('Quantity').value.trim(),
+      Payment: document.getElementById('Payment').value.trim(),
+      TotalFreight: document.getElementById('TotalFreight').value.trim(),
       log: logData,
       history: historyData
     };
@@ -63,9 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbw1_foX2lNvSNEJvgBU1r6jiLCvC7wYfG_JDyRaOoP6mVjXES6Yj2nYfrp1vqknq_jJ/exec';
+
 async function addTracking(data) {
   try {
-    const response = await fetch('/.netlify/functions/proxy', {
+    const response = await fetch(GAS_URL, {
       method: 'POST',
       mode: 'cors',
       headers: {
