@@ -18,7 +18,7 @@
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    h1 {
+    h1, h2 {
       color: #003366;
     }
     input, textarea, select {
@@ -35,6 +35,7 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      margin-right: 10px;
     }
     button:hover {
       background-color: #0055a5;
@@ -53,6 +54,7 @@
 
     <form id="shipmentForm">
       <h2>Edit Shipment</h2>
+
       <label>Tracking Number:</label>
       <input type="text" id="shipmentTrackingNumber" name="trackingNumber" required />
 
@@ -117,23 +119,37 @@
       <textarea id="history" name="history" rows="4"></textarea>
 
       <button type="submit" id="submitBtn">Save Shipment</button>
+      <button type="button" onclick="resetForm()">New Entry</button>
     </form>
   </div>
 
 <script>
   function formatDate(dateStr) {
     if (!dateStr) return '';
-    return dateStr.split('T')[0];
+    return new Date(dateStr).toISOString().split('T')[0];
+  }
+
+  function parseJSONSafe(value) {
+    try {
+      return JSON.parse(value || '[]');
+    } catch {
+      throw new Error("Invalid JSON format");
+    }
+  }
+
+  function resetForm() {
+    document.getElementById('shipmentForm').reset();
+    document.getElementById('shipmentTrackingNumber').disabled = false;
   }
 
   async function addTracking(data) {
     try {
       data.estimatedDeliveryDate = formatDate(data.estimatedDeliveryDate);
       data.shippedDate = formatDate(data.shippedDate);
-
-      // Stringify log and history fields before sending
       data.log = JSON.stringify(data.log || []);
       data.history = JSON.stringify(data.history || []);
+
+      document.getElementById('submitBtn').disabled = true;
 
       const response = await fetch('/.netlify/functions/proxy', {
         method: 'POST',
@@ -142,7 +158,7 @@
       });
 
       const result = await response.json();
-      console.log("Response from server:", result);
+      document.getElementById('submitBtn').disabled = false;
 
       if (result.success) {
         alert("Shipment saved successfully!");
@@ -150,6 +166,7 @@
         alert("Failed to save shipment: " + (result.message || "Unknown error"));
       }
     } catch (error) {
+      document.getElementById('submitBtn').disabled = false;
       console.error("Error submitting tracking data:", error);
       alert("An error occurred while saving the shipment.");
     }
@@ -161,36 +178,33 @@
       const result = await response.json();
 
       if (result.success && result.shipment) {
-        const shipment = result.shipment;
+        const s = result.shipment;
+        document.getElementById('shipmentTrackingNumber').value = s.trackingNumber || '';
+        document.getElementById('shipmentTrackingNumber').disabled = true;
+        document.getElementById('Status').value = s.status || '';
+        document.getElementById('ShipperName').value = s.shipperName || '';
+        document.getElementById('ShipperPhone').value = s.shipperPhone || '';
+        document.getElementById('ShipperAddress').value = s.shipperAddress || '';
+        document.getElementById('ShipperEmail').value = s.shipperEmail || '';
+        document.getElementById('ReceiverName').value = s.receiverName || '';
+        document.getElementById('ReceiverPhone').value = s.receiverPhone || '';
+        document.getElementById('ReceiverAddress').value = s.receiverAddress || '';
+        document.getElementById('ReceiverEmail').value = s.receiverEmail || '';
+        document.getElementById('EstimatedDeliveryDate').value = formatDate(s.estimatedDeliveryDate);
+        document.getElementById('ShippedDate').value = formatDate(s.shippedDate);
+        document.getElementById('PickUpTime').value = s.pickUpTime || '';
+        document.getElementById('Departure').value = s.departure || '';
+        document.getElementById('Mode').value = s.mode || '';
+        document.getElementById('Product').value = s.product || '';
+        document.getElementById('Quantity').value = s.quantity || '';
+        document.getElementById('Payment').value = s.payment || '';
+        document.getElementById('TotalFreight').value = s.totalFreight || '';
 
-        document.getElementById('shipmentTrackingNumber').value = shipment.trackingNumber || '';
-        document.getElementById('Status').value = shipment.status || '';
-        document.getElementById('ShipperName').value = shipment.shipperName || '';
-        document.getElementById('ShipperPhone').value = shipment.shipperPhone || '';
-        document.getElementById('ShipperAddress').value = shipment.shipperAddress || '';
-        document.getElementById('ShipperEmail').value = shipment.shipperEmail || '';
-        document.getElementById('ReceiverName').value = shipment.receiverName || '';
-        document.getElementById('ReceiverPhone').value = shipment.receiverPhone || '';
-        document.getElementById('ReceiverAddress').value = shipment.receiverAddress || '';
-        document.getElementById('ReceiverEmail').value = shipment.receiverEmail || '';
-        document.getElementById('EstimatedDeliveryDate').value = formatDate(shipment.estimatedDeliveryDate);
-        document.getElementById('ShippedDate').value = formatDate(shipment.shippedDate);
-        document.getElementById('PickUpTime').value = shipment.pickUpTime || '';
-        document.getElementById('Departure').value = shipment.departure || '';
-        document.getElementById('Mode').value = shipment.mode || '';
-        document.getElementById('Product').value = shipment.product || '';
-        document.getElementById('Quantity').value = shipment.quantity || '';
-        document.getElementById('Payment').value = shipment.payment || '';
-        document.getElementById('TotalFreight').value = shipment.totalFreight || '';
-
-        // Parse stored JSON strings back to readable text
-        const logJSON = shipment.log || '[]';
-        const historyJSON = shipment.history || '[]';
-
-        document.getElementById('log').value = JSON.stringify(JSON.parse(logJSON), null, 2);
-        document.getElementById('history').value = JSON.stringify(JSON.parse(historyJSON), null, 2);
+        document.getElementById('log').value = JSON.stringify(JSON.parse(s.log || '[]'), null, 2);
+        document.getElementById('history').value = JSON.stringify(JSON.parse(s.history || '[]'), null, 2);
       } else {
         alert("Tracking number not found.");
+        resetForm();
       }
     } catch (error) {
       console.error("Error loading tracking data:", error);
@@ -222,8 +236,8 @@
           quantity: document.getElementById('Quantity').value.trim(),
           payment: document.getElementById('Payment').value.trim(),
           totalFreight: document.getElementById('TotalFreight').value.trim(),
-          log: JSON.parse(document.getElementById('log').value || '[]'),
-          history: JSON.parse(document.getElementById('history').value || '[]')
+          log: parseJSONSafe(document.getElementById('log').value),
+          history: parseJSONSafe(document.getElementById('history').value)
         };
         await addTracking(data);
       } catch (err) {
