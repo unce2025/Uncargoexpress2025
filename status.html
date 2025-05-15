@@ -1,4 +1,3 @@
-<!-- status.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -335,7 +334,7 @@
 
     const fetchShipmentData = async () => {
       try {
-        const response = await fetch(`https://script.google.com/macros/s/AKfycbw1_foX2lNvSNEJvgBU1r6jiLCvC7wYfG_JDyRaOoP6mVjXES6Yj2nYfrp1vqknq_jJ/exec?tracking=${encodeURIComponent(trackingNumber)}`);
+        const response = await fetch(`https://script.google.com/macros/s/AKfycbwD_8ZzBGDSYPnKRSUz00TIucVWThJM3Ek8llQm91WRdEfRcA-s217ho8XmpusIGFSA/exec?tracking=${encodeURIComponent(trackingNumber)}`);
         const result = await response.json();
 
         if (!result.success || !result.shipment) {
