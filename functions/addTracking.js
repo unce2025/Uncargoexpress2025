@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let logData = [];
     let historyData = [];
 
-    // Safely parse log
+    // Parse log field
     try {
       const rawLog = document.getElementById('log').value;
       logData = rawLog ? JSON.parse(rawLog) : [];
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Safely parse history
+    // Parse history field
     try {
       const rawHistory = document.getElementById('history').value;
       historyData = rawHistory ? JSON.parse(rawHistory) : [];
@@ -23,47 +23,73 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Required fields validation
+    // Validate required fields
     const requiredFields = [
-      'TrackingNumber', 'Status', 'ShipperName', 'ReceiverName', 
-      'EstimatedDeliveryDate', 'ShippedDate', 'PickUpTime', 'Departure', 
+      'TrackingNumber', 'Status', 'ShipperName', 'ReceiverName',
+      'EstimatedDeliveryDate', 'ShippedDate', 'PickUpTime', 'Departure',
       'Mode', 'Product', 'Quantity', 'Payment', 'TotalFreight'
     ];
 
-    // Check if any required field is empty
     for (let field of requiredFields) {
-      if (!document.getElementById(field).value.trim()) {
+      const value = document.getElementById(field).value.trim();
+      if (!value) {
         alert(`Please fill in the ${field} field.`);
         return;
       }
     }
 
-    // Gather the form data
+    // Create formData object
     const formData = {
-      trackingNumber: document.getElementById('TrackingNumber').value,
-      status: document.getElementById('Status').value,
-      shipperName: document.getElementById('ShipperName').value,
-      shipperPhone: document.getElementById('ShipperPhone').value,
-      shipperAddress: document.getElementById('ShipperAddress').value,
-      shipperEmail: document.getElementById('ShipperEmail').value,
-      receiverName: document.getElementById('ReceiverName').value,
-      receiverPhone: document.getElementById('ReceiverPhone').value,
-      receiverAddress: document.getElementById('ReceiverAddress').value,
-      receiverEmail: document.getElementById('ReceiverEmail').value,
-      estimatedDeliveryDate: document.getElementById('EstimatedDeliveryDate').value,
-      shippedDate: document.getElementById('ShippedDate').value,
-      pickUpTime: document.getElementById('PickUpTime').value,
-      departure: document.getElementById('Departure').value,
-      mode: document.getElementById('Mode').value,
-      product: document.getElementById('Product').value,
-      quantity: document.getElementById('Quantity').value,
-      payment: document.getElementById('Payment').value,
-      totalFreight: document.getElementById('TotalFreight').value,
+      trackingNumber: document.getElementById('TrackingNumber').value.trim(),
+      status: document.getElementById('Status').value.trim(),
+      shipperName: document.getElementById('ShipperName').value.trim(),
+      shipperPhone: document.getElementById('ShipperPhone').value.trim(),
+      shipperAddress: document.getElementById('ShipperAddress').value.trim(),
+      shipperEmail: document.getElementById('ShipperEmail').value.trim(),
+      receiverName: document.getElementById('ReceiverName').value.trim(),
+      receiverPhone: document.getElementById('ReceiverPhone').value.trim(),
+      receiverAddress: document.getElementById('ReceiverAddress').value.trim(),
+      receiverEmail: document.getElementById('ReceiverEmail').value.trim(),
+      estimatedDeliveryDate: document.getElementById('EstimatedDeliveryDate').value.trim(),
+      shippedDate: document.getElementById('ShippedDate').value.trim(),
+      pickUpTime: document.getElementById('PickUpTime').value.trim(),
+      departure: document.getElementById('Departure').value.trim(),
+      mode: document.getElementById('Mode').value.trim(),
+      product: document.getElementById('Product').value.trim(),
+      quantity: document.getElementById('Quantity').value.trim(),
+      payment: document.getElementById('Payment').value.trim(),
+      totalFreight: document.getElementById('TotalFreight').value.trim(),
       log: logData,
       history: historyData
     };
 
-    // Submit the form data
+    // Send to server
     addTracking(formData);
   });
 });
+
+async function addTracking(data) {
+  try {
+    const response = await fetch('https://script.google.com/macros/s/AKfycbyYfwKHcOgHvrLZauzlg-tX2XC4VdJZawWKqQThqj4yFbmze602NuJoOTeQcAYHlgGl/exec', {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    const resultText = await response.text();
+    const result = JSON.parse(resultText);
+
+    if (result.success) {
+      alert("Shipment saved successfully.");
+    } else {
+      alert("Error: " + result.message);
+      console.error("Server response:", result);
+    }
+  } catch (error) {
+    console.error("Error submitting tracking data:", error);
+    alert("An error occurred while saving the shipment.");
+  }
+}
