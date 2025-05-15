@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function addTracking(data) {
   try {
-    const response = await fetch('https://script.google.com/macros/s/AKfycbyYfwKHcOgHvrLZauzlg-tX2XC4VdJZawWKqQThqj4yFbmze602NuJoOTeQcAYHlgGl/exec', {
+    const response = await fetch('/.netlify/functions/proxy', {
       method: 'POST',
       mode: 'cors',
       headers: {
