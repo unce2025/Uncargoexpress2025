@@ -23,7 +23,17 @@ exports.handler = async function(event) {
     }
 
     const response = await fetch(url, options);
-    const data = await response.json(); // <-- Expect JSON from GAS
+    const text = await response.text();
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      return {
+        statusCode: 502,
+        body: JSON.stringify({ error: "Invalid JSON from GAS", raw: text })
+      };
+    }
 
     return {
       statusCode: 200,
