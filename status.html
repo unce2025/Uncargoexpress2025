@@ -270,8 +270,8 @@
       <div class="info-column">
         <p><strong>Estimated Delivery:</strong> <span id="estimatedDeliveryDate"></span></p>
         <p><strong>Shipped Date:</strong> <span id="shippedDate"></span></p>
-        <p><strong>Pickup Time:</strong> <span id="pickupTime"></span></p>
-        <p><strong>Departure Time:</strong> <span id="departureTime"></span></p>
+        <p><strong>Flight Number:</strong> <span id="flightNumber"></span></p>
+        <p><strong>Package Weight:</strong> <span id="packageWeight"></span></p>
         <p><strong>Mode:</strong> <span id="mode"></span></p>
       </div>
       <div class="info-column">
@@ -367,9 +367,9 @@
       document.getElementById('estimatedDeliveryDate').textContent = shipment.EstimatedDeliveryDate ? new Date(shipment.EstimatedDeliveryDate).toLocaleDateString() : 'N/A';
       document.getElementById('shippedDate').textContent = shipment.ShippedDate ? new Date(shipment.ShippedDate).toLocaleDateString() : 'N/A';
 
-      // Format PickUpTime and Departure as date/time
-      document.getElementById('pickupTime').textContent = formatDateTime(shipment.PickUpTime);
-      document.getElementById('departureTime').textContent = formatDateTime(shipment.Departure);
+    
+      document.getElementById('flightNumber').textContent = shipment.FlightNumber || 'N/A';
+      document.getElementById('packageWeight').textContent = shipment.PackageWeight || 'N/A';
 
       document.getElementById('mode').textContent = shipment.Mode || 'N/A';
 
