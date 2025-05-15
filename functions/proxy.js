@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 
 exports.handler = async function(event) {
-  const GAS_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbyYfwKHcOgHvrLZauzlg-tX2XC4VdJZawWKqQThqj4yFbmze602NuJoOTeQcAYHlgGl/exec";
 
   try {
     let url = GAS_URL;
@@ -13,7 +13,9 @@ exports.handler = async function(event) {
     };
 
     if (event.httpMethod === "GET") {
-      url += event.queryStringParameters ? "?" + new URLSearchParams(event.queryStringParameters).toString() : "";
+      url += event.queryStringParameters
+        ? "?" + new URLSearchParams(event.queryStringParameters).toString()
+        : "";
     } else if (event.httpMethod === "POST") {
       options.body = event.body;
     } else {
@@ -21,7 +23,7 @@ exports.handler = async function(event) {
     }
 
     const response = await fetch(url, options);
-    const data = await response.text();
+    const data = await response.json(); // <-- Expect JSON from GAS
 
     return {
       statusCode: 200,
@@ -29,7 +31,7 @@ exports.handler = async function(event) {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "Content-Type"
       },
-      body: data,
+      body: JSON.stringify(data),
     };
   } catch (error) {
     return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
