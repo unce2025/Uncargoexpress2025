@@ -18,21 +18,26 @@ exports.handler = async function(event) {
 
   try {
     let url = GAS_URL;
+    const headers = { "Content-Type": "application/json" };
     let options = {
       method: event.httpMethod,
-      headers: {
-        "Content-Type": "application/json"
-      }
+      headers,
     };
 
     if (event.httpMethod === "GET") {
-      url += event.queryStringParameters
-        ? "?" + new URLSearchParams(event.queryStringParameters).toString()
-        : "";
+      // Append query params from the original request
+      if (event.queryStringParameters && Object.keys(event.queryStringParameters).length > 0) {
+        const params = new URLSearchParams(event.queryStringParameters).toString();
+        url += "?" + params;
+      }
     } else if (event.httpMethod === "POST") {
       options.body = event.body;
     } else {
-      return { statusCode: 405, body: "Method not allowed" };
+      return {
+        statusCode: 405,
+        headers: { "Access-Control-Allow-Origin": "*" },
+        body: "Method Not Allowed"
+      };
     }
 
     const response = await fetch(url, options);
@@ -41,12 +46,12 @@ exports.handler = async function(event) {
     let data;
     try {
       data = JSON.parse(text);
-    } catch (e) {
+    } catch {
       return {
         statusCode: 502,
         headers: {
           "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Headers": "Content-Type"
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({ error: "Invalid JSON from GAS", raw: text })
       };
@@ -56,18 +61,15 @@ exports.handler = async function(event) {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type"
+        "Access-Control-Allow-Origin": "*"
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(data)
     };
+
   } catch (error) {
     return {
       statusCode: 500,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type"
-      },
+      headers: { "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify({ error: error.message })
     };
   }
