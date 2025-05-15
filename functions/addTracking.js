@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const requiredFields = [
       'TrackingNumber', 'Status', 'ShipperName', 'ReceiverName',
-      'EstimatedDeliveryDate', 'ShippedDate', 'PickUpTime', 'Departure',
+      'EstimatedDeliveryDate', 'ShippedDate', 'FlightNumber', 'PackageWeight',
       'Mode', 'Product', 'Quantity', 'Payment', 'TotalFreight'
     ];
 
@@ -48,8 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
       ReceiverEmail: document.getElementById('ReceiverEmail').value.trim(),
       EstimatedDeliveryDate: document.getElementById('EstimatedDeliveryDate').value.trim(),
       ShippedDate: document.getElementById('ShippedDate').value.trim(),
-      PickUpTime: document.getElementById('PickUpTime').value.trim(),
-      Departure: document.getElementById('Departure').value.trim(),
+      FlightNumber: document.getElementById('FlightNumber').value.trim(),
+      PackageWeight: document.getElementById('PackageWeight').value.trim(),
       Mode: document.getElementById('Mode').value.trim(),
       Product: document.getElementById('Product').value.trim(),
       Quantity: document.getElementById('Quantity').value.trim(),
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbysJChO3-Xys8Dn7d9SNqthUMpAA80LZLInUpq8JKVbJU1AsMuQh4d1xTQHvmxwfHM1/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzSfjjysne-gXJ-6re4NIgTFelItLFycAKiGfL9JGuGHIDMc4BpnIHGKrGT14opFDdH/exec';
 
 async function addTracking(data) {
   try {
