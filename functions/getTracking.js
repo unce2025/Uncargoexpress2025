@@ -1,3 +1,25 @@
+async function getTracking(trackingNumber) {
+  if (!trackingNumber || trackingNumber.trim() === "") {
+    alert("Please enter a valid tracking number.");
+    return;
+  }
+
+  try {
+    const url = `https://your-netlify-site.netlify.app/.netlify/functions/proxy?tracking=${encodeURIComponent(trackingNumber.trim())}`;
+    const response = await fetch(url);
+    const result = await response.json();
+
+    if (result.success) {
+      displayShipment(result.shipment);
+    } else {
+      alert("Tracking number not found.");
+    }
+  } catch (error) {
+    console.error("Error fetching tracking info:", error);
+    alert("An error occurred while retrieving tracking information.");
+  }
+}
+
 function displayShipment(shipment) {
   if (!shipment) {
     alert("No shipment data available.");
@@ -9,27 +31,12 @@ function displayShipment(shipment) {
 
   shipmentInfoContainer.innerHTML = `
     <h3>Shipment Information</h3>
-    <p><strong>Timestamp:</strong> ${shipment.Timestamp}</p>
-    <p><strong>Tracking Number:</strong> ${shipment.TrackingNumber}</p>
-    <p><strong>Status:</strong> ${shipment.Status}</p>
-    <p><strong>Shipper Name:</strong> ${shipment.ShipperName}</p>
-    <p><strong>Shipper Phone:</strong> ${shipment.ShipperPhone}</p>
-    <p><strong>Shipper Address:</strong> ${shipment.ShipperAddress}</p>
-    <p><strong>Shipper Email:</strong> ${shipment.ShipperEmail}</p>
-    <p><strong>Receiver Name:</strong> ${shipment.ReceiverName}</p>
-    <p><strong>Receiver Phone:</strong> ${shipment.ReceiverPhone}</p>
-    <p><strong>Receiver Address:</strong> ${shipment.ReceiverAddress}</p>
-    <p><strong>Receiver Email:</strong> ${shipment.ReceiverEmail}</p>
-    <p><strong>Estimated Delivery Date:</strong> ${shipment.EstimatedDeliveryDate}</p>
-    <p><strong>Shipped Date:</strong> ${shipment.ShippedDate}</p>
-    <p><strong>Pick-Up Time:</strong> ${shipment.PickUpTime}</p>
-    <p><strong>Departure:</strong> ${shipment.Departure}</p>
-    <p><strong>Mode:</strong> ${shipment.Mode}</p>
-    <p><strong>Product:</strong> ${shipment.Product}</p>
-    <p><strong>Quantity:</strong> ${shipment.Quantity}</p>
-    <p><strong>Payment:</strong> ${shipment.Payment}</p>
-    <p><strong>Total Freight:</strong> ${shipment.TotalFreight}</p>
-    <p><strong>Log:</strong> ${shipment.log}</p>
-    <p><strong>History:</strong> ${shipment.history}</p>
+    <p><strong>Tracking Number:</strong> ${shipment.trackingNumber}</p>
+    <p><strong>Status:</strong> ${shipment.status}</p>
+    <p><strong>Shipper Name:</strong> ${shipment.shipperName}</p>
+    <p><strong>Receiver Name:</strong> ${shipment.receiverName}</p>
+    <p><strong>Estimated Delivery Date:</strong> ${shipment.estimatedDeliveryDate}</p>
+    <p><strong>Shipped Date:</strong> ${shipment.shippedDate}</p>
+    <p><strong>Payment:</strong> ${shipment.payment}</p>
   `;
 }
