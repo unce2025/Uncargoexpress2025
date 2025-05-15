@@ -326,29 +326,37 @@
   </div>
 
 <script>
+  function getTrackingNumberFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('tracking');
+  }
+
   async function fetchShipmentData(trackingNumber) {
     try {
       const response = await fetch(`https://script.google.com/macros/s/AKfycbzrtpPr6-NoxotSQ-upinCohoElIJxQQO259cpYlUOjhSFLcIcng5m_MnDeh6r9tyR5/exec?tracking=${trackingNumber}`);
       const data = await response.json();
 
       if (!data.success) {
+        console.error('Shipment not found');
         alert('Shipment not found. Please check your tracking number.');
         return;
       }
 
       const shipment = data.shipment;
 
-      // Display basic info
+      // Shipper info
       document.getElementById('shipperName').textContent = shipment.ShipperName || 'N/A';
       document.getElementById('shipperAddress').textContent = shipment.ShipperAddress || 'N/A';
       document.getElementById('shipperEmail').textContent = shipment.ShipperEmail || 'N/A';
       document.getElementById('shipperPhone').textContent = shipment.ShipperPhone || 'N/A';
 
+      // Receiver info
       document.getElementById('receiverName').textContent = shipment.ReceiverName || 'N/A';
       document.getElementById('receiverAddress').textContent = shipment.ReceiverAddress || 'N/A';
       document.getElementById('receiverPhone').textContent = shipment.ReceiverPhone || 'N/A';
       document.getElementById('receiverEmail').textContent = shipment.ReceiverEmail || 'N/A';
 
+      // Shipment details
       document.getElementById('estimatedDeliveryDate').textContent = shipment.EstimatedDeliveryDate ? new Date(shipment.EstimatedDeliveryDate).toLocaleDateString() : 'N/A';
       document.getElementById('shippedDate').textContent = shipment.ShippedDate ? new Date(shipment.ShippedDate).toLocaleDateString() : 'N/A';
       document.getElementById('pickupTime').textContent = shipment.PickUpTime || 'N/A';
@@ -360,27 +368,28 @@
       document.getElementById('payment').textContent = shipment.Payment || 'N/A';
       document.getElementById('totalFreight').textContent = shipment.TotalFreight || 'N/A';
 
-      document.getElementById('statusIndicator').textContent = `SHIPMENT STATUS: ${shipment.Status || 'N/A'}`;
+      // Status
+      const statusIndicator = document.getElementById('statusIndicator');
+      statusIndicator.textContent = `SHIPMENT STATUS: ${shipment.Status || 'N/A'}`;
 
       // Barcode
-      if (shipment.TrackingNumber) {
-        document.getElementById('barcodeImage').src = `https://barcode.tec-it.com/barcode.ashx?data=${shipment.TrackingNumber}&code=Code128&dpi=96`;
-      }
+      const barcodeImage = document.getElementById('barcodeImage');
+      barcodeImage.src = `https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&dpi=96`;
 
-      // Log
-      const logContainer = document.getElementById('logContainer');
+      // Shipment Log
       const logArray = JSON.parse(shipment.log || '[]');
+      const logContainer = document.getElementById('logContainer');
       logContainer.innerHTML = '';
       logArray.forEach(entry => {
-        const div = document.createElement('div');
-        div.className = 'timeline-entry';
-        div.innerHTML = `<h4>${entry.date || ''}</h4><p>${entry.description || ''}</p>`;
-        logContainer.appendChild(div);
+        const entryDiv = document.createElement('div');
+        entryDiv.classList.add('timeline-entry');
+        entryDiv.innerHTML = `<h4>${entry.date || ''}</h4><p>${entry.description || ''}</p>`;
+        logContainer.appendChild(entryDiv);
       });
 
-      // History
-      const historyTableBody = document.getElementById('historyTableBody');
+      // Shipment History
       const historyArray = JSON.parse(shipment.history || '[]');
+      const historyTableBody = document.getElementById('historyTableBody');
       historyTableBody.innerHTML = '';
       historyArray.forEach(item => {
         const row = document.createElement('tr');
@@ -396,13 +405,13 @@
       });
 
       // Packages
-      const packagesTableBody = document.getElementById('packagesTableBody');
       const packagesArray = JSON.parse(shipment.packages || '[]');
+      const packagesTableBody = document.getElementById('packagesTableBody');
       packagesTableBody.innerHTML = '';
       packagesArray.forEach(pkg => {
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td>${pkg.qty || ''}</td>
+          <td>${pkg.quantity || ''}</td>
           <td>${pkg.type || ''}</td>
           <td>${pkg.description || ''}</td>
           <td>${pkg.length || ''}</td>
@@ -414,17 +423,19 @@
       });
 
     } catch (error) {
-      console.error('Error fetching shipment data:', error);
-      alert('Error loading shipment data.');
+      console.error('Error fetching shipment:', error);
+      alert('Error retrieving shipment data.');
     }
   }
 
-  // Automatically fetch data if tracking number is passed via URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const trackingNumber = urlParams.get('tracking');
+  // Start on load
+  const trackingNumber = getTrackingNumberFromURL();
   if (trackingNumber) {
     fetchShipmentData(trackingNumber);
+  } else {
+    alert('No tracking number found in URL.');
   }
 </script>
-</body>
-</html>
+
+
+</body></html>
