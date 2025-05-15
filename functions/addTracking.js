@@ -62,3 +62,29 @@ document.addEventListener('DOMContentLoaded', () => {
     addTracking(formData);
   });
 });
+
+async function addTracking(data) {
+  try {
+    const response = await fetch('https://script.google.com/macros/s/AKfycbyYfwKHcOgHvrLZauzlg-tX2XC4VdJZawWKqQThqj4yFbmze602NuJoOTeQcAYHlgGl/exec', {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    const resultText = await response.text();
+    const result = JSON.parse(resultText);
+
+    if (result.success) {
+      alert("Shipment saved successfully.");
+    } else {
+      alert("Error: " + result.message);
+      console.error("Server response:", result);
+    }
+  } catch (error) {
+    console.error("Error submitting tracking data:", error);
+    alert("An error occurred while saving the shipment.");
+  }
+}
