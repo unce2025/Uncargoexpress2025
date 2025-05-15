@@ -340,7 +340,7 @@
 
   async function fetchShipmentData(trackingNumber) {
     try {
-      const response = await fetch(`https://script.google.com/macros/s/AKfycbz6sDjz5ra5F0MKrHVfgycdvOQ-kCdmFKhlExuPiz69LnS0Q9PXQQKEmJ1yttS49_y5/exec?tracking=${trackingNumber}`);
+      const response = await fetch(`https://script.google.com/macros/s/AKfycbxG90QVfLdv872SuyNW8EDZKvr3pqbT4UoWygyvbCjqUo0AuuWKxABmNsuIBjTVLLWZ/exec?tracking=${trackingNumber}`);
       const data = await response.json();
 
       if (!data.success) {
