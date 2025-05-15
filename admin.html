@@ -121,24 +121,23 @@
   </div>
 
 <script>
-  // Function to format date as yyyy-MM-dd
   function formatDate(dateStr) {
-    if (!dateStr) return '';  // If no date is provided, return an empty string.
-    return dateStr.split('T')[0];  // Split at 'T' and return only the yyyy-MM-dd part.
+    if (!dateStr) return '';
+    return dateStr.split('T')[0];
   }
 
-  // Function to add tracking data
   async function addTracking(data) {
     try {
-      // Ensure date fields are in the correct format before sending
       data.estimatedDeliveryDate = formatDate(data.estimatedDeliveryDate);
       data.shippedDate = formatDate(data.shippedDate);
 
+      // Stringify log and history fields before sending
+      data.log = JSON.stringify(data.log || []);
+      data.history = JSON.stringify(data.history || []);
+
       const response = await fetch('/.netlify/functions/proxy', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
 
@@ -156,7 +155,6 @@
     }
   }
 
-  // Function to load tracking data
   async function loadTracking(trackingNumber) {
     try {
       const response = await fetch(`/.netlify/functions/proxy?tracking=${encodeURIComponent(trackingNumber)}`);
@@ -165,7 +163,6 @@
       if (result.success && result.shipment) {
         const shipment = result.shipment;
 
-        // Format dates before displaying
         document.getElementById('shipmentTrackingNumber').value = shipment.trackingNumber || '';
         document.getElementById('Status').value = shipment.status || '';
         document.getElementById('ShipperName').value = shipment.shipperName || '';
@@ -176,11 +173,8 @@
         document.getElementById('ReceiverPhone').value = shipment.receiverPhone || '';
         document.getElementById('ReceiverAddress').value = shipment.receiverAddress || '';
         document.getElementById('ReceiverEmail').value = shipment.receiverEmail || '';
-        
-        // Apply formatDate to date fields
         document.getElementById('EstimatedDeliveryDate').value = formatDate(shipment.estimatedDeliveryDate);
         document.getElementById('ShippedDate').value = formatDate(shipment.shippedDate);
-        
         document.getElementById('PickUpTime').value = shipment.pickUpTime || '';
         document.getElementById('Departure').value = shipment.departure || '';
         document.getElementById('Mode').value = shipment.mode || '';
@@ -188,8 +182,13 @@
         document.getElementById('Quantity').value = shipment.quantity || '';
         document.getElementById('Payment').value = shipment.payment || '';
         document.getElementById('TotalFreight').value = shipment.totalFreight || '';
-        document.getElementById('log').value = JSON.stringify(shipment.log || [], null, 2);
-        document.getElementById('history').value = JSON.stringify(shipment.history || [], null, 2);
+
+        // Parse stored JSON strings back to readable text
+        const logJSON = shipment.log || '[]';
+        const historyJSON = shipment.history || '[]';
+
+        document.getElementById('log').value = JSON.stringify(JSON.parse(logJSON), null, 2);
+        document.getElementById('history').value = JSON.stringify(JSON.parse(historyJSON), null, 2);
       } else {
         alert("Tracking number not found.");
       }
@@ -199,43 +198,44 @@
     }
   }
 
-  // Adding event listeners when the page is loaded
   document.addEventListener('DOMContentLoaded', () => {
-    // Submit tracking data
     document.getElementById('submitBtn').addEventListener('click', async (e) => {
-      e.preventDefault(); // Prevent the form from submitting normally
-      const data = {
-        trackingNumber: document.getElementById('shipmentTrackingNumber').value.trim(),
-        status: document.getElementById('Status').value.trim(),
-        shipperName: document.getElementById('ShipperName').value.trim(),
-        shipperPhone: document.getElementById('ShipperPhone').value.trim(),
-        shipperAddress: document.getElementById('ShipperAddress').value.trim(),
-        shipperEmail: document.getElementById('ShipperEmail').value.trim(),
-        receiverName: document.getElementById('ReceiverName').value.trim(),
-        receiverPhone: document.getElementById('ReceiverPhone').value.trim(),
-        receiverAddress: document.getElementById('ReceiverAddress').value.trim(),
-        receiverEmail: document.getElementById('ReceiverEmail').value.trim(),
-        estimatedDeliveryDate: document.getElementById('EstimatedDeliveryDate').value.trim(),
-        shippedDate: document.getElementById('ShippedDate').value.trim(),
-        pickUpTime: document.getElementById('PickUpTime').value.trim(),
-        departure: document.getElementById('Departure').value.trim(),
-        mode: document.getElementById('Mode').value.trim(),
-        product: document.getElementById('Product').value.trim(),
-        quantity: document.getElementById('Quantity').value.trim(),
-        payment: document.getElementById('Payment').value.trim(),
-        totalFreight: document.getElementById('TotalFreight').value.trim(),
-        log: JSON.parse(document.getElementById('log').value),
-        history: JSON.parse(document.getElementById('history').value)
-      };
-
-      await addTracking(data);
+      e.preventDefault();
+      try {
+        const data = {
+          trackingNumber: document.getElementById('shipmentTrackingNumber').value.trim(),
+          status: document.getElementById('Status').value.trim(),
+          shipperName: document.getElementById('ShipperName').value.trim(),
+          shipperPhone: document.getElementById('ShipperPhone').value.trim(),
+          shipperAddress: document.getElementById('ShipperAddress').value.trim(),
+          shipperEmail: document.getElementById('ShipperEmail').value.trim(),
+          receiverName: document.getElementById('ReceiverName').value.trim(),
+          receiverPhone: document.getElementById('ReceiverPhone').value.trim(),
+          receiverAddress: document.getElementById('ReceiverAddress').value.trim(),
+          receiverEmail: document.getElementById('ReceiverEmail').value.trim(),
+          estimatedDeliveryDate: document.getElementById('EstimatedDeliveryDate').value.trim(),
+          shippedDate: document.getElementById('ShippedDate').value.trim(),
+          pickUpTime: document.getElementById('PickUpTime').value.trim(),
+          departure: document.getElementById('Departure').value.trim(),
+          mode: document.getElementById('Mode').value.trim(),
+          product: document.getElementById('Product').value.trim(),
+          quantity: document.getElementById('Quantity').value.trim(),
+          payment: document.getElementById('Payment').value.trim(),
+          totalFreight: document.getElementById('TotalFreight').value.trim(),
+          log: JSON.parse(document.getElementById('log').value || '[]'),
+          history: JSON.parse(document.getElementById('history').value || '[]')
+        };
+        await addTracking(data);
+      } catch (err) {
+        alert("Please ensure 'log' and 'history' fields are valid JSON.");
+        console.error(err);
+      }
     });
 
-    // Search shipment data by tracking number
     document.getElementById('searchForm').addEventListener('submit', async (e) => {
-      e.preventDefault();  // Prevent the form from submitting normally
+      e.preventDefault();
       const trackingNumber = document.getElementById('trackingSearch').value.trim();
-      await loadTracking(trackingNumber);
+      if (trackingNumber) await loadTracking(trackingNumber);
     });
   });
 </script>
