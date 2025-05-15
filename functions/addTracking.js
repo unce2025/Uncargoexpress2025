@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxG90QVfLdv872SuyNW8EDZKvr3pqbT4UoWygyvbCjqUo0AuuWKxABmNsuIBjTVLLWZ/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbysJChO3-Xys8Dn7d9SNqthUMpAA80LZLInUpq8JKVbJU1AsMuQh4d1xTQHvmxwfHM1/exec';
 
 async function addTracking(data) {
   try {
