@@ -323,48 +323,64 @@
   </div>
 
 <script>
+  // Utility to format ISO date string to yyyy-MM-dd
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    return dateStr.split('T')[0];
+  }
+
   async function getTrackingData(trackingNumber) {
     try {
-      const response = await fetch(`https://script.google.com/macros/s/AKfycbyYfwKHcOgHvrLZauzlg-tX2XC4VdJZawWKqQThqj4yFbmze602NuJoOTeQcAYHlgGl/exec?trackingNumber=${encodeURIComponent(trackingNumber)}`);
+      const response = await fetch(`https://script.google.com/macros/s/AKfycbyYfwKHcOgHvrLZauzlg-tX2XC4VdJZawWKqQThqj4yFbmze602NuJoOTeQcAYHlgGl/exec?tracking=${encodeURIComponent(trackingNumber)}`);
       const result = await response.json();
 
       if (result.error) {
+        console.error("Server error:", result.error);
         alert(result.error);
         return;
       }
 
       const data = result.shipment;
+      if (!data) {
+        alert("Shipment not found.");
+        return;
+      }
 
-      // Set text content for each span
+      // Populate span fields
       const fields = [
         "TrackingNumber", "Status", "ShipperName", "ShipperPhone", "ShipperAddress", "ShipperEmail",
         "ReceiverName", "ReceiverPhone", "ReceiverAddress", "ReceiverEmail", "EstimatedDeliveryDate",
         "ShippedDate", "PickUpTime", "Departure", "Mode", "Product", "Quantity", "Payment", "TotalFreight"
       ];
+
       fields.forEach(field => {
-        document.getElementById(field).textContent = data[field] || "";
+        const el = document.getElementById(field);
+        if (el) {
+          const value = data[field] || '';
+          el.textContent = field.includes('Date') ? formatDate(value) : value;
+        }
       });
 
-      // Timeline log
+      // Populate log timeline
       const timeline = document.querySelector('.timeline');
       if (timeline) {
         timeline.innerHTML = '';
         (data.log || []).forEach(entry => {
           const item = document.createElement('div');
           item.className = 'timeline-item';
-          item.innerHTML = `<div class="timeline-content"><strong>${entry.date || ''}</strong>: ${entry.description || ''}</div>`;
+          item.innerHTML = `<div class="timeline-content"><strong>${formatDate(entry.date) || ''}</strong>: ${entry.description || ''}</div>`;
           timeline.appendChild(item);
         });
       }
 
-      // Shipment history table
+      // Populate history table
       const historyTable = document.querySelector('.history-table tbody');
       if (historyTable) {
         historyTable.innerHTML = '';
         (data.history || []).forEach(entry => {
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td>${entry.date || ''}</td>
+            <td>${formatDate(entry.date) || ''}</td>
             <td>${entry.time || ''}</td>
             <td>${entry.location || ''}</td>
             <td>${entry.status || ''}</td>
@@ -375,7 +391,7 @@
         });
       }
 
-      // Package details table
+      // Populate package details if available
       const packageTable = document.querySelector('.package-table tbody');
       if (packageTable) {
         packageTable.innerHTML = '';
@@ -400,13 +416,14 @@
     }
   }
 
-  // Get tracking number from URL
+  // Load tracking number from URL
   const urlParams = new URLSearchParams(window.location.search);
-  const trackingNumber = urlParams.get('trackingNumber');
+  const trackingNumber = urlParams.get('tracking');
   if (trackingNumber) {
     getTrackingData(trackingNumber);
   }
 </script>
+
 
 
 
