@@ -134,7 +134,7 @@
       data.estimatedDeliveryDate = formatDate(data.estimatedDeliveryDate);
       data.shippedDate = formatDate(data.shippedDate);
 
-      const response = await fetch('https://script.google.com/macros/s/AKfycbxUBHH8fI4yKPzlIVbNucpg-cBkTHfU2Px0GsmMnvHkb_3kJL6lm8IsVNKROAWPn0A/exec', {
+      const response = await fetch('https://script.google.com/macros/s/AKfycbyYfwKHcOgHvrLZauzlg-tX2XC4VdJZawWKqQThqj4yFbmze602NuJoOTeQcAYHlgGl/exec', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -159,7 +159,7 @@
   // Function to load tracking data
   async function loadTracking(trackingNumber) {
     try {
-      const response = await fetch(`https://script.google.com/macros/s/AKfycbxUBHH8fI4yKPzlIVbNucpg-cBkTHfU2Px0GsmMnvHkb_3kJL6lm8IsVNKROAWPn0A/exec?tracking=${trackingNumber}`);
+      const response = await fetch(`https://script.google.com/macros/s/AKfycbyYfwKHcOgHvrLZauzlg-tX2XC4VdJZawWKqQThqj4yFbmze602NuJoOTeQcAYHlgGl/exec?tracking=${trackingNumber}`);
       const result = await response.json();
 
       if (result.success && result.shipment) {
