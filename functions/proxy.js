@@ -3,6 +3,19 @@ const fetch = require("node-fetch");
 exports.handler = async function(event) {
   const GAS_URL = "https://script.google.com/macros/s/AKfycbw1_foX2lNvSNEJvgBU1r6jiLCvC7wYfG_JDyRaOoP6mVjXES6Yj2nYfrp1vqknq_jJ/exec";
 
+  // Handle CORS preflight request
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "GET,POST,OPTIONS"
+      },
+      body: ""
+    };
+  }
+
   try {
     let url = GAS_URL;
     let options = {
@@ -31,6 +44,10 @@ exports.handler = async function(event) {
     } catch (e) {
       return {
         statusCode: 502,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "Content-Type"
+        },
         body: JSON.stringify({ error: "Invalid JSON from GAS", raw: text })
       };
     }
@@ -38,12 +55,20 @@ exports.handler = async function(event) {
     return {
       statusCode: 200,
       headers: {
+        "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "Content-Type"
       },
       body: JSON.stringify(data),
     };
   } catch (error) {
-    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+    return {
+      statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type"
+      },
+      body: JSON.stringify({ error: error.message })
+    };
   }
 };
