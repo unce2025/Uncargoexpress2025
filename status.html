@@ -331,9 +331,16 @@
     return urlParams.get('tracking');
   }
 
+  function formatDateTime(dateTimeStr) {
+    if (!dateTimeStr) return "N/A";
+    const date = new Date(dateTimeStr);
+    if (isNaN(date)) return "Invalid date";
+    return date.toLocaleString();  // Local date & time format
+  }
+
   async function fetchShipmentData(trackingNumber) {
     try {
-      const response = await fetch(`https://script.google.com/macros/s/AKfycbzrtpPr6-NoxotSQ-upinCohoElIJxQQO259cpYlUOjhSFLcIcng5m_MnDeh6r9tyR5/exec?tracking=${trackingNumber}`);
+      const response = await fetch(`https://script.google.com/macros/s/AKfycbxe_TxpSD_klqT_k5h1cuz8kTpHtbg7JLl8Y-3ToMlU2K6p3vrcoMD7Y31IVoRHojGW/exec?tracking=${trackingNumber}`);
       const data = await response.json();
 
       if (!data.success) {
@@ -359,8 +366,11 @@
       // Shipment details
       document.getElementById('estimatedDeliveryDate').textContent = shipment.EstimatedDeliveryDate ? new Date(shipment.EstimatedDeliveryDate).toLocaleDateString() : 'N/A';
       document.getElementById('shippedDate').textContent = shipment.ShippedDate ? new Date(shipment.ShippedDate).toLocaleDateString() : 'N/A';
-      document.getElementById('pickupTime').textContent = shipment.PickUpTime || 'N/A';
-      document.getElementById('departureTime').textContent = shipment.Departure || 'N/A';
+
+      // Format PickUpTime and Departure as date/time
+      document.getElementById('pickupTime').textContent = formatDateTime(shipment.PickUpTime);
+      document.getElementById('departureTime').textContent = formatDateTime(shipment.Departure);
+
       document.getElementById('mode').textContent = shipment.Mode || 'N/A';
 
       document.getElementById('product').textContent = shipment.Product || 'N/A';
