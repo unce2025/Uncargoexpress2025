@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let logData = [];
     let historyData = [];
 
-    // Parse log field
     try {
       const rawLog = document.getElementById('log').value;
       logData = rawLog ? JSON.parse(rawLog) : [];
@@ -13,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Parse history field
     try {
       const rawHistory = document.getElementById('history').value;
       historyData = rawHistory ? JSON.parse(rawHistory) : [];
@@ -23,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Validate required fields
     const requiredFields = [
       'TrackingNumber', 'Status', 'ShipperName', 'ReceiverName',
       'EstimatedDeliveryDate', 'ShippedDate', 'PickUpTime', 'Departure',
@@ -38,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Create formData object
     const formData = {
       trackingNumber: document.getElementById('TrackingNumber').value.trim(),
       status: document.getElementById('Status').value.trim(),
@@ -63,33 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
       history: historyData
     };
 
-    // Send to server
     addTracking(formData);
   });
 });
-
-async function addTracking(data) {
-  try {
-    const response = await fetch('https://script.google.com/macros/s/AKfycbyYfwKHcOgHvrLZauzlg-tX2XC4VdJZawWKqQThqj4yFbmze602NuJoOTeQcAYHlgGl/exec', {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    });
-
-    const resultText = await response.text();
-    const result = JSON.parse(resultText);
-
-    if (result.success) {
-      alert("Shipment saved successfully.");
-    } else {
-      alert("Error: " + result.message);
-      console.error("Server response:", result);
-    }
-  } catch (error) {
-    console.error("Error submitting tracking data:", error);
-    alert("An error occurred while saving the shipment.");
-  }
-}
