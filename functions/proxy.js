@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 
 exports.handler = async function(event) {
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbyYfwKHcOgHvrLZauzlg-tX2XC4VdJZawWKqQThqj4yFbmze602NuJoOTeQcAYHlgGl/exec";
+  const GAS_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
 
   try {
     let url = GAS_URL;
@@ -27,7 +27,7 @@ exports.handler = async function(event) {
       statusCode: 200,
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Headers": "Content-Type"
       },
       body: data,
     };
