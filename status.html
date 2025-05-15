@@ -5,7 +5,7 @@
   <title>Shipment Label</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
    <style>
-    /* --- your entire CSS remains unchanged --- */
+   
     body {
       margin: 0;
       padding: 20px;
@@ -334,7 +334,7 @@
 
     const fetchShipmentData = async () => {
       try {
-        const response = await fetch(`https://script.google.com/macros/s/AKfycbwD_8ZzBGDSYPnKRSUz00TIucVWThJM3Ek8llQm91WRdEfRcA-s217ho8XmpusIGFSA/exec?tracking=${encodeURIComponent(trackingNumber)}`);
+        const response = await fetch(`https://script.google.com/macros/s/AKfycbzrtpPr6-NoxotSQ-upinCohoElIJxQQO259cpYlUOjhSFLcIcng5m_MnDeh6r9tyR5/exec?tracking=${encodeURIComponent(trackingNumber)}`);
         const result = await response.json();
 
         if (!result.success || !result.shipment) {
