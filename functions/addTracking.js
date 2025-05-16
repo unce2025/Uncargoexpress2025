@@ -1,4 +1,4 @@
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzerHjcOxHyjbxFEJ2jRdklOk06f_oc9t4YUOLyBzIqhnlp98go0vbONcsLZYrHUMSd/exec'; // Example
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbw6IGmF5eKh06tFNi49DJHLdDm0xLlDNUYV0rYjWhFRhwjrTSLng-Ju6acP5eS0eqQ8/exec'; // Example
 
 async function addTracking(data) {
   try {
