@@ -1,70 +1,3 @@
-  document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('submitBtn').addEventListener('click', () => {
-    let logData = [];
-    let historyData = [];
-
-    try {
-      const rawLog = document.getElementById('log').value;
-      logData = rawLog ? JSON.parse(rawLog) : [];
-    } catch (e) {
-      alert("Log field contains invalid JSON format. Please fix it.");
-      console.error("Invalid log JSON:", document.getElementById('log').value);
-      return;
-    }
-
-    try {
-      const rawHistory = document.getElementById('history').value;
-      historyData = rawHistory ? JSON.parse(rawHistory) : [];
-    } catch (e) {
-      alert("History field contains invalid JSON format. Please fix it.");
-      console.error("Invalid history JSON:", document.getElementById('history').value);
-      return;
-    }
-
-    const requiredFields = [
-      'TrackingNumber', 'Status', 'ShipperName', 'ReceiverName',
-      'EstimatedDeliveryDate', 'ShippedDate', 'FlightNumber', 'PackageWeight',
-      'Mode', 'Product', 'Quantity', 'Payment', 'TotalFreight'
-    ];
-
-    for (let field of requiredFields) {
-      const value = document.getElementById(field).value.trim();
-      if (!value) {
-        alert(`Please fill in the ${field} field.`);
-        return;
-      }
-    }
-
-    const formData = {
-      TrackingNumber: document.getElementById('TrackingNumber').value.trim(),
-      Status: document.getElementById('Status').value.trim(),
-      ShipperName: document.getElementById('ShipperName').value.trim(),
-      ShipperPhone: document.getElementById('ShipperPhone').value.trim(),
-      ShipperAddress: document.getElementById('ShipperAddress').value.trim(),
-      ShipperEmail: document.getElementById('ShipperEmail').value.trim(),
-      ReceiverName: document.getElementById('ReceiverName').value.trim(),
-      ReceiverPhone: document.getElementById('ReceiverPhone').value.trim(),
-      ReceiverAddress: document.getElementById('ReceiverAddress').value.trim(),
-      ReceiverEmail: document.getElementById('ReceiverEmail').value.trim(),
-      EstimatedDeliveryDate: document.getElementById('EstimatedDeliveryDate').value.trim(),
-      ShippedDate: document.getElementById('ShippedDate').value.trim(),
-      FlightNumber: document.getElementById('FlightNumber').value.trim(),
-      PackageWeight: document.getElementById('PackageWeight').value.trim(),
-      Mode: document.getElementById('Mode').value.trim(),
-      Product: document.getElementById('Product').value.trim(),
-      Quantity: document.getElementById('Quantity').value.trim(),
-      Payment: document.getElementById('Payment').value.trim(),
-      TotalFreight: document.getElementById('TotalFreight').value.trim(),
-      log: logData,
-      history: historyData
-    };
-
-    addTracking(formData);
-  });
-});
-
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzT5fHtkupOG9FaYvKik1x6YWBraqdyyOopnkmsxYMJyqrF-q0HKy5heItxr0CnVic/exec';
-
 async function addTracking(data) {
   try {
     const response = await fetch(GAS_URL, {
@@ -73,7 +6,7 @@ async function addTracking(data) {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify({ shipment: data })  // ✅ wrap correctly
     });
 
     const resultText = await response.text();
