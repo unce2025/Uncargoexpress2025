@@ -1,18 +1,14 @@
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbw6IGmF5eKh06tFNi49DJHLdDm0xLlDNUYV0rYjWhFRhwjrTSLng-Ju6acP5eS0eqQ8/exec'; // Example
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzp4Tx9w2hw5LE8tOXx6Wf8kNHTzTxR-2lEfc4bnYj7uaTFZOjuw_8cdWRcBBT0rFzd/exec';
 
 async function addTracking(data) {
   try {
     const response = await fetch(GAS_URL, {
       method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ shipment: data })  // ✅ wrap correctly
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ shipment: data }),
     });
 
-    const resultText = await response.text();
-    const result = JSON.parse(resultText);
+    const result = await response.json();
 
     if (result.success) {
       alert("Shipment saved successfully.");
