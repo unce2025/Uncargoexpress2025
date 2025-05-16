@@ -97,7 +97,8 @@
   </form>
 
 <script>
-  const PROXY_URL = '/.netlify/functions/proxy'; // Your Netlify proxy URL
+ const PROXY_URL = 'https://script.google.com/macros/s/AKfycbxHoAFz4C9Mhhgg3Zdapp6cFFd28WrSFqo7LM-O_cTLbcghAugM4MglUR8GRFzMsTGA/exec';
+
 
   const searchForm = document.getElementById('searchForm');
   const shipmentForm = document.getElementById('shipmentForm');
@@ -109,7 +110,8 @@
     if (!trackingNumber) return alert("Enter a tracking number");
 
     try {
-      const res = await fetch(`${PROXY_URL}?trackingNumber=${encodeURIComponent(trackingNumber)}`);
+      // FIXED: Changed 'trackingNumber' to 'tracking' to match Apps Script parameter
+      const res = await fetch(`${PROXY_URL}?tracking=${encodeURIComponent(trackingNumber)}`);
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
 
@@ -159,7 +161,7 @@
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const result = await res.json();
 
-      if (result.status === 'success') {
+      if (result.success) {  // Fixed to check 'success' key (your Apps Script uses success)
         alert("Shipment saved successfully!");
         shipmentForm.reset();
       } else {
