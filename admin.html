@@ -96,83 +96,95 @@
     <button type="submit">Save Shipment</button>
   </form>
 
-  <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5YJ2Y_ckInT02F9IdLj7U6SI4uG2pNfHoJD-gMtV0LgazblqzK5gWfL5mKeLwhLaM/exec'; // Replace with your actual Script URL
+<script>
+  const PROXY_URL = '/.netlify/functions/proxy'; // Your Netlify proxy URL
 
-    const searchForm = document.getElementById('searchForm');
-    const shipmentForm = document.getElementById('shipmentForm');
+  const searchForm = document.getElementById('searchForm');
+  const shipmentForm = document.getElementById('shipmentForm');
 
-    searchForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      const trackingNumber = document.getElementById('trackingSearch').value.trim();
-      if (!trackingNumber) return alert("Enter a tracking number");
+  // Search shipment by tracking number
+  searchForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const trackingNumber = document.getElementById('trackingSearch').value.trim();
+    if (!trackingNumber) return alert("Enter a tracking number");
 
-      try {
-        const res = await fetch(`${SCRIPT_URL}?trackingNumber=${encodeURIComponent(trackingNumber)}`);
-        const data = await res.json();
-        if (data.shipment) {
-          populateForm(data.shipment);
+    try {
+      const res = await fetch(`${PROXY_URL}?trackingNumber=${encodeURIComponent(trackingNumber)}`);
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const data = await res.json();
+
+      if (data.shipment) {
+        populateForm(data.shipment);
+      } else {
+        alert("Shipment not found");
+        shipmentForm.reset();
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
+    }
+  });
+
+  // Submit shipment form (add or update shipment)
+  shipmentForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const formData = new FormData(shipmentForm);
+    const shipment = {};
+    formData.forEach((val, key) => shipment[key] = val.trim());
+
+    if (!shipment.TrackingNumber) {
+      return alert("Tracking Number is required");
+    }
+
+    // Parse log JSON safely
+    try {
+      shipment.log = shipment.log ? JSON.parse(shipment.log) : [];
+    } catch {
+      return alert("Invalid JSON format in log field");
+    }
+
+    // Parse history JSON safely
+    try {
+      shipment.history = shipment.history ? JSON.parse(shipment.history) : [];
+    } catch {
+      return alert("Invalid JSON format in history field");
+    }
+
+    try {
+      const res = await fetch(PROXY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ shipment })
+      });
+
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const result = await res.json();
+
+      if (result.status === 'success') {
+        alert("Shipment saved successfully!");
+        shipmentForm.reset();
+      } else {
+        alert("Error saving shipment: " + (result.message || "Unknown error"));
+      }
+    } catch (err) {
+      alert("Request failed: " + err.message);
+    }
+  });
+
+  // Fill form inputs from shipment data object
+  function populateForm(data) {
+    for (const key in data) {
+      const el = document.getElementById(key);
+      if (el) {
+        if (key === 'log' || key === 'history') {
+          el.value = JSON.stringify(data[key], null, 2);
         } else {
-          alert("Shipment not found");
-          shipmentForm.reset();
-        }
-      } catch (err) {
-        alert("Error: " + err.message);
-      }
-    });
-
-    shipmentForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      const formData = new FormData(shipmentForm);
-      const shipment = {};
-      formData.forEach((val, key) => shipment[key] = val.trim());
-
-      if (!shipment.TrackingNumber) {
-        return alert("Tracking Number is required");
-      }
-
-      try {
-        shipment.log = shipment.log ? JSON.parse(shipment.log) : [];
-      } catch {
-        return alert("Invalid log JSON");
-      }
-
-      try {
-        shipment.history = shipment.history ? JSON.parse(shipment.history) : [];
-      } catch {
-        return alert("Invalid history JSON");
-      }
-
-      try {
-        const res = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ shipment })
-        });
-        const result = await res.json();
-        if (result.status === 'success') {
-          alert("Shipment saved successfully!");
-          shipmentForm.reset();
-        } else {
-          alert("Error saving: " + (result.message || "Unknown error"));
-        }
-      } catch (err) {
-        alert("Request failed: " + err.message);
-      }
-    });
-
-    function populateForm(data) {
-      for (const key in data) {
-        const el = document.getElementById(key);
-        if (el) {
-          if (key === 'log' || key === 'history') {
-            el.value = JSON.stringify(data[key], null, 2);
-          } else {
-            el.value = data[key];
-          }
+          el.value = data[key];
         }
       }
     }
-  </script>
+  }
+</script>
+
+  
 </body>
 </html>
