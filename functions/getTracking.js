@@ -1,5 +1,5 @@
 async function getTracking(trackingNumber) {
-  const url = `https://script.google.com/macros/s/AKfycbwqQ0i-5Uk22vLPwi_b5dsdwqcR5_mxhn6YB-VPLQH_FZFYkFtd5UdjoquqXKkeO8qC/exec?tracking=${encodeURIComponent(trackingNumber)}`;
+  const url = `https://script.google.com/macros/s/AKfycbyoIzttXdgc9CGEgJAv_Bps7fP5ZA0X1dh-hs1g4qujGFG9ZRZ4poIDvI2tN_12OO6L/exec?tracking=${encodeURIComponent(trackingNumber)}`;
 
   try {
     const response = await fetch(url);
@@ -13,21 +13,7 @@ async function getTracking(trackingNumber) {
     if (result.success && result.shipment) {
       const shipment = result.shipment;
 
-      // Parse log and history safely
-      try {
-        shipment.log = JSON.parse(shipment.log || "[]");
-      } catch (e) {
-        console.warn("Invalid JSON in log field:", e);
-        shipment.log = [];
-      }
-
-      try {
-        shipment.history = JSON.parse(shipment.history || "[]");
-      } catch (e) {
-        console.warn("Invalid JSON in history field:", e);
-        shipment.history = [];
-      }
-
+      // No need to parse log/history — already arrays
       displayShipment(shipment);
     } else {
       alert("Tracking number not found.");
