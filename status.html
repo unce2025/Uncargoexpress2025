@@ -326,6 +326,18 @@
   </div>
 
 <script>
+  // Helper function to safely parse JSON strings
+  function safeParseJSON(jsonString) {
+    try {
+      if (typeof jsonString === "string" && jsonString.trim() !== "") {
+        return JSON.parse(jsonString);
+      }
+    } catch (e) {
+      console.warn("JSON parse error:", e, jsonString);
+    }
+    return [];
+  }
+
   function getTrackingNumberFromURL() {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('tracking');
@@ -367,7 +379,6 @@
       document.getElementById('estimatedDeliveryDate').textContent = shipment.EstimatedDeliveryDate ? new Date(shipment.EstimatedDeliveryDate).toLocaleDateString() : 'N/A';
       document.getElementById('shippedDate').textContent = shipment.ShippedDate ? new Date(shipment.ShippedDate).toLocaleDateString() : 'N/A';
 
-    
       document.getElementById('flightNumber').textContent = shipment.FlightNumber || 'N/A';
       document.getElementById('packageWeight').textContent = shipment.PackageWeight || 'N/A';
 
@@ -387,7 +398,7 @@
       barcodeImage.src = `https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&dpi=96`;
 
       // Shipment Log
-      const logArray = JSON.parse(shipment.log || '[]');
+      const logArray = safeParseJSON(shipment.log);
       const logContainer = document.getElementById('logContainer');
       logContainer.innerHTML = '';
       logArray.forEach(entry => {
@@ -398,7 +409,7 @@
       });
 
       // Shipment History
-      const historyArray = JSON.parse(shipment.history || '[]');
+      const historyArray = safeParseJSON(shipment.history);
       const historyTableBody = document.getElementById('historyTableBody');
       historyTableBody.innerHTML = '';
       historyArray.forEach(item => {
@@ -415,7 +426,7 @@
       });
 
       // Packages
-      const packagesArray = JSON.parse(shipment.packages || '[]');
+      const packagesArray = safeParseJSON(shipment.packages);
       const packagesTableBody = document.getElementById('packagesTableBody');
       packagesTableBody.innerHTML = '';
       packagesArray.forEach(pkg => {
@@ -438,7 +449,7 @@
     }
   }
 
-  // Start on load
+  // On page load, get tracking number and fetch shipment data
   const trackingNumber = getTrackingNumberFromURL();
   if (trackingNumber) {
     fetchShipmentData(trackingNumber);
@@ -446,6 +457,7 @@
     alert('No tracking number found in URL.');
   }
 </script>
+
 
 
 </body></html>
