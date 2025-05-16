@@ -329,21 +329,16 @@
 document.addEventListener("DOMContentLoaded", () => {
   const API_URL = "https://script.google.com/macros/s/AKfycbxjKoofO7d6UppF6YUWD8NDG6suTrCycEy1rHj9bXqBdOaFKgJcSG9X4jfYc0Syjpcc/exec";
 
-  function getQueryParam(param) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
-  }
+  const getQueryParam = (param) => new URLSearchParams(window.location.search).get(param);
 
-  function formatDate(dateStr) {
-    if (!dateStr) return "";
-    const d = new Date(dateStr);
-    if (isNaN(d)) return dateStr;
-    return d.toISOString().split("T")[0];
-  }
+  const formatDate = (str) => {
+    const d = new Date(str);
+    return isNaN(d) ? str : d.toISOString().split("T")[0];
+  };
 
-  function displayShipment(shipment) {
+  const displayShipment = (shipment) => {
     if (!shipment) {
-      alert("No shipment data to display.");
+      alert("Shipment not found.");
       return;
     }
 
@@ -367,106 +362,109 @@ document.addEventListener("DOMContentLoaded", () => {
       TotalFreight: "totalFreight"
     };
 
-    for (const [key, elementId] of Object.entries(fieldsMap)) {
-      const el = document.getElementById(elementId);
-      if (el) {
-        let value = shipment[key];
-        if (key.toLowerCase().includes("date")) {
-          value = formatDate(value);
-        }
-        el.textContent = value ?? "";
+    for (const [key, id] of Object.entries(fieldsMap)) {
+      const el = document.getElementById(id);
+      if (el && shipment[key]) {
+        el.textContent = shipment[key];
       }
     }
 
-    // Update status
     const statusIndicator = document.getElementById("statusIndicator");
-    if (statusIndicator) {
-      statusIndicator.textContent = `SHIPMENT STATUS: ${shipment.Status ?? "Unknown"}`;
+    if (statusIndicator && shipment.Status) {
+      statusIndicator.textContent = "SHIPMENT STATUS: " + shipment.Status.toUpperCase();
     }
 
-    // Update barcode image
+    // Barcode
     const barcodeImage = document.getElementById("barcodeImage");
     if (barcodeImage && shipment.TrackingNumber) {
-      barcodeImage.src = `https://barcode.tec-it.com/barcode.ashx?data=${shipment.TrackingNumber}&code=Code128&dpi=96`;
+      barcodeImage.src = `https://barcode.tec-it.com/barcode.ashx?data=${shipment.TrackingNumber}&code=Code128&translate-esc=false`;
     }
 
     // Log
     const logContainer = document.getElementById("logContainer");
-    if (Array.isArray(shipment.log) && logContainer) {
-      logContainer.innerHTML = "";
-      shipment.log.forEach(entry => {
-        const div = document.createElement("div");
-        div.className = "timeline-entry";
-        div.innerHTML = `
-          <h4>${entry.date || ""} - ${entry.status || ""}</h4>
-          <p>${entry.note || ""}</p>
-        `;
-        logContainer.appendChild(div);
-      });
+    if (shipment.log && logContainer) {
+      try {
+        const logData = JSON.parse(shipment.log);
+        logContainer.innerHTML = "";
+        logData.forEach(entry => {
+          const div = document.createElement("div");
+          div.className = "timeline-item";
+          div.innerHTML = `<strong>${entry.date || ""}</strong>: ${entry.description || ""}`;
+          logContainer.appendChild(div);
+        });
+      } catch (e) {
+        logContainer.innerHTML = "<div class='timeline-item'>Invalid log data</div>";
+      }
     }
 
     // History
     const historyTableBody = document.getElementById("historyTableBody");
-    if (Array.isArray(shipment.history) && historyTableBody) {
-      historyTableBody.innerHTML = "";
-      shipment.history.forEach(entry => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${entry.date || ""}</td>
-          <td>${entry.time || ""}</td>
-          <td>${entry.location || ""}</td>
-          <td>${entry.status || ""}</td>
-          <td>${entry.updatedBy || ""}</td>
-          <td>${entry.remarks || ""}</td>
-        `;
-        historyTableBody.appendChild(tr);
-      });
-    }
-
-    // Packages
-    const packagesTableBody = document.getElementById("packagesTableBody");
-    if (Array.isArray(shipment.packages) && packagesTableBody) {
-      packagesTableBody.innerHTML = "";
-      shipment.packages.forEach(pkg => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${pkg.quantity || ""}</td>
-          <td>${pkg.pieceType || ""}</td>
-          <td>${pkg.description || ""}</td>
-          <td>${pkg.length || ""}</td>
-          <td>${pkg.width || ""}</td>
-          <td>${pkg.height || ""}</td>
-          <td>${pkg.weight || ""}</td>
-        `;
-        packagesTableBody.appendChild(tr);
-      });
-    }
-  }
-
-  async function fetchShipmentData(trackingNumber) {
-    try {
-      const response = await fetch(`${API_URL}?TrackingNumber=${encodeURIComponent(trackingNumber)}`);
-      const result = await response.json();
-      if (result.success && result.shipment) {
-        displayShipment(result.shipment);
-      } else {
-        alert("Shipment not found.");
+    if (shipment.history && historyTableBody) {
+      try {
+        const historyData = JSON.parse(shipment.history);
+        historyTableBody.innerHTML = "";
+        historyData.forEach(entry => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${entry.date || ""}</td>
+            <td>${entry.time || ""}</td>
+            <td>${entry.location || ""}</td>
+            <td>${entry.status || ""}</td>
+            <td>${entry.updatedBy || ""}</td>
+            <td>${entry.remarks || ""}</td>
+          `;
+          historyTableBody.appendChild(row);
+        });
+      } catch (e) {
+        historyTableBody.innerHTML = "<tr><td colspan='6'>Invalid history data</td></tr>";
       }
-    } catch (error) {
-      console.error("Error fetching shipment:", error);
-      alert("Error fetching shipment data.");
     }
-  }
+
+    // Packages (Optional, if you use a separate field)
+    const packagesTableBody = document.getElementById("packagesTableBody");
+    if (shipment.packages && packagesTableBody) {
+      try {
+        const packagesData = JSON.parse(shipment.packages);
+        packagesTableBody.innerHTML = "";
+        packagesData.forEach(pkg => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${pkg.qty || ""}</td>
+            <td>${pkg.pieceType || ""}</td>
+            <td>${pkg.description || ""}</td>
+            <td>${pkg.length || ""}</td>
+            <td>${pkg.width || ""}</td>
+            <td>${pkg.height || ""}</td>
+            <td>${pkg.weight || ""}</td>
+          `;
+          packagesTableBody.appendChild(row);
+        });
+      } catch (e) {
+        packagesTableBody.innerHTML = "<tr><td colspan='7'>Invalid package data</td></tr>";
+      }
+    }
+  };
 
   const trackingNumber = getQueryParam("tracking");
   if (trackingNumber) {
-    fetchShipmentData(trackingNumber);
+    fetch(`${API_URL}?trackingNumber=${trackingNumber}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.shipment) {
+          displayShipment(data.shipment);
+        } else {
+          alert("No shipment found.");
+        }
+      })
+      .catch(err => {
+        console.error("Error loading shipment:", err);
+        alert("Failed to load shipment data.");
+      });
   } else {
-    alert("Tracking number missing in URL.");
+    alert("No tracking number provided.");
   }
 });
 </script>
-
 
 
 
