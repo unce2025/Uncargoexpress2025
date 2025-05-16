@@ -1,3 +1,5 @@
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyWydoEZj5yKA6dFiIPvrnHv0iU0U0QDDagt86WlMh4-Rpaac0OeSCheUiyxYfd0XD8/exec'; // Example
+
 async function addTracking(data) {
   try {
     const response = await fetch(GAS_URL, {
