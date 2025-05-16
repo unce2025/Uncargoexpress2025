@@ -327,16 +327,13 @@
   
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  // ✅ Correct deployed Apps Script URL here
   const API_URL = "https://script.google.com/macros/s/AKfycbxjKoofO7d6UppF6YUWD8NDG6suTrCycEy1rHj9bXqBdOaFKgJcSG9X4jfYc0Syjpcc/exec";
 
-  // Utility: Get URL param by name
   function getQueryParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(param);
   }
 
-  // Utility: Format date string as yyyy-MM-dd
   function formatDate(dateStr) {
     if (!dateStr) return "";
     const d = new Date(dateStr);
@@ -344,7 +341,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return d.toISOString().split("T")[0];
   }
 
-  // Display shipment data in the page
   function displayShipment(shipment) {
     if (!shipment) {
       alert("No shipment data to display.");
@@ -352,8 +348,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const fieldsMap = {
-      TrackingNumber: "trackingNumber",
-      Status: "status",
       ShipperName: "shipperName",
       ShipperPhone: "shipperPhone",
       ShipperAddress: "shipperAddress",
@@ -384,59 +378,94 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Render log entries
-    if (Array.isArray(shipment.log)) {
-      const logContainer = document.getElementById("logContainer");
-      if (logContainer) {
-        logContainer.innerHTML = "";
-        shipment.log.forEach(entry => {
-          const p = document.createElement("p");
-          p.textContent = `${entry.date || ""}: ${entry.status || ""} - ${entry.note || ""}`;
-          logContainer.appendChild(p);
-        });
-      }
+    // Update status
+    const statusIndicator = document.getElementById("statusIndicator");
+    if (statusIndicator) {
+      statusIndicator.textContent = `SHIPMENT STATUS: ${shipment.Status ?? "Unknown"}`;
     }
 
-    // Render history (if applicable)
-    if (Array.isArray(shipment.history)) {
-      const historyContainer = document.getElementById("historyContainer");
-      if (historyContainer) {
-        historyContainer.innerHTML = "";
-        shipment.history.forEach(entry => {
-          const p = document.createElement("p");
-          p.textContent = `${entry.date || ""}: ${entry.event || ""}`;
-          historyContainer.appendChild(p);
-        });
-      }
+    // Update barcode image
+    const barcodeImage = document.getElementById("barcodeImage");
+    if (barcodeImage && shipment.TrackingNumber) {
+      barcodeImage.src = `https://barcode.tec-it.com/barcode.ashx?data=${shipment.TrackingNumber}&code=Code128&dpi=96`;
     }
 
-    // Render packages (if applicable)
-    if (Array.isArray(shipment.packages)) {
-      const packageContainer = document.getElementById("packageContainer");
-      if (packageContainer) {
-        packageContainer.innerHTML = "";
-        shipment.packages.forEach(pkg => {
-          const div = document.createElement("div");
-          div.innerHTML = `<strong>${pkg.label || ""}</strong>: ${pkg.content || ""}`;
-          packageContainer.appendChild(div);
-        });
-      }
+    // Log
+    const logContainer = document.getElementById("logContainer");
+    if (Array.isArray(shipment.log) && logContainer) {
+      logContainer.innerHTML = "";
+      shipment.log.forEach(entry => {
+        const div = document.createElement("div");
+        div.className = "timeline-entry";
+        div.innerHTML = `
+          <h4>${entry.date || ""} - ${entry.status || ""}</h4>
+          <p>${entry.note || ""}</p>
+        `;
+        logContainer.appendChild(div);
+      });
+    }
+
+    // History
+    const historyTableBody = document.getElementById("historyTableBody");
+    if (Array.isArray(shipment.history) && historyTableBody) {
+      historyTableBody.innerHTML = "";
+      shipment.history.forEach(entry => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${entry.date || ""}</td>
+          <td>${entry.time || ""}</td>
+          <td>${entry.location || ""}</td>
+          <td>${entry.status || ""}</td>
+          <td>${entry.updatedBy || ""}</td>
+          <td>${entry.remarks || ""}</td>
+        `;
+        historyTableBody.appendChild(tr);
+      });
+    }
+
+    // Packages
+    const packagesTableBody = document.getElementById("packagesTableBody");
+    if (Array.isArray(shipment.packages) && packagesTableBody) {
+      packagesTableBody.innerHTML = "";
+      shipment.packages.forEach(pkg => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${pkg.quantity || ""}</td>
+          <td>${pkg.pieceType || ""}</td>
+          <td>${pkg.description || ""}</td>
+          <td>${pkg.length || ""}</td>
+          <td>${pkg.width || ""}</td>
+          <td>${pkg.height || ""}</td>
+          <td>${pkg.weight || ""}</td>
+        `;
+        packagesTableBody.appendChild(tr);
+      });
     }
   }
 
-  // Fetch shipment from API
-  async function fetchShipment(trackingNumber) {
-    if (!trackingNumber) {
-      alert("No tracking number provided in URL.");
-      return;
-    }
-
+  async function fetchShipmentData(trackingNumber) {
     try {
-      const response = await fetch(`${API_URL}?tracking=${encodeURIComponent(trackingNumber)}`);
-      if (!response.ok) {
-        alert("Failed to fetch shipment data.");
-        return;
+      const response = await fetch(`${API_URL}?TrackingNumber=${encodeURIComponent(trackingNumber)}`);
+      const result = await response.json();
+      if (result.success && result.shipment) {
+        displayShipment(result.shipment);
+      } else {
+        alert("Shipment not found.");
       }
+    } catch (error) {
+      console.error("Error fetching shipment:", error);
+      alert("Error fetching shipment data.");
+    }
+  }
+
+  const trackingNumber = getQueryParam("tracking");
+  if (trackingNumber) {
+    fetchShipmentData(trackingNumber);
+  } else {
+    alert("Tracking number missing in URL.");
+  }
+});
+</script>
       const data = await response.json();
       if (data.success) {
         displayShipment(data.shipment);
