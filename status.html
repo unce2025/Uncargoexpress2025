@@ -326,18 +326,6 @@
   </div>
 
 <script>
-  // Helper function to safely parse JSON strings
-  function safeParseJSON(jsonString) {
-    try {
-      if (typeof jsonString === "string" && jsonString.trim() !== "") {
-        return JSON.parse(jsonString);
-      }
-    } catch (e) {
-      console.warn("JSON parse error:", e, jsonString);
-    }
-    return [];
-  }
-
   function getTrackingNumberFromURL() {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('tracking');
@@ -347,12 +335,12 @@
     if (!dateTimeStr) return "N/A";
     const date = new Date(dateTimeStr);
     if (isNaN(date)) return "Invalid date";
-    return date.toLocaleString();  // Local date & time format
+    return date.toLocaleString();
   }
 
   async function fetchShipmentData(trackingNumber) {
     try {
-      const response = await fetch(`https://script.google.com/macros/s/AKfycby5YJ2Y_ckInT02F9IdLj7U6SI4uG2pNfHoJD-gMtV0LgazblqzK5gWfL5mKeLwhLaM/exec?tracking=${trackingNumber}`);
+      const response = await fetch(`https://script.google.com/macros/s/AKfycbyWydoEZj5yKA6dFiIPvrnHv0iU0U0QDDagt86WlMh4-Rpaac0OeSCheUiyxYfd0XD8/exec?tracking=${trackingNumber}`);
       const data = await response.json();
 
       if (!data.success) {
@@ -376,14 +364,11 @@
       document.getElementById('receiverEmail').textContent = shipment.ReceiverEmail || 'N/A';
 
       // Shipment details
-      document.getElementById('estimatedDeliveryDate').textContent = shipment.EstimatedDeliveryDate ? new Date(shipment.EstimatedDeliveryDate).toLocaleDateString() : 'N/A';
-      document.getElementById('shippedDate').textContent = shipment.ShippedDate ? new Date(shipment.ShippedDate).toLocaleDateString() : 'N/A';
-
+      document.getElementById('estimatedDeliveryDate').textContent = formatDateTime(shipment.EstimatedDeliveryDate);
+      document.getElementById('shippedDate').textContent = formatDateTime(shipment.ShippedDate);
       document.getElementById('flightNumber').textContent = shipment.FlightNumber || 'N/A';
       document.getElementById('packageWeight').textContent = shipment.PackageWeight || 'N/A';
-
       document.getElementById('mode').textContent = shipment.Mode || 'N/A';
-
       document.getElementById('product').textContent = shipment.Product || 'N/A';
       document.getElementById('quantity').textContent = shipment.Quantity || 'N/A';
       document.getElementById('payment').textContent = shipment.Payment || 'N/A';
@@ -398,7 +383,7 @@
       barcodeImage.src = `https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&dpi=96`;
 
       // Shipment Log
-      const logArray = safeParseJSON(shipment.log);
+      const logArray = Array.isArray(shipment.log) ? shipment.log : [];
       const logContainer = document.getElementById('logContainer');
       logContainer.innerHTML = '';
       logArray.forEach(entry => {
@@ -409,14 +394,13 @@
       });
 
       // Shipment History
-      const historyArray = safeParseJSON(shipment.history);
+      const historyArray = Array.isArray(shipment.history) ? shipment.history : [];
       const historyTableBody = document.getElementById('historyTableBody');
       historyTableBody.innerHTML = '';
       historyArray.forEach(item => {
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${item.date || ''}</td>
-          <td>${item.time || ''}</td>
           <td>${item.location || ''}</td>
           <td>${item.status || ''}</td>
           <td>${item.updatedBy || ''}</td>
@@ -425,8 +409,8 @@
         historyTableBody.appendChild(row);
       });
 
-      // Packages
-      const packagesArray = safeParseJSON(shipment.packages);
+      // Shipment Packages
+      const packagesArray = Array.isArray(shipment.packages) ? shipment.packages : [];
       const packagesTableBody = document.getElementById('packagesTableBody');
       packagesTableBody.innerHTML = '';
       packagesArray.forEach(pkg => {
@@ -449,7 +433,6 @@
     }
   }
 
-  // On page load, get tracking number and fetch shipment data
   const trackingNumber = getTrackingNumberFromURL();
   if (trackingNumber) {
     fetchShipmentData(trackingNumber);
