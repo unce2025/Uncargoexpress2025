@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('submitBtn').addEventListener('click', () => {
     let logData = [];
     let historyData = [];
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzSfjjysne-gXJ-6re4NIgTFelItLFycAKiGfL9JGuGHIDMc4BpnIHGKrGT14opFDdH/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzT5fHtkupOG9FaYvKik1x6YWBraqdyyOopnkmsxYMJyqrF-q0HKy5heItxr0CnVic/exec';
 
 async function addTracking(data) {
   try {
