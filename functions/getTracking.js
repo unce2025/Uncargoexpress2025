@@ -1,5 +1,5 @@
 async function getTracking(trackingNumber) {
-  const url = `https://script.google.com/macros/s/AKfycbzSfjjysne-gXJ-6re4NIgTFelItLFycAKiGfL9JGuGHIDMc4BpnIHGKrGT14opFDdH/exec?tracking=${encodeURIComponent(trackingNumber)}`;
+  const url = `https://script.google.com/macros/s/AKfycbzT5fHtkupOG9FaYvKik1x6YWBraqdyyOopnkmsxYMJyqrF-q0HKy5heItxr0CnVic/exec?tracking=${encodeURIComponent(trackingNumber)}`;
 
   try {
     const response = await fetch(url);
