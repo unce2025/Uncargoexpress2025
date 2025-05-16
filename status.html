@@ -466,22 +466,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 </script>
-      const data = await response.json();
-      if (data.success) {
-        displayShipment(data.shipment);
-      } else {
-        alert("Shipment not found: " + data.message);
-      }
-    } catch (error) {
-      alert("Error fetching shipment: " + error.message);
-    }
-  }
 
-  // Start
-  const tracking = getQueryParam("tracking");
-  fetchShipment(tracking);
-});
-</script>
+
+
+
+  
 
   
 </body></html>
