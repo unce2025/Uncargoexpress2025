@@ -97,94 +97,107 @@
   </form>
 
 <script>
- const PROXY_URL = 'https://script.google.com/macros/s/AKfycbw6IGmF5eKh06tFNi49DJHLdDm0xLlDNUYV0rYjWhFRhwjrTSLng-Ju6acP5eS0eqQ8/exec';
+const PROXY_URL = 'https://script.google.com/macros/s/AKfycbzp4Tx9w2hw5LE8tOXx6Wf8kNHTzTxR-2lEfc4bnYj7uaTFZOjuw_8cdWRcBBT0rFzd/exec';
 
+const searchForm = document.getElementById('searchForm');
+const shipmentForm = document.getElementById('shipmentForm');
 
-  const searchForm = document.getElementById('searchForm');
-  const shipmentForm = document.getElementById('shipmentForm');
+function formatDateForInput(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d)) return ''; // fallback if invalid date
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 
-  // Search shipment by tracking number
-  searchForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    const trackingNumber = document.getElementById('trackingSearch').value.trim();
-    if (!trackingNumber) return alert("Enter a tracking number");
+// Search shipment by tracking number
+searchForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const trackingNumber = document.getElementById('trackingSearch').value.trim();
+  if (!trackingNumber) return alert("Enter a tracking number");
 
-    try {
-      // FIXED: Changed 'trackingNumber' to 'tracking' to match Apps Script parameter
-      const res = await fetch(`${PROXY_URL}?tracking=${encodeURIComponent(trackingNumber)}`);
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      const data = await res.json();
+  try {
+    const res = await fetch(`${PROXY_URL}?tracking=${encodeURIComponent(trackingNumber)}`);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    const data = await res.json();
 
-      if (data.shipment) {
-        populateForm(data.shipment);
+    if (data.shipment) {
+      populateForm(data.shipment);
+    } else {
+      alert("Shipment not found");
+      shipmentForm.reset();
+    }
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+});
+
+// Submit shipment form (add or update shipment)
+shipmentForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const formData = new FormData(shipmentForm);
+  const shipment = {};
+  formData.forEach((val, key) => shipment[key] = val.trim());
+
+  if (!shipment.TrackingNumber) {
+    return alert("Tracking Number is required");
+  }
+
+  // Parse JSON safely
+  try {
+    shipment.log = shipment.log ? JSON.parse(shipment.log) : [];
+  } catch {
+    return alert("Invalid JSON format in log field");
+  }
+
+  try {
+    shipment.history = shipment.history ? JSON.parse(shipment.history) : [];
+  } catch {
+    return alert("Invalid JSON format in history field");
+  }
+
+  // Format date fields to "YYYY-MM-DD" strings to satisfy input type="date"
+  shipment.EstimatedDeliveryDate = formatDateForInput(shipment.EstimatedDeliveryDate);
+  shipment.ShippedDate = formatDateForInput(shipment.ShippedDate);
+
+  try {
+    const res = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ shipment })
+    });
+
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    const result = await res.json();
+
+    if (result.success) {
+      alert("Shipment saved successfully!");
+      shipmentForm.reset();
+    } else {
+      alert("Error saving shipment: " + (result.message || "Unknown error"));
+    }
+  } catch (err) {
+    alert("Request failed: " + err.message);
+  }
+});
+
+function populateForm(data) {
+  for (const key in data) {
+    const el = document.getElementById(key);
+    if (el) {
+      if (key === 'log' || key === 'history') {
+        el.value = JSON.stringify(data[key], null, 2);
+      } else if (key === 'EstimatedDeliveryDate' || key === 'ShippedDate') {
+        el.value = formatDateForInput(data[key]);
       } else {
-        alert("Shipment not found");
-        shipmentForm.reset();
-      }
-    } catch (err) {
-      alert("Error: " + err.message);
-    }
-  });
-
-  // Submit shipment form (add or update shipment)
-  shipmentForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    const formData = new FormData(shipmentForm);
-    const shipment = {};
-    formData.forEach((val, key) => shipment[key] = val.trim());
-
-    if (!shipment.TrackingNumber) {
-      return alert("Tracking Number is required");
-    }
-
-    // Parse log JSON safely
-    try {
-      shipment.log = shipment.log ? JSON.parse(shipment.log) : [];
-    } catch {
-      return alert("Invalid JSON format in log field");
-    }
-
-    // Parse history JSON safely
-    try {
-      shipment.history = shipment.history ? JSON.parse(shipment.history) : [];
-    } catch {
-      return alert("Invalid JSON format in history field");
-    }
-
-    try {
-      const res = await fetch(PROXY_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ shipment })
-      });
-
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      const result = await res.json();
-
-      if (result.success) {  // Fixed to check 'success' key (your Apps Script uses success)
-        alert("Shipment saved successfully!");
-        shipmentForm.reset();
-      } else {
-        alert("Error saving shipment: " + (result.message || "Unknown error"));
-      }
-    } catch (err) {
-      alert("Request failed: " + err.message);
-    }
-  });
-
-  // Fill form inputs from shipment data object
-  function populateForm(data) {
-    for (const key in data) {
-      const el = document.getElementById(key);
-      if (el) {
-        if (key === 'log' || key === 'history') {
-          el.value = JSON.stringify(data[key], null, 2);
-        } else {
-          el.value = data[key];
-        }
+        el.value = data[key];
       }
     }
   }
+}
+
 </script>
 
   
