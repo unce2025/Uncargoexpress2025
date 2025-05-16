@@ -326,6 +326,7 @@
   </div>
 
 <script>
+  // Get tracking number from URL query param "?tracking=..."
   function getTrackingNumberFromURL() {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('tracking');
@@ -344,7 +345,10 @@
 
   async function fetchShipmentData(trackingNumber) {
     try {
-      const response = await fetch(`{"success":true,"shipment":{"Timestamp":"","TrackingNumber":"UN123CE456","Status":"On Hold","ShipperName":"Michael Thompson","ShipperPhone":63766486582,"ShipperAddress":"101 Lexington Ave, NY, USA","ShipperEmail":"michaelthomp@gmail.com","ReceiverName":"Elizabeth Rodriguez","ReceiverPhone":9265453761,"ReceiverAddress":"San Pablo, Laguna, Philippines","ReceiverEmail":"elizabethrodriguez202@gmail.com","EstimatedDeliveryDate":"2025-05-29T16:00:00.000Z","ShippedDate":"2025-05-21T16:00:00.000Z","FlightNumber":"BA268","PackageWeight":"2.5 kg","Mode":"Air-Freight","Product":"Electronics","Quantity":2,"Payment":"PayPal","TotalFreight":320,"log":[{"date":"2025-05-09","description":"Order received and payment confirmed"},{"date":"2025-05-10","description":"Shipping label created"},{"date":"2025-05-11","description":"Package picked up by courier"},{"date":"2025-05-12","description":"Shipped via air freight"},{"date":"2025-05-15","description":"Expected arrival date updated"},{"date":"2025-05-17","description":"Shipment placed on hold due to customs inspection"},{"date":"2025-05-18","description":"Customer notified about customs hold"}],"history":[{"date":"2025-05-10","time":"08:30","location":"Warehouse - New York, USA","status":"Label created","updatedBy":"Admin","remarks":"Initial label generation"},{"date":"2025-05-11","time":"10:15","location":"Warehouse - New York, USA","status":"Package picked up by courier","updatedBy":"Courier Team","remarks":"Package scanned for pickup"},{"date":"2025-05-12","time":"14:00","location":"Sorting Center - New York, USA","status":"Package sorted","updatedBy":"Sorting Staff","remarks":"Sorted by destination"},{"date":"2025-05-13","time":"09:45","location":"JFK Airport","status":"Departed from origin","updatedBy":"Airport Staff","remarks":"Departure cleared"},{"date":"2025-05-14","time":"16:30","location":"In transit","status":"In flight","updatedBy":"Flight Crew","remarks":"Flight on schedule"},{"date":"2025-05-15","time":"07:20","location":"London Heathrow Airport","status":"Arrived at destination country","updatedBy":"UK Customs","remarks":"Arrival logged"},{"date":"2025-05-16","time":"12:00","location":"London Sorting Facility","status":"Customs clearance","updatedBy":"Customs Agent","remarks":"Cleared with no issues"},{"date":"2025-05-17","time":"15:45","location":"London Sorting Facility","status":"On hold due to customs inspection","updatedBy":"Customs Agent","remarks":"Additional inspection required"}]}}?tracking=${trackingNumber}`);
+      // Replace this URL with your deployed Google Apps Script web app URL
+      const url = `https://script.google.com/macros/s/AKfycbw6IGmF5eKh06tFNi49DJHLdDm0xLlDNUYV0rYjWhFRhwjrTSLng-Ju6acP5eS0eqQ8/exec?tracking=${encodeURIComponent(trackingNumber)}`;
+
+      const response = await fetch(url);
       const data = await response.json();
 
       if (!data.success) {
@@ -382,9 +386,9 @@
       const statusIndicator = document.getElementById('statusIndicator');
       statusIndicator.textContent = `SHIPMENT STATUS: ${shipment.Status || 'N/A'}`;
 
-      // Barcode
+      // Barcode image (use tracking number)
       const barcodeImage = document.getElementById('barcodeImage');
-      barcodeImage.src = `https://barcode.tec-it.com/barcode.ashx?data=${trackingNumber}&code=Code128&dpi=96`;
+      barcodeImage.src = `https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(trackingNumber)}&code=Code128&dpi=96`;
 
       // Shipment Log - format date only
       const logArray = Array.isArray(shipment.log) ? shipment.log : [];
@@ -437,13 +441,17 @@
     }
   }
 
-  const trackingNumber = getTrackingNumberFromURL();
-  if (trackingNumber) {
-    fetchShipmentData(trackingNumber);
-  } else {
-    alert('No tracking number found in URL.');
-  }
+  // On page load, get tracking number and fetch shipment data
+  document.addEventListener('DOMContentLoaded', () => {
+    const trackingNumber = getTrackingNumberFromURL();
+    if (trackingNumber) {
+      fetchShipmentData(trackingNumber);
+    } else {
+      alert('No tracking number found in URL.');
+    }
+  });
 </script>
+
 
 
 
