@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 
-exports.handler = async function(event) {
-  const GAS_URL = "https://script.google.com/macros/s/AKfycby5YJ2Y_ckInT02F9IdLj7U6SI4uG2pNfHoJD-gMtV0LgazblqzK5gWfL5mKeLwhLaM/exec";
+exports.handler = async function (event) {
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbyWydoEZj5yKA6dFiIPvrnHv0iU0U0QDDagt86WlMh4-Rpaac0OeSCheUiyxYfd0XD8/exec";
 
   // Handle CORS preflight request
   if (event.httpMethod === "OPTIONS") {
@@ -10,7 +10,7 @@ exports.handler = async function(event) {
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Methods": "GET,POST,OPTIONS"
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
       },
       body: ""
     };
@@ -19,20 +19,26 @@ exports.handler = async function(event) {
   try {
     let url = GAS_URL;
     const headers = { "Content-Type": "application/json" };
-    let options = {
+    const options = {
       method: event.httpMethod,
-      headers,
+      headers
     };
 
+    // For GET: append query string
     if (event.httpMethod === "GET") {
-      // Append query params from the original request
       if (event.queryStringParameters && Object.keys(event.queryStringParameters).length > 0) {
         const params = new URLSearchParams(event.queryStringParameters).toString();
         url += "?" + params;
       }
-    } else if (event.httpMethod === "POST") {
+    }
+
+    // For POST: include body
+    else if (event.httpMethod === "POST") {
       options.body = event.body;
-    } else {
+    }
+
+    // Reject unsupported methods
+    else {
       return {
         statusCode: 405,
         headers: { "Access-Control-Allow-Origin": "*" },
@@ -40,9 +46,11 @@ exports.handler = async function(event) {
       };
     }
 
+    // Perform the actual fetch
     const response = await fetch(url, options);
     const text = await response.text();
 
+    // Attempt to parse JSON
     let data;
     try {
       data = JSON.parse(text);
@@ -53,19 +61,19 @@ exports.handler = async function(event) {
           "Access-Control-Allow-Origin": "*",
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ error: "Invalid JSON from GAS", raw: text })
+        body: JSON.stringify({ error: "Invalid JSON returned from GAS", raw: text })
       };
     }
 
+    // Return parsed result
     return {
       statusCode: 200,
       headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*"
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json"
       },
       body: JSON.stringify(data)
     };
-
   } catch (error) {
     return {
       statusCode: 500,
