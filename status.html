@@ -327,7 +327,7 @@
 
 <script>
   function getTrackingData(trackingNumber) {
-    fetch(`https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?tracking=${trackingNumber}`)
+    fetch(`https://script.google.com/macros/s/AKfycbzp4Tx9w2hw5LE8tOXx6Wf8kNHTzTxR-2lEfc4bnYj7uaTFZOjuw_8cdWRcBBT0rFzd/exec?tracking=${trackingNumber}`)
       .then(res => res.json())
       .then(data => {
         if (!data || !data.shipment) {
