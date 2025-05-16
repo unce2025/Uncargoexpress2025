@@ -326,133 +326,85 @@
   </div>
 
 <script>
-  // Get tracking number from URL query param "?tracking=..."
-  function getTrackingNumberFromURL() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('tracking');
+  function getTrackingData(trackingNumber) {
+    fetch(`https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?tracking=${trackingNumber}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data || !data.shipment) {
+          document.getElementById('not-found').style.display = 'block';
+          document.getElementById('shipment-info').style.display = 'none';
+          return;
+        }
+
+        document.getElementById('not-found').style.display = 'none';
+        document.getElementById('shipment-info').style.display = 'block';
+
+        const shipment = data.shipment;
+
+        document.getElementById('tracking-number').textContent = shipment.TrackingNumber || '';
+        document.getElementById('status').textContent = shipment.Status || '';
+        document.getElementById('estimated-delivery').textContent = shipment.EstimatedDeliveryDate || '';
+        document.getElementById('shipped-date').textContent = shipment.ShippedDate || '';
+
+        document.getElementById('shipper-name').textContent = shipment.ShipperName || '';
+        document.getElementById('shipper-phone').textContent = shipment.ShipperPhone || '';
+        document.getElementById('shipper-address').textContent = shipment.ShipperAddress || '';
+        document.getElementById('shipper-email').textContent = shipment.ShipperEmail || '';
+
+        document.getElementById('receiver-name').textContent = shipment.ReceiverName || '';
+        document.getElementById('receiver-phone').textContent = shipment.ReceiverPhone || '';
+        document.getElementById('receiver-address').textContent = shipment.ReceiverAddress || '';
+        document.getElementById('receiver-email').textContent = shipment.ReceiverEmail || '';
+
+        document.getElementById('flight-number').textContent = shipment.FlightNumber || '';
+        document.getElementById('package-weight').textContent = shipment.PackageWeight || '';
+        document.getElementById('mode').textContent = shipment.Mode || '';
+        document.getElementById('product').textContent = shipment.Product || '';
+        document.getElementById('quantity').textContent = shipment.Quantity || '';
+        document.getElementById('payment').textContent = shipment.Payment || '';
+        document.getElementById('total-freight').textContent = shipment.TotalFreight || '';
+
+        // Populate log timeline
+        const log = JSON.parse(shipment.log || '[]');
+        const logContainer = document.getElementById('log-timeline');
+        logContainer.innerHTML = '';
+        log.forEach(entry => {
+          const div = document.createElement('div');
+          div.className = 'timeline-entry';
+          div.innerHTML = `
+            <strong>${entry.date}:</strong> ${entry.description}
+          `;
+          logContainer.appendChild(div);
+        });
+
+        // ✅ Fixed shipment history (includes TIME)
+        const history = JSON.parse(shipment.history || '[]');
+        const historyTable = document.getElementById('history-table');
+        historyTable.innerHTML = '';
+        history.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${row.date || ''}</td>
+            <td>${row.time || ''}</td>
+            <td>${row.location || ''}</td>
+            <td>${row.status || ''}</td>
+            <td>${row.updatedBy || ''}</td>
+            <td>${row.remarks || ''}</td>
+          `;
+          historyTable.appendChild(tr);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById('not-found').style.display = 'block';
+        document.getElementById('shipment-info').style.display = 'none';
+      });
   }
 
-  // Format date string to YYYY-MM-DD (no time)
-  function formatDateOnly(dateStr) {
-    if (!dateStr) return "N/A";
-    const date = new Date(dateStr);
-    if (isNaN(date)) return "Invalid date";
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+  const urlParams = new URLSearchParams(window.location.search);
+  const trackingNumber = urlParams.get('tracking');
+  if (trackingNumber) {
+    getTrackingData(trackingNumber);
   }
-
-  async function fetchShipmentData(trackingNumber) {
-    try {
-      // Replace this URL with your deployed Google Apps Script web app URL
-      const url = `https://script.google.com/macros/s/AKfycbw6IGmF5eKh06tFNi49DJHLdDm0xLlDNUYV0rYjWhFRhwjrTSLng-Ju6acP5eS0eqQ8/exec?tracking=${encodeURIComponent(trackingNumber)}`;
-
-      const response = await fetch(url);
-      const data = await response.json();
-
-      if (!data.success) {
-        console.error('Shipment not found');
-        alert('Shipment not found. Please check your tracking number.');
-        return;
-      }
-
-      const shipment = data.shipment;
-
-      // Shipper info
-      document.getElementById('shipperName').textContent = shipment.ShipperName || 'N/A';
-      document.getElementById('shipperAddress').textContent = shipment.ShipperAddress || 'N/A';
-      document.getElementById('shipperEmail').textContent = shipment.ShipperEmail || 'N/A';
-      document.getElementById('shipperPhone').textContent = shipment.ShipperPhone || 'N/A';
-
-      // Receiver info
-      document.getElementById('receiverName').textContent = shipment.ReceiverName || 'N/A';
-      document.getElementById('receiverAddress').textContent = shipment.ReceiverAddress || 'N/A';
-      document.getElementById('receiverPhone').textContent = shipment.ReceiverPhone || 'N/A';
-      document.getElementById('receiverEmail').textContent = shipment.ReceiverEmail || 'N/A';
-
-      // Shipment details — format dates without time
-      document.getElementById('estimatedDeliveryDate').textContent = formatDateOnly(shipment.EstimatedDeliveryDate);
-      document.getElementById('shippedDate').textContent = formatDateOnly(shipment.ShippedDate);
-      document.getElementById('flightNumber').textContent = shipment.FlightNumber || 'N/A';
-      document.getElementById('packageWeight').textContent = shipment.PackageWeight || 'N/A';
-      document.getElementById('mode').textContent = shipment.Mode || 'N/A';
-      document.getElementById('product').textContent = shipment.Product || 'N/A';
-      document.getElementById('quantity').textContent = shipment.Quantity || 'N/A';
-      document.getElementById('payment').textContent = shipment.Payment || 'N/A';
-      document.getElementById('totalFreight').textContent = shipment.TotalFreight || 'N/A';
-
-      // Status
-      const statusIndicator = document.getElementById('statusIndicator');
-      statusIndicator.textContent = `SHIPMENT STATUS: ${shipment.Status || 'N/A'}`;
-
-      // Barcode image (use tracking number)
-      const barcodeImage = document.getElementById('barcodeImage');
-      barcodeImage.src = `https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(trackingNumber)}&code=Code128&dpi=96`;
-
-      // Shipment Log - format date only
-      const logArray = Array.isArray(shipment.log) ? shipment.log : [];
-      const logContainer = document.getElementById('logContainer');
-      logContainer.innerHTML = '';
-      logArray.forEach(entry => {
-        const entryDiv = document.createElement('div');
-        entryDiv.classList.add('timeline-entry');
-        entryDiv.innerHTML = `<h4>${formatDateOnly(entry.date)}</h4><p>${entry.description || ''}</p>`;
-        logContainer.appendChild(entryDiv);
-      });
-
-      // Shipment History - format date only
-      const historyArray = Array.isArray(shipment.history) ? shipment.history : [];
-      const historyTableBody = document.getElementById('historyTableBody');
-      historyTableBody.innerHTML = '';
-      historyArray.forEach(item => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${formatDateOnly(item.date)}</td>
-          <td>${item.location || ''}</td>
-          <td>${item.status || ''}</td>
-          <td>${item.updatedBy || ''}</td>
-          <td>${item.remarks || ''}</td>
-        `;
-        historyTableBody.appendChild(row);
-      });
-
-      // Shipment Packages
-      const packagesArray = Array.isArray(shipment.packages) ? shipment.packages : [];
-      const packagesTableBody = document.getElementById('packagesTableBody');
-      packagesTableBody.innerHTML = '';
-      packagesArray.forEach(pkg => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${pkg.quantity || ''}</td>
-          <td>${pkg.type || ''}</td>
-          <td>${pkg.description || ''}</td>
-          <td>${pkg.length || ''}</td>
-          <td>${pkg.width || ''}</td>
-          <td>${pkg.height || ''}</td>
-          <td>${pkg.weight || ''}</td>
-        `;
-        packagesTableBody.appendChild(row);
-      });
-
-    } catch (error) {
-      console.error('Error fetching shipment:', error);
-      alert('Error retrieving shipment data.');
-    }
-  }
-
-  // On page load, get tracking number and fetch shipment data
-  document.addEventListener('DOMContentLoaded', () => {
-    const trackingNumber = getTrackingNumberFromURL();
-    if (trackingNumber) {
-      fetchShipmentData(trackingNumber);
-    } else {
-      alert('No tracking number found in URL.');
-    }
-  });
 </script>
-
-
-
-
 </body></html>
