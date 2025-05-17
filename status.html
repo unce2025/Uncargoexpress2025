@@ -324,12 +324,14 @@
 
     <a href="index.html" class="back-btn">Back to Home</a>
   </div>
-<script>
+
+  <script>
   const scriptURL = "https://script.google.com/macros/s/AKfycbzBBwy4tcn7cblpdfh9eYI8QkwdqMgM8zS309EvnWgA_1TowuNrabOWWMn7PKtckwvv/exec";
 
+  // ✅ FIXED: Use 'tracking' instead of 'track' to match what the backend expects
   function getTrackingNumberFromURL() {
     const params = new URLSearchParams(window.location.search);
-    return params.get("track"); // keep ?track=12345 in URL, but fix fetch below
+    return params.get("tracking");
   }
 
   function displayShipment(data) {
@@ -449,6 +451,7 @@
       });
   }
 
+  // Initialize
   const trackingNumber = getTrackingNumberFromURL();
   fetchShipmentData(trackingNumber);
 </script>
