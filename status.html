@@ -325,7 +325,7 @@
     <a href="index.html" class="back-btn">Back to Home</a>
   </div>
 <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbzBBwy4tcn7cblpdfh9eYI8QkwdqMgM8zS309EvnWgA_1TowuNrabOWWMn7PKtckwvv/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbxaJNPDvBfowAq9OUojrSm4zi2l1HcUUbYKkJprfeOZUfvIDRjYuiCKK4j2ShANdOxK/exec";
 
 // Format ISO date string to readable format like "May 21, 2025"
 function formatDate(dateString) {
@@ -339,11 +339,11 @@ function formatDate(dateString) {
   });
 }
 
-// Get tracking number from URL param 'track'
+// Get tracking number from URL param 'tracking' (updated here)
 function getTrackingNumberFromURL() {
   const params = new URLSearchParams(window.location.search);
-  const trackNum = params.get("track");
-  console.log("Tracking number from URL param 'track':", trackNum);
+  const trackNum = params.get("tracking");
+  console.log("Tracking number from URL param 'tracking':", trackNum);
   return trackNum;
 }
 
@@ -475,8 +475,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const trackingNumber = getTrackingNumberFromURL();
   fetchShipmentData(trackingNumber);
 });
-
 </script>
+
 
 
 </body></html>
