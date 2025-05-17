@@ -61,7 +61,7 @@
       </div>
 
       <form id="trackingForm" novalidate>
-        <input type="text" id="trackingNumber" placeholder="UN123CE456" />
+        <input type="text" id="trackingNumber" placeholder="e.g. UN123CE456" />
         <button type="submit"><i class="fa fa-search"></i> Track your shipment</button>
       </form>
     </section>
@@ -849,13 +849,15 @@ fetch('/.netlify/functions/addTracking', {
       return;
     }
 
-    // Optional: Remove this if you want to allow dynamic tracking numbers
-    if (value !== 'UN123CE456') {
-      alert('The tracking number entered does not match our records. Kindly verify the number and try again.');
-      input.classList.add('error');
-      input.value = '';
-      return;
-    }
+   if (!value) {
+  alert('Please enter your tracking number.');
+  input.classList.add('error');
+  return;
+}
+
+// Redirect to status page with tracking number
+window.location.href = `status.html?tracking=${encodeURIComponent(value)}`;
+
 
     pageLoading.style.display = 'flex';
 
