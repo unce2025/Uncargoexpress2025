@@ -324,7 +324,6 @@
 
     <a href="index.html" class="back-btn">Back to Home</a>
   </div>
-
 <script>
   const scriptURL = "https://script.google.com/macros/s/AKfycbzBBwy4tcn7cblpdfh9eYI8QkwdqMgM8zS309EvnWgA_1TowuNrabOWWMn7PKtckwvv/exec";
 
@@ -340,11 +339,15 @@
     });
   }
 
+  // Get tracking number from URL param 'track'
   function getTrackingNumberFromURL() {
     const params = new URLSearchParams(window.location.search);
-    return params.get("track"); // expects URL like ?track=UN123CE456
+    const trackNum = params.get("track");
+    console.log("Tracking number from URL param 'track':", trackNum);
+    return trackNum;
   }
 
+  // Show shipment info on page
   function displayShipment(data) {
     if (!data) {
       document.getElementById("statusIndicator").innerText = "SHIPMENT NOT FOUND";
@@ -363,7 +366,7 @@
     document.getElementById("receiverAddress").innerText = data.ReceiverAddress || "";
     document.getElementById("receiverEmail").innerText = data.ReceiverEmail || "";
 
-    // Shipment Details with formatted dates
+    // Shipment Details (with formatted dates)
     document.getElementById("estimatedDeliveryDate").innerText = formatDate(data.EstimatedDeliveryDate);
     document.getElementById("shippedDate").innerText = formatDate(data.ShippedDate);
     document.getElementById("flightNumber").innerText = data.FlightNumber || "";
@@ -441,15 +444,20 @@
     }
   }
 
+  // Fetch shipment data from Google Apps Script
   function fetchShipmentData(trackingNumber) {
     if (!trackingNumber) {
       document.getElementById("statusIndicator").innerText = "NO TRACKING NUMBER PROVIDED";
       return;
     }
-
+    console.log("Fetching shipment data for:", trackingNumber);
     fetch(`${scriptURL}?tracking=${encodeURIComponent(trackingNumber)}`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`Network response was not ok: ${res.statusText}`);
+        return res.json();
+      })
       .then(result => {
+        console.log("Fetch result:", result);
         if (result.success && result.shipment) {
           displayShipment(result.shipment);
         } else {
@@ -462,6 +470,7 @@
       });
   }
 
+  // Start here
   const trackingNumber = getTrackingNumberFromURL();
   fetchShipmentData(trackingNumber);
 </script>
