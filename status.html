@@ -328,11 +328,7 @@
 <script>
   const scriptURL = "https://script.google.com/macros/s/AKfycbzBBwy4tcn7cblpdfh9eYI8QkwdqMgM8zS309EvnWgA_1TowuNrabOWWMn7PKtckwvv/exec";
 
-  function getTrackingNumberFromURL() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("track");
-  }
-
+  // Format ISO date string to readable format like "May 21, 2025"
   function formatDate(dateString) {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -344,25 +340,30 @@
     });
   }
 
+  function getTrackingNumberFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("track"); // expects URL like ?track=UN123CE456
+  }
+
   function displayShipment(data) {
     if (!data) {
       document.getElementById("statusIndicator").innerText = "SHIPMENT NOT FOUND";
       return;
     }
 
-    // Shipper
+    // Shipper Info
     document.getElementById("shipperName").innerText = data.ShipperName || "";
     document.getElementById("shipperPhone").innerText = data.ShipperPhone || "";
     document.getElementById("shipperAddress").innerText = data.ShipperAddress || "";
     document.getElementById("shipperEmail").innerText = data.ShipperEmail || "";
 
-    // Receiver
+    // Receiver Info
     document.getElementById("receiverName").innerText = data.ReceiverName || "";
     document.getElementById("receiverPhone").innerText = data.ReceiverPhone || "";
     document.getElementById("receiverAddress").innerText = data.ReceiverAddress || "";
     document.getElementById("receiverEmail").innerText = data.ReceiverEmail || "";
 
-    // Shipment Details (with formatted dates)
+    // Shipment Details with formatted dates
     document.getElementById("estimatedDeliveryDate").innerText = formatDate(data.EstimatedDeliveryDate);
     document.getElementById("shippedDate").innerText = formatDate(data.ShippedDate);
     document.getElementById("flightNumber").innerText = data.FlightNumber || "";
