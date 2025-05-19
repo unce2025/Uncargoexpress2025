@@ -3,454 +3,343 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Shipment Admin Panel - United Nation Cargo Express</title>
+<title>Shipment Admin Panel</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f2f2f2;
-    margin: 0;
-    padding: 20px;
-  }
-  h1 {
-    text-align: center;
-    color: #002147;
-  }
-  form {
-    max-width: 900px;
-    margin: 20px auto;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
-  input, select, button, textarea {
-    font-size: 1rem;
-  }
-  input, select, textarea {
-    width: 100%;
-    padding: 8px;
-    margin: 6px 0 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    box-sizing: border-box;
-  }
-  button {
-    background-color: #002147;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-  button:hover {
-    background-color: #003366;
-  }
-  .section {
-    margin-bottom: 30px;
-  }
-  label {
-    font-weight: bold;
-    margin-top: 10px;
-    display: block;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 10px;
-  }
-  th, td {
-    border: 1px solid #ccc;
-    padding: 8px;
-    text-align: left;
-  }
-  th {
-    background-color: #e0e0e0;
-  }
-  .small-input {
-    width: 100px;
-  }
-  .remove-row {
-    background-color: #cc0000;
-    padding: 6px 10px;
-    border-radius: 4px;
-  }
-  .remove-row:hover {
-    background-color: #990000;
-  }
-  .add-row {
-    background-color: #007b00;
-    padding: 8px 15px;
-    border-radius: 6px;
-    margin-bottom: 15px;
-  }
-  .add-row:hover {
-    background-color: #005a00;
-  }
+  body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; padding: 10px; }
+  label { display: block; margin-top: 10px; font-weight: bold; }
+  input, select, textarea, button { width: 100%; padding: 6px; margin-top: 4px; box-sizing: border-box; }
+  textarea { resize: vertical; }
+  .inline-inputs { display: flex; gap: 10px; }
+  .inline-inputs > * { flex: 1; }
+  .list-container { border: 1px solid #ccc; padding: 10px; margin-top: 5px; max-height: 200px; overflow-y: auto; }
+  .list-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; background: #f9f9f9; padding: 5px 8px; border-radius: 4px; }
+  .list-item button { background: #d9534f; color: white; border: none; padding: 2px 8px; cursor: pointer; border-radius: 4px; }
+  .add-btn { margin-top: 5px; }
+  .success-msg { color: green; margin-top: 10px; }
+  .error-msg { color: red; margin-top: 10px; }
 </style>
 </head>
 <body>
 
-<h1>Admin Panel - United Nation Cargo Express</h1>
+<h1>Shipment Admin Panel</h1>
 
-<!-- Search Form -->
-<form id="searchForm">
-  <input type="text" id="trackingSearch" placeholder="Enter Tracking Number to Search" required />
-  <button type="submit">Search Shipment</button>
+<!-- Search by tracking number -->
+<label for="searchTracking">Search by Tracking Number</label>
+<div class="inline-inputs">
+  <input type="text" id="searchTracking" placeholder="Enter tracking number" />
+  <button onclick="searchShipment()">Search</button>
+</div>
+
+<form id="shipmentForm" onsubmit="return saveShipment(event)">
+
+  <!-- Shipment basic fields -->
+  <label for="TrackingNumber">Tracking Number</label>
+  <input type="text" id="TrackingNumber" name="TrackingNumber" required />
+
+  <label for="Status">Status</label>
+  <input type="text" id="Status" name="Status" />
+
+  <label for="ShipperName">Shipper Name</label>
+  <input type="text" id="ShipperName" name="ShipperName" />
+
+  <label for="ShipperPhone">Shipper Phone</label>
+  <input type="text" id="ShipperPhone" name="ShipperPhone" />
+
+  <label for="ShipperAddress">Shipper Address</label>
+  <textarea id="ShipperAddress" name="ShipperAddress"></textarea>
+
+  <label for="ShipperEmail">Shipper Email</label>
+  <input type="email" id="ShipperEmail" name="ShipperEmail" />
+
+  <label for="ReceiverName">Receiver Name</label>
+  <input type="text" id="ReceiverName" name="ReceiverName" />
+
+  <label for="ReceiverPhone">Receiver Phone</label>
+  <input type="text" id="ReceiverPhone" name="ReceiverPhone" />
+
+  <label for="ReceiverAddress">Receiver Address</label>
+  <textarea id="ReceiverAddress" name="ReceiverAddress"></textarea>
+
+  <label for="ReceiverEmail">Receiver Email</label>
+  <input type="email" id="ReceiverEmail" name="ReceiverEmail" />
+
+  <label for="EstimatedDeliveryDate">Estimated Delivery Date</label>
+  <input type="date" id="EstimatedDeliveryDate" name="EstimatedDeliveryDate" />
+
+  <label for="ShippedDate">Shipped Date</label>
+  <input type="date" id="ShippedDate" name="ShippedDate" />
+
+  <label for="PickUpTime">Pick Up Time</label>
+  <input type="time" id="PickUpTime" name="PickUpTime" />
+
+  <label for="Departure">Departure</label>
+  <input type="text" id="Departure" name="Departure" />
+
+  <label for="Mode">Mode</label>
+  <input type="text" id="Mode" name="Mode" />
+
+  <label for="Product">Product</label>
+  <input type="text" id="Product" name="Product" />
+
+  <label for="Quantity">Quantity</label>
+  <input type="number" id="Quantity" name="Quantity" min="0" />
+
+  <label for="Payment">Payment</label>
+  <input type="text" id="Payment" name="Payment" />
+
+  <label for="TotalFreight">Total Freight</label>
+  <input type="number" id="TotalFreight" name="TotalFreight" min="0" step="0.01" />
+
+  <!-- Log entries UI -->
+  <div>
+    <h3>Shipment Log</h3>
+    <div class="inline-inputs">
+      <input type="date" id="logDate" />
+      <input type="text" id="logDesc" placeholder="Log description" />
+      <button type="button" class="add-btn" onclick="addLogEntry()">Add Log Entry</button>
+    </div>
+    <div id="logList" class="list-container"></div>
+    <textarea id="log" name="log" style="display:none;"></textarea>
+  </div>
+
+  <!-- History entries UI -->
+  <div>
+    <h3>Shipment History</h3>
+    <div class="inline-inputs">
+      <input type="text" id="historyDesc" placeholder="History entry description" />
+      <button type="button" class="add-btn" onclick="addHistoryEntry()">Add History Entry</button>
+    </div>
+    <div id="historyList" class="list-container"></div>
+    <textarea id="history" name="history" style="display:none;"></textarea>
+  </div>
+
+  <!-- Packages field as JSON textarea (optional) -->
+  <label for="packages">Packages (JSON format)</label>
+  <textarea id="packages" name="packages" rows="4" placeholder='[{"type":"Box","weight":10}]'></textarea>
+
+  <button type="submit" style="margin-top:20px;">Save Shipment</button>
 </form>
 
-<!-- Main Shipment Form -->
-<form id="shipmentForm">
-
-  <div class="section">
-    <input type="text" id="TrackingNumber" name="TrackingNumber" placeholder="Tracking Number" required />
-    <input type="text" id="Status" name="Status" placeholder="Status" required />
-    <input type="text" id="ShipperName" name="ShipperName" placeholder="Shipper Name" />
-    <input type="text" id="ShipperPhone" name="ShipperPhone" placeholder="Shipper Phone" />
-    <input type="text" id="ShipperAddress" name="ShipperAddress" placeholder="Shipper Address" />
-    <input type="email" id="ShipperEmail" name="ShipperEmail" placeholder="Shipper Email" />
-    <input type="text" id="ReceiverName" name="ReceiverName" placeholder="Receiver Name" />
-    <input type="text" id="ReceiverPhone" name="ReceiverPhone" placeholder="Receiver Phone" />
-    <input type="text" id="ReceiverAddress" name="ReceiverAddress" placeholder="Receiver Address" />
-    <input type="email" id="ReceiverEmail" name="ReceiverEmail" placeholder="Receiver Email" />
-    <input type="date" id="EstimatedDeliveryDate" name="EstimatedDeliveryDate" placeholder="Estimated Delivery Date" />
-    <input type="date" id="ShippedDate" name="ShippedDate" placeholder="Shipped Date" />
-    <input type="text" id="FlightNumber" name="FlightNumber" placeholder="Flight Number" />
-    <input type="text" id="PackageWeight" name="PackageWeight" placeholder="Package Weight (e.g., 2.5 kg)" />
-    <input type="text" id="Mode" name="Mode" placeholder="Mode (e.g., Air-Freight)" />
-    <input type="text" id="Product" name="Product" placeholder="Product" />
-    <input type="number" id="Quantity" name="Quantity" placeholder="Quantity" />
-    <input type="text" id="Payment" name="Payment" placeholder="Payment Method" />
-    <input type="text" id="TotalFreight" name="TotalFreight" placeholder="Total Freight (e.g., $320)" />
-  </div>
-
-  <!-- Log Section -->
-  <div class="section">
-    <label>Log Entries</label>
-    <button type="button" id="addLogRow" class="add-row">+ Add Log Entry</button>
-    <table id="logTable">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Description</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Dynamic rows here -->
-      </tbody>
-    </table>
-  </div>
-
-  <!-- History Section -->
-  <div class="section">
-    <label>Shipment History</label>
-    <button type="button" id="addHistoryRow" class="add-row">+ Add History Entry</button>
-    <table id="historyTable">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>Location</th>
-          <th>Status</th>
-          <th>Updated By</th>
-          <th>Remarks</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Dynamic rows here -->
-      </tbody>
-    </table>
-  </div>
-
-  <button type="submit">Save Shipment</button>
-</form>
+<div id="msg" style="margin-top:20px;"></div>
 
 <script>
-const PROXY_URL = 'https://script.google.com/macros/s/AKfycbxaJNPDvBfowAq9OUojrSm4zi2l1HcUUbYKkJprfeOZUfvIDRjYuiCKK4j2ShANdOxK/exec';
+  // Hold log and history as arrays
+  const logEntries = [];
+  const historyEntries = [];
 
-const searchForm = document.getElementById('searchForm');
-const shipmentForm = document.getElementById('shipmentForm');
+  // Render log list
+  function renderLog() {
+    const logList = document.getElementById('logList');
+    logList.innerHTML = '';
+    logEntries.forEach((entry, index) => {
+      const li = document.createElement('div');
+      li.className = 'list-item';
+      li.textContent = `${entry.date} - ${entry.desc}`;
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = 'Remove';
+      removeBtn.onclick = () => {
+        logEntries.splice(index, 1);
+        renderLog();
+      };
+      li.appendChild(removeBtn);
+      logList.appendChild(li);
+    });
+    document.getElementById('log').value = JSON.stringify(logEntries);
+  }
 
-const logTableBody = document.querySelector('#logTable tbody');
-const historyTableBody = document.querySelector('#historyTable tbody');
-const addLogRowBtn = document.getElementById('addLogRow');
-const addHistoryRowBtn = document.getElementById('addHistoryRow');
+  // Render history list
+  function renderHistory() {
+    const historyList = document.getElementById('historyList');
+    historyList.innerHTML = '';
+    historyEntries.forEach((desc, index) => {
+      const li = document.createElement('div');
+      li.className = 'list-item';
+      li.textContent = desc;
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = 'Remove';
+      removeBtn.onclick = () => {
+        historyEntries.splice(index, 1);
+        renderHistory();
+      };
+      li.appendChild(removeBtn);
+      historyList.appendChild(li);
+    });
+    document.getElementById('history').value = JSON.stringify(historyEntries);
+  }
 
-function formatDateForInput(dateStr) {
-  if (!dateStr) return '';
-  const d = new Date(dateStr);
-  if (isNaN(d)) return ''; // fallback if invalid date
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
+  // Add log entry from inputs
+  function addLogEntry() {
+    const dateInput = document.getElementById('logDate');
+    const descInput = document.getElementById('logDesc');
+    if (!dateInput.value || !descInput.value.trim()) {
+      alert('Please enter both date and log description.');
+      return;
+    }
+    logEntries.push({ date: dateInput.value, desc: descInput.value.trim() });
+    dateInput.value = '';
+    descInput.value = '';
+    renderLog();
+  }
 
-// Utility to create log row
-function createLogRow(date='', description='') {
-  const tr = document.createElement('tr');
+  // Add history entry from input
+  function addHistoryEntry() {
+    const descInput = document.getElementById('historyDesc');
+    if (!descInput.value.trim()) {
+      alert('Please enter a history description.');
+      return;
+    }
+    historyEntries.push(descInput.value.trim());
+    descInput.value = '';
+    renderHistory();
+  }
 
-  const dateTd = document.createElement('td');
-  const dateInput = document.createElement('input');
-  dateInput.type = 'date';
-  dateInput.value = date;
-  dateInput.required = true;
-  dateTd.appendChild(dateInput);
-  tr.appendChild(dateTd);
-
-  const descTd = document.createElement('td');
-  const descInput = document.createElement('input');
-  descInput.type = 'text';
-  descInput.value = description;
-  descInput.placeholder = 'Description';
-  descInput.required = true;
-  descTd.appendChild(descInput);
-  tr.appendChild(descTd);
-
-  const actionTd = document.createElement('td');
-  const removeBtn = document.createElement('button');
-  removeBtn.type = 'button';
-  removeBtn.className = 'remove-row';
-  removeBtn.textContent = 'Remove';
-  removeBtn.onclick = () => tr.remove();
-  actionTd.appendChild(removeBtn);
-  tr.appendChild(actionTd);
-
-  return tr;
-}
-
-// Utility to create history row
-function createHistoryRow(date='', time='', location='', status='', updatedBy='', remarks='') {
-  const tr = document.createElement('tr');
-
-  // Date
-  const dateTd = document.createElement('td');
-  const dateInput = document.createElement('input');
-  dateInput.type = 'date';
-  dateInput.value = date;
-  dateInput.required = true;
-  dateTd.appendChild(dateInput);
-  tr.appendChild(dateTd);
-
-  // Time
-  const timeTd = document.createElement('td');
-  const timeInput = document.createElement('input');
-  timeInput.type = 'time';
-  timeInput.value = time;
-  timeInput.required = true;
-  timeTd.appendChild(timeInput);
-  tr.appendChild(timeTd);
-
-  // Location
-  const locTd = document.createElement('td');
-  const locInput = document.createElement('input');
-  locInput.type = 'text';
-  locInput.value = location;
-  locInput.placeholder = 'Location';
-  locInput.required = true;
-  locTd.appendChild(locInput);
-  tr.appendChild(locTd);
-
-  // Status
-  const statusTd = document.createElement('td');
-  const statusInput = document.createElement('input');
-  statusInput.type = 'text';
-  statusInput.value = status;
-  statusInput.placeholder = 'Status';
-  statusInput.required = true;
-  statusTd.appendChild(statusInput);
-  tr.appendChild(statusTd);
-
-  // Updated By
-  const updatedByTd = document.createElement('td');
-  const updatedByInput = document.createElement('input');
-  updatedByInput.type = 'text';
-  updatedByInput.value = updatedBy;
-  updatedByInput.placeholder = 'Updated By';
-  updatedByInput.required = true;
-  updatedByTd.appendChild(updatedByInput);
-  tr.appendChild(updatedByTd);
-
-  // Remarks
-  const remarksTd = document.createElement('td');
-  const remarksInput = document.createElement('input');
-  remarksInput.type = 'text';
-  remarksInput.value = remarks;
-  remarksInput.placeholder = 'Remarks';
-  remarksInput.required = false;
-  remarksTd.appendChild(remarksInput);
-  tr.appendChild(remarksTd);
-
-  // Action
-  const actionTd = document.createElement('td');
-  const removeBtn = document.createElement('button');
-  removeBtn.type = 'button';
-  removeBtn.className = 'remove-row';
-  removeBtn.textContent = 'Remove';
-  removeBtn.onclick = () => tr.remove();
-  actionTd.appendChild(removeBtn);
-  tr.appendChild(actionTd);
-
-  return tr;
-}
-
-// Add initial empty rows to tables for better UX
-addLogRowBtn.addEventListener('click', () => {
-  logTableBody.appendChild(createLogRow());
-});
-addHistoryRowBtn.addEventListener('click', () => {
-  historyTableBody.appendChild(createHistoryRow());
-});
-
-// Populate form from data (search)
-function populateForm(data) {
-  for (const key in data) {
-    const el = document.getElementById(key);
-    if (el) {
-      if (key === 'EstimatedDeliveryDate' || key === 'ShippedDate') {
-        el.value = formatDateForInput(data[key]);
-      } else {
-        el.value = data[key];
+  // Load shipment data into form including logs and history
+  function loadShipment(shipment) {
+    if (!shipment) return;
+    const fields = [
+      "TrackingNumber","Status","ShipperName","ShipperPhone","ShipperAddress","ShipperEmail",
+      "ReceiverName","ReceiverPhone","ReceiverAddress","ReceiverEmail",
+      "EstimatedDeliveryDate","ShippedDate","PickUpTime","Departure","Mode",
+      "Product","Quantity","Payment","TotalFreight","packages"
+    ];
+    fields.forEach(f => {
+      const el = document.getElementById(f);
+      if (el) {
+        if (f === "EstimatedDeliveryDate" || f === "ShippedDate") {
+          // Dates from backend may be MM/dd/yyyy, convert to yyyy-MM-dd for input
+          el.value = shipment[f] ? formatDateForInput(shipment[f]) : '';
+        } else {
+          el.value = shipment[f] || '';
+        }
       }
+    });
+
+    // Load logs and history JSON
+    loadLogFromJSON(shipment.log || '[]');
+    loadHistoryFromJSON(shipment.history || '[]');
+  }
+
+  // Format MM/dd/yyyy to yyyy-MM-dd for <input type="date">
+  function formatDateForInput(dateStr) {
+    const parts = dateStr.split('/');
+    if(parts.length === 3){
+      return `${parts[2]}-${parts[0].padStart(2,'0')}-${parts[1].padStart(2,'0')}`;
+    }
+    return dateStr;
+  }
+
+  // Parse and load logs JSON into UI
+  function loadLogFromJSON(jsonStr) {
+    try {
+      const arr = JSON.parse(jsonStr);
+      if (Array.isArray(arr)) {
+        logEntries.splice(0, logEntries.length, ...arr);
+        renderLog();
+      } else {
+        logEntries.splice(0, logEntries.length);
+        renderLog();
+      }
+    } catch (e) {
+      logEntries.splice(0, logEntries.length);
+      renderLog();
     }
   }
 
-  // Populate log table from string format "date|description\n..."
-  logTableBody.innerHTML = '';
-  if (data.log) {
-    const logRows = data.log.split('\n').filter(Boolean);
-    logRows.forEach(row => {
-      const parts = row.split('|');
-      const date = parts[0] || '';
-      const desc = parts[1] || '';
-      logTableBody.appendChild(createLogRow(date, desc));
-    });
+  // Parse and load history JSON into UI
+  function loadHistoryFromJSON(jsonStr) {
+    try {
+      const arr = JSON.parse(jsonStr);
+      if (Array.isArray(arr)) {
+        historyEntries.splice(0, historyEntries.length, ...arr);
+        renderHistory();
+      } else {
+        historyEntries.splice(0, historyEntries.length);
+        renderHistory();
+      }
+    } catch (e) {
+      historyEntries.splice(0, historyEntries.length);
+      renderHistory();
+    }
   }
 
-  // Populate history table from string format "date|time|location|status|updatedBy|remarks
-\n..."
-historyTableBody.innerHTML = '';
-if (data.history) {
-const histRows = data.history.split('\n').filter(Boolean);
-histRows.forEach(row => {
-const parts = row.split('|');
-historyTableBody.appendChild(createHistoryRow(
-parts[0] || '',
-parts[1] || '',
-parts[2] || '',
-parts[3] || '',
-parts[4] || '',
-parts[5] || ''
-));
-});
-}
-}
+  // Search shipment by tracking number
+  async function searchShipment() {
+    const tracking = document.getElementById('searchTracking').value.trim();
+    if (!tracking) {
+      alert('Please enter a tracking number to search.');
+      return;
+    }
+    showMessage('Searching shipment...', false);
+    try {
+      const response = await fetch(`https://script.google.com/macros/s/AKfycbxaJNPDvBfowAq9OUojrSm4zi2l1HcUUbYKkJprfeOZUfvIDRjYuiCKK4j2ShANdOxK/exec?tracking=${encodeURIComponent(tracking)}`);
+      const data = await response.json();
+      if (data.success && data.shipment) {
+        loadShipment(data.shipment);
+        showMessage('Shipment loaded.', false);
+      } else {
+        clearForm();
+        showMessage('Shipment not found.', true);
+      }
+    } catch (err) {
+      showMessage('Error fetching shipment: ' + err.message, true);
+    }
+  }
 
-// Collect table data and convert to string format for saving
-function serializeLog() {
-const rows = logTableBody.querySelectorAll('tr');
-const arr = [];
-rows.forEach(tr => {
-const date = tr.children[0].querySelector('input').value.trim();
-const desc = tr.children[1].querySelector('input').value.trim();
-if (date && desc) arr.push(${date}|${desc});
-});
-return arr.join('\n');
-}
+  // Clear form fields and lists
+  function clearForm() {
+    document.getElementById('shipmentForm').reset();
+    logEntries.splice(0, logEntries.length);
+    historyEntries.splice(0, historyEntries.length);
+    renderLog();
+    renderHistory();
+  }
 
-function serializeHistory() {
-const rows = historyTableBody.querySelectorAll('tr');
-const arr = [];
-rows.forEach(tr => {
-const date = tr.children[0].querySelector('input').value.trim();
-const time = tr.children[1].querySelector('input').value.trim();
-const location = tr.children[2].querySelector('input').value.trim();
-const status = tr.children[3].querySelector('input').value.trim();
-const updatedBy = tr.children[4].querySelector('input').value.trim();
-const remarks = tr.children[5].querySelector('input').value.trim();
-if (date && time && location && status && updatedBy) {
-arr.push(${date}|${time}|${location}|${status}|${updatedBy}|${remarks});
-}
-});
-return arr.join('\n');
-}
+  // Show success/error message
+  function showMessage(msg, isError) {
+    const msgEl = document.getElementById('msg');
+    msgEl.textContent = msg;
+    msgEl.className = isError ? 'error-msg' : 'success-msg';
+  }
 
-searchForm.addEventListener('submit', async (e) => {
-e.preventDefault();
-const trackingNumber = document.getElementById('trackingSearch').value.trim();
-if (!trackingNumber) {
-alert('Please enter a tracking number.');
-return;
-}
-try {
-const res = await fetch(${PROXY_URL}?trackingNumber=${encodeURIComponent(trackingNumber)});
-const data = await res.json();
-if (data && data.shipment) {
-populateForm(data.shipment);
-alert('Shipment data loaded. You can now edit and save.');
-} else {
-alert('No shipment found for this tracking number.');
-}
-} catch (err) {
-alert('Error fetching shipment data: ' + err.message);
-}
-});
+  // Save shipment form data
+  async function saveShipment(event) {
+    event.preventDefault();
 
-shipmentForm.addEventListener('submit', async (e) => {
-e.preventDefault();
+    const form = document.getElementById('shipmentForm');
 
-const formData = {
-TrackingNumber: document.getElementById('TrackingNumber').value.trim(),
-Status: document.getElementById('Status').value.trim(),
-ShipperName: document.getElementById('ShipperName').value.trim(),
-ShipperPhone: document.getElementById('ShipperPhone').value.trim(),
-ShipperAddress: document.getElementById('ShipperAddress').value.trim(),
-ShipperEmail: document.getElementById('ShipperEmail').value.trim(),
-ReceiverName: document.getElementById('ReceiverName').value.trim(),
-ReceiverPhone: document.getElementById('ReceiverPhone').value.trim(),
-ReceiverAddress: document.getElementById('ReceiverAddress').value.trim(),
-ReceiverEmail: document.getElementById('ReceiverEmail').value.trim(),
-EstimatedDeliveryDate: document.getElementById('EstimatedDeliveryDate').value,
-ShippedDate: document.getElementById('ShippedDate').value,
-FlightNumber: document.getElementById('FlightNumber').value.trim(),
-PackageWeight: document.getElementById('PackageWeight').value.trim(),
-Mode: document.getElementById('Mode').value.trim(),
-Product: document.getElementById('Product').value.trim(),
-Quantity: document.getElementById('Quantity').value.trim(),
-Payment: document.getElementById('Payment').value.trim(),
-TotalFreight: document.getElementById('TotalFreight').value.trim(),
-log: serializeLog(),
-history: serializeHistory()
-};
+    // Gather all form data into object
+    const formData = new FormData(form);
+    const shipment = {};
+    for (const [key, value] of formData.entries()) {
+      shipment[key] = value;
+    }
 
-if (!formData.TrackingNumber) {
-alert('Tracking Number is required.');
-return;
-}
+    // Parse quantity and total freight as numbers
+    if (shipment.Quantity) shipment.Quantity = Number(shipment.Quantity);
+    if (shipment.TotalFreight) shipment.TotalFreight = Number(shipment.TotalFreight);
 
-try {
-const res = await fetch(PROXY_URL, {
-method: 'POST',
-headers: {
-'Content-Type': 'application/json'
-},
-body: JSON.stringify(formData)
-});
-const result = await res.json();
-if (result.success) {
-alert('Shipment saved successfully!');
-shipmentForm.reset();
-logTableBody.innerHTML = '';
-historyTableBody.innerHTML = '';
-} else {
-alert('Failed to save shipment: ' + (result.message || 'Unknown error'));
-}
-} catch (err) {
-alert('Error saving shipment: ' + err.message);
-}
-});
+    // Send POST to Google Apps Script
+    showMessage('Saving shipment...', false);
+
+    try {
+      const response = await fetch('YOUR_GOOGLE_SCRIPT_URL', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ shipment })
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        showMessage(data.message || 'Shipment saved successfully.', false);
+        // Optionally clear form or keep data
+      } else {
+        showMessage(data.message || 'Error saving shipment.', true);
+      }
+    } catch (err) {
+      showMessage('Error saving shipment: ' + err.message, true);
+    }
+  }
 </script>
 
-</body> </html> 
+</body>
+</html>
