@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
   <title>Admin Panel - United Nation Cargo Express</title>
   <style>
     :root {
@@ -50,6 +50,7 @@
       font-size: 16px;
       cursor: pointer;
       border-radius: 4px;
+      transition: background-color 0.3s ease;
     }
 
     .btn:hover {
@@ -77,6 +78,13 @@
     .flex > div {
       flex: 1;
       min-width: 150px;
+    }
+
+    textarea#log {
+      white-space: pre-line;
+      background-color: #f9f9f9;
+      border-left: 4px solid var(--primary);
+      resize: vertical;
     }
 
     @media (max-width: 600px) {
@@ -187,7 +195,7 @@
 
   <!-- Save Button -->
   <div class="section">
-    <button class="btn" onclick="saveShipment()">💾 Save Shipment</button>
+    <button class="btn" onclick="saveShipment()"> Save Shipment</button>
   </div>
 
   <script>
@@ -214,6 +222,7 @@
         UpdatedBy: document.getElementById('histUpdatedBy').value,
         Remarks: document.getElementById('histRemarks').value
       };
+      if (!entry.Date || !entry.Time) return alert("Date and Time are required for history entries.");
       history.push(entry);
       displayHistory();
       document.querySelectorAll('#histDate, #histTime, #histLocation, #histStatus, #histUpdatedBy, #histRemarks').forEach(el => el.value = '');
@@ -222,7 +231,7 @@
     function displayHistory() {
       const container = document.getElementById('historyList');
       container.innerHTML = '';
-      history.forEach(entry => {
+      [...history].reverse().forEach(entry => {
         container.innerHTML += `<div class="history-entry">${entry.Date} ${entry.Time} - ${entry.Location}, ${entry.Status}, ${entry.UpdatedBy}, ${entry.Remarks}</div>`;
       });
     }
@@ -255,8 +264,13 @@
         Payment: getValue('Payment'),
         TotalFreight: getValue('TotalFreight'),
         log: getValue('log'),
-        history: history
+        history: JSON.stringify(history)
       };
+
+      if (!shipment.TrackingNumber) {
+        alert("Tracking Number is required!");
+        return;
+      }
 
       fetch(endpoint, {
         method: 'POST',
@@ -264,7 +278,8 @@
         headers: { 'Content-Type': 'application/json' }
       })
       .then(res => res.json())
-      .then(data => alert(data.message || 'Saved!'));
+      .then(data => alert(data.message || 'Saved!'))
+      .catch(() => alert('Failed to save shipment. Please try again.'));
     }
 
     function loadShipment() {
@@ -273,15 +288,18 @@
       fetch(`${endpoint}?tracking=${encodeURIComponent(tracking)}`)
         .then(res => res.json())
         .then(data => {
-          if (!data.success || !data.shipment) return alert("Not found");
+          if (!data.success || !data.shipment) return alert("Shipment not found.");
           const s = data.shipment;
           Object.keys(s).forEach(k => {
             if (k !== 'history') setValue(k, s[k]);
           });
           try { history = JSON.parse(s.history || '[]'); } catch { history = []; }
           displayHistory();
-        });
-    }
-  </script>
-</body>
-</html>
+          document.querySelector('.section:nth-of-type(2)').scrollIntoView({ behavior: 'smooth' });
+        })
+        .catch(() => alert('Failed to load shipment
+data.'));
+}
+</script>
+
+</body> </html> 
