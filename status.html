@@ -339,12 +339,10 @@ function formatDate(dateString) {
   });
 }
 
-// Get tracking number from URL param 'tracking' (updated here)
+// Get tracking number from URL param 'tracking'
 function getTrackingNumberFromURL() {
   const params = new URLSearchParams(window.location.search);
-  const trackNum = params.get("tracking");
-  console.log("Tracking number from URL param 'tracking':", trackNum);
-  return trackNum;
+  return params.get("tracking");
 }
 
 // Show shipment info on page
@@ -366,7 +364,7 @@ function displayShipment(data) {
   document.getElementById("receiverAddress").innerText = data.ReceiverAddress || "";
   document.getElementById("receiverEmail").innerText = data.ReceiverEmail || "";
 
-  // Shipment Details (with formatted dates)
+  // Shipment Details (formatted dates)
   document.getElementById("estimatedDeliveryDate").innerText = formatDate(data.EstimatedDeliveryDate);
   document.getElementById("shippedDate").innerText = formatDate(data.ShippedDate);
   document.getElementById("flightNumber").innerText = data.FlightNumber || "";
@@ -378,28 +376,29 @@ function displayShipment(data) {
   document.getElementById("totalFreight").innerText = data.TotalFreight || "";
   document.getElementById("statusIndicator").innerText = "SHIPMENT STATUS: " + (data.Status || "N/A");
 
-  // Barcode
-  const trackingNumber = data.TrackingNumber;
-  if (trackingNumber) {
-    document.getElementById("barcodeImage").src =
-      "https://barcode.tec-it.com/barcode.ashx?data=" + trackingNumber + "&code=Code128&dpi=96";
+  // Barcode Image
+  if (data.TrackingNumber) {
+    document.getElementById("barcodeImage").src = 
+      "https://barcode.tec-it.com/barcode.ashx?data=" + encodeURIComponent(data.TrackingNumber) + "&code=Code128&dpi=96";
   }
 
- const logContainer = document.getElementById("logContainer");
-logContainer.innerHTML = "";
-try {
-  const logs = JSON.parse(data.log || "[]");
-  logs.forEach(entry => {
-    const div = document.createElement("div");
-    div.className = "timeline-entry";
-    div.innerHTML = `<h4>${entry.date || ""}</h4><p>${entry.description || ""}</p>`;
-    logContainer.appendChild(div);
-  });
-} catch (e) {
-  console.error("Invalid log JSON", e);
-}
+  // Shipment Log (timeline)
+  const logContainer = document.getElementById("logContainer");
+  logContainer.innerHTML = "";
+  try {
+    const logs = JSON.parse(data.log || "[]");
+    logs.forEach(entry => {
+      const div = document.createElement("div");
+      div.className = "timeline-entry";
+      div.innerHTML = `<h4>${entry.date || ""}</h4><p>${entry.description || ""}</p>`;
+      logContainer.appendChild(div);
+    });
+  } catch (e) {
+    console.error("Invalid log JSON", e);
+    logContainer.innerText = "No shipment log available.";
+  }
 
-  // Shipment History
+  // Shipment History Table
   const historyBody = document.getElementById("historyTableBody");
   historyBody.innerHTML = "";
   try {
@@ -418,6 +417,9 @@ try {
     });
   } catch (e) {
     console.error("Invalid history JSON", e);
+    const row = document.createElement("tr");
+    row.innerHTML = `<td colspan="6">No shipment history available.</td>`;
+    historyBody.appendChild(row);
   }
 
   // Packages Table
@@ -440,41 +442,44 @@ try {
     });
   } catch (e) {
     console.error("Invalid packages JSON", e);
+    const row = document.createElement("tr");
+    row.innerHTML = `<td colspan="7">No package details available.</td>`;
+    packagesBody.appendChild(row);
   }
 }
 
-// Fetch shipment data from Google Apps Script
-function fetchShipmentData(trackingNumber) {
+// Fetch shipment data from Google Apps Script API by tracking number
+async function fetchShipmentData(trackingNumber) {
   if (!trackingNumber) {
-    document.getElementById("statusIndicator").innerText = "NO TRACKING NUMBER PROVIDED";
+    document.getElementById("statusIndicator").innerText = "No tracking number provided.";
     return;
   }
-  console.log("Fetching shipment data for:", trackingNumber);
-  fetch(`${scriptURL}?tracking=${encodeURIComponent(trackingNumber)}`)
-    .then(res => {
-      if (!res.ok) throw new Error(`Network response was not ok: ${res.statusText}`);
-      return res.json();
-    })
-    .then(result => {
-      console.log("Fetch result:", result);
-      if (result.success && result.shipment) {
-        displayShipment(result.shipment);
-      } else {
-        displayShipment(null);
-      }
-    })
-    .catch(error => {
-      console.error("Fetch error:", error);
-      document.getElementById("statusIndicator").innerText = "ERROR FETCHING SHIPMENT DATA";
-    });
+  
+  try {
+    const url = `${scriptURL}?tracking=${encodeURIComponent(trackingNumber)}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const result = await response.json();
+    if (result && result.shipment) {
+      displayShipment(result.shipment);
+    } else {
+      document.getElementById("statusIndicator").innerText = "Shipment not found.";
+    }
+  } catch (error) {
+    console.error("Fetch error:", error);
+    document.getElementById("statusIndicator").innerText = "Error loading shipment data.";
+  }
 }
 
-// On page load, get tracking number from URL and fetch data
-document.addEventListener("DOMContentLoaded", () => {
+// On page load, get tracking number from URL and fetch shipment data
+window.addEventListener("DOMContentLoaded", () => {
   const trackingNumber = getTrackingNumberFromURL();
   fetchShipmentData(trackingNumber);
 });
 </script>
+
 
 
 
