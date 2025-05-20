@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 
 exports.handler = async function (event) {
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbxaJNPDvBfowAq9OUojrSm4zi2l1HcUUbYKkJprfeOZUfvIDRjYuiCKK4j2ShANdOxK/exec";
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbwB3n0A3M9Dr0BDzenvz8jPgl6pM5I_8cJM6VulJUdaxqBv3X9CHGEE96tYOZosd8L-/exec";
 
   // Handle CORS preflight request
   if (event.httpMethod === "OPTIONS") {
