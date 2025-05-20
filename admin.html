@@ -243,161 +243,176 @@
   </div>
 
   <script>
-  const endpoint = 'https://script.google.com/macros/s/AKfycbxaJNPDvBfowAq9OUojrSm4zi2l1HcUUbYKkJprfeOZUfvIDRjYuiCKK4j2ShANdOxK/exec'; // Replace with your Apps Script URL
-  let history = [];
-
-  function getValue(id) {
-    return document.getElementById(id).value.trim();
-  }
-
-  function setValue(id, value) {
-    document.getElementById(id).value = value || '';
-  }
+  const scriptURL = "https://script.google.com/macros/s/AKfycbxaJNPDvBfowAq9OUojrSm4zi2l1HcUUbYKkJprfeOZUfvIDRjYuiCKK4j2ShANdOxK/exec";
 
   function addLogEntry() {
-    const date = getValue('logDate');
-    const desc = getValue('logDescription');
-    if (date && desc) {
-      const currentLog = getValue('log');
-      setValue('log', `${currentLog}${date}: ${desc}\n`);
-      setValue('logDate', '');
-      setValue('logDescription', '');
-    } else {
-      alert("Please enter both Log Date and Description.");
-    }
+    const container = document.getElementById("logContainer");
+    const entry = document.createElement("input");
+    entry.type = "text";
+    entry.name = "log";
+    entry.placeholder = "Enter log entry";
+    container.appendChild(entry);
   }
 
   function addHistoryEntry() {
-    const entry = {
-      Date: getValue('historyDate'),
-      Time: getValue('historyTime'),
-      Location: getValue('historyLocation'),
-      Status: getValue('historyStatus'),
-      UpdatedBy: getValue('historyUpdatedBy'),
-      Remarks: getValue('historyRemarks')
-    };
+    const container = document.getElementById("historyContainer");
 
-    if (!entry.Date || !entry.Time || !entry.Location || !entry.Status) {
-      alert("Please fill in at least Date, Time, Location and Status for History Entry.");
+    const fields = [
+      { name: "Date", placeholder: "MM/DD/YYYY" },
+      { name: "Time", placeholder: "HH:MM" },
+      { name: "Location", placeholder: "City, Country" },
+      { name: "Status", placeholder: "e.g., In Transit" },
+      { name: "UpdatedBy", placeholder: "Staff Name" },
+      { name: "Remarks", placeholder: "Remarks or notes" },
+    ];
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "history-entry";
+
+    fields.forEach(field => {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.name = "history";
+      input.placeholder = `${field.name}: ${field.placeholder}`;
+      input.dataset.key = field.name;
+      wrapper.appendChild(input);
+    });
+
+    container.appendChild(wrapper);
+  }
+
+  function displayHistory(historyJSON) {
+    const container = document.getElementById("historyContainer");
+    container.innerHTML = "";
+
+    try {
+      const history = JSON.parse(historyJSON);
+      history.forEach((entry, i) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "history-entry";
+
+        const fields = ["Date", "Time", "Location", "Status", "UpdatedBy", "Remarks"];
+        fields.forEach(key => {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.name = "history";
+          input.placeholder = `${key}: ${entry[key] || ""}`;
+          input.value = entry[key] || "";
+          input.dataset.key = key;
+          wrapper.appendChild(input);
+        });
+
+        container.appendChild(wrapper);
+      });
+    } catch (e) {
+      console.error("Invalid history JSON:", e);
+    }
+  }
+
+  function getFormData() {
+    const data = {};
+    const inputs = document.querySelectorAll("form input, form textarea");
+
+    inputs.forEach(input => {
+      const name = input.name;
+      if (name === "log") {
+        if (!data.log) data.log = [];
+        if (input.value.trim()) data.log.push(input.value.trim());
+      } else if (name === "history") {
+        if (!data.history) data.history = [];
+
+        const wrapper = input.closest(".history-entry");
+        if (!wrapper) return;
+
+        const entry = {};
+        wrapper.querySelectorAll('input[name="history"]').forEach(i => {
+          const key = i.dataset.key;
+          if (key) entry[key] = i.value.trim();
+        });
+
+        if (Object.values(entry).some(v => v)) {
+          data.history.push(entry);
+        }
+      } else {
+        data[name] = input.value.trim();
+      }
+    });
+
+    data.log = JSON.stringify(data.log || []);
+    data.history = JSON.stringify(data.history || []);
+    return data;
+  }
+
+  function saveShipment() {
+    const data = getFormData();
+
+    fetch(scriptURL, {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then(res => res.text())
+    .then(response => alert("Shipment saved successfully."))
+    .catch(error => {
+      console.error("Error!", error.message);
+      alert("Error saving shipment.");
+    });
+  }
+
+  function loadShipment() {
+    const trackingNumber = document.getElementById("searchTrackingNumber").value.trim();
+    if (!trackingNumber) {
+      alert("Please enter a tracking number.");
       return;
     }
-    history.push(entry);
-    displayHistory
-();
-// Clear input fields after adding
-['historyDate','historyTime','historyLocation','historyStatus','historyUpdatedBy','historyRemarks'].forEach(id => setValue(id, ''));
-}
 
-function displayHistory() {
-const container = document.getElementById('historyContainer');
-container.innerHTML = '';
-history.forEach((h, i) => {
-const div = document.createElement('div');
-div.className = 'history-entry';
-div.innerHTML = <strong>Entry ${i + 1}:</strong><br> Date: ${h.Date} Time: ${h.Time}<br> Location: ${h.Location}<br> Status: ${h.Status}<br> Updated By: ${h.UpdatedBy || '-'}<br> Remarks: ${h.Remarks || '-'};
-container.appendChild(div);
-});
-}
+    fetch(`${scriptURL}?trackingNumber=${trackingNumber}`)
+      .then(res => res.json())
+      .then(result => {
+        if (!result || !result.shipment) {
+          alert("No shipment found.");
+          return;
+        }
 
-async function loadShipment() {
-const trackingNumber = getValue('TrackingNumber');
-if (!trackingNumber) {
-alert('Please enter a tracking number to search.');
-return;
-}
-  try {
-  const url = `${endpoint}?trackingNumber=${encodeURIComponent(trackingNumber)}`;
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`Server responded with ${response.status}`);
+        const shipment = result.shipment;
+        const inputs = document.querySelectorAll("form input, form textarea");
 
-  const data = await response.json();
-  if (!data.shipment) {
-    alert('Shipment not found.');
-    return;
+        inputs.forEach(input => {
+          const name = input.name;
+          if (name === "log" || name === "history") {
+            // These will be handled separately
+            return;
+          }
+          if (shipment[name]) {
+            input.value = shipment[name];
+          }
+        });
+
+        // Clear and re-add log inputs
+        const logContainer = document.getElementById("logContainer");
+        logContainer.innerHTML = "";
+        try {
+          const logs = JSON.parse(shipment.log || "[]");
+          logs.forEach(log => {
+            const input = document.createElement("input");
+            input.type = "text";
+            input.name = "log";
+            input.value = log;
+            logContainer.appendChild(input);
+          });
+        } catch (e) {
+          console.error("Invalid log JSON", e);
+        }
+
+        displayHistory(shipment.history || "[]");
+      })
+      .catch(error => {
+        console.error("Error loading shipment:", error);
+        alert("Failed to load shipment.");
+      });
   }
-  const s = data.shipment;
-
-  // Set shipment form fields
-  setValue('Status', s.Status);
-  setValue('ShipperName', s.ShipperName);
-  setValue('ShipperPhone', s.ShipperPhone);
-  setValue('ShipperAddress', s.ShipperAddress);
-  setValue('ShipperEmail', s.ShipperEmail);
-  setValue('EstimatedDeliveryDate', s.EstimatedDeliveryDate);
-  setValue('ShippedDate', s.ShippedDate);
-  setValue('ReceiverName', s.ReceiverName);
-  setValue('ReceiverPhone', s.ReceiverPhone);
-  setValue('ReceiverAddress', s.ReceiverAddress);
-  setValue('ReceiverEmail', s.ReceiverEmail);
-  setValue('FlightNumber', s.FlightNumber);
-  setValue('PackageWeight', s.PackageWeight);
-  setValue('PickUpTime', s.PickUpTime);
-  setValue('Departure', s.Departure);
-  setValue('Mode', s.Mode);
-  setValue('Product', s.Product);
-  setValue('Quantity', s.Quantity);
-  setValue('Payment', s.Payment);
-  setValue('TotalFreight', s.TotalFreight);
-  setValue('log', s.log || '');
-
-  // Load history array
-  history = s.history || [];
-  displayHistory();
-
-} catch (error) {
-  console.error(error);
-  alert('Error loading shipment data. Please try again.');
-}
-}
-
-async function saveShipment() {
-const trackingNumber = getValue('TrackingNumber');
-if (!trackingNumber) {
-alert('Tracking Number is required to save shipment.');
-return;
-}
-  // Collect all shipment data into an object
-const shipmentData = {
-  TrackingNumber: trackingNumber,
-  Status: getValue('Status'),
-  ShipperName: getValue('ShipperName'),
-  ShipperPhone: getValue('ShipperPhone'),
-  ShipperAddress: getValue('ShipperAddress'),
-  ShipperEmail: getValue('ShipperEmail'),
-  EstimatedDeliveryDate: getValue('EstimatedDeliveryDate'),
-  ShippedDate: getValue('ShippedDate'),
-  ReceiverName: getValue('ReceiverName'),
-  ReceiverPhone: getValue('ReceiverPhone'),
-  ReceiverAddress: getValue('ReceiverAddress'),
-  ReceiverEmail: getValue('ReceiverEmail'),
-  FlightNumber: getValue('FlightNumber'),
-  PackageWeight: getValue('PackageWeight'),
-  PickUpTime: getValue('PickUpTime'),
-  Departure: getValue('Departure'),
-  Mode: getValue('Mode'),
-  Product: getValue('Product'),
-  Quantity: getValue('Quantity'),
-  Payment: getValue('Payment'),
-  TotalFreight: getValue('TotalFreight'),
-  log: getValue('log'),
-  history: history
-};
-
-try {
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    body: JSON.stringify({ shipment: shipmentData }),
-    headers: { 'Content-Type': 'application/json' }
-  });
-  if (!response.ok) throw new Error(`Server responded with ${response.status}`);
-  const result = await response.json();
-
-  alert('Shipment saved successfully.');
-} catch (error) {
-  console.error(error);
-  alert('Error saving shipment. Please try again.');
-}
-}
 </script>
 
-</body> </html> 
+ </body> </html> 
