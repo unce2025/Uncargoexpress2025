@@ -1,26 +1,12 @@
 async function getTracking(trackingNumber) {
-  const proxyUrl = "/.netlify/functions/proxy"; // Or your actual proxy endpoint path
-  const params = new URLSearchParams({ trackingNumber });
+  const url = https://script.google.com/macros/s/AKfycbwu3fx5fNd95SFm-skPSQT9BkMQ3oE0tblji3uttfz6D9gScWP_iqEtmy-3haoJp1R3/exec?tracking=${encodeURIComponent(trackingNumber)};
 
   try {
-    const response = await fetch(`${proxyUrl}?${params.toString()}`);
+    const response = await fetch(url);
     const result = await response.json();
-
-    if (result && result.shipment) {
-      displayShipment(result.shipment);
-    } else {
-      alert("Shipment not found.");
-    }
+    return result;
   } catch (error) {
-    console.error("Error fetching shipment:", error);
-    alert("Failed to load shipment data.");
-  }
-}
-
-function loadShipment(event) {
-  event.preventDefault();
-  const trackingNumber = document.getElementById("searchTrackingNumber").value.trim();
-  if (trackingNumber) {
-    getTracking(trackingNumber);
+    console.error('Error retrieving shipment:', error);
+    return { success: false, message: 'Request failed.' };
   }
 }
