@@ -192,115 +192,129 @@
       <button type="button" id="saveButton" class="btn"> Save Shipment</button>
     </div>
   </form>
-
 <script>
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbwu3fx5fNd95SFm-skPSQT9BkMQ3oE0tblji3uttfz6D9gScWP_iqEtmy-3haoJp1R3/exec'; // Replace with your actual Apps Script URL
+  document.addEventListener("DOMContentLoaded", () => {
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwu3fx5fNd95SFm-skPSQT9BkMQ3oE0tblji3uttfz6D9gScWP_iqEtmy-3haoJp1R3/exec'; // Replace with your actual Apps Script URL
 
-  // Fetch tracking data by tracking number
-  async function fetchTrackingData(trackingNumber) {
-    try {
-      const response = await fetch(`${scriptURL}?TrackingNumber=${encodeURIComponent(trackingNumber)}`);
-      const result = await response.json();
-      if (result && result.shipment) {
-        populateForm(result.shipment);
-      } else {
-        alert("Tracking number not found.");
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  }
-
-  // Populate form with retrieved data
-  function populateForm(data) {
-    for (const key in data) {
-      const el = document.getElementById(key);
-      if (el) {
-        if (key === 'log') {
-          el.value = formatLog(data[key]);
-        } else if (key === 'history') {
-          el.value = formatHistory(data[key]);
+    // Fetch tracking data by tracking number
+    async function fetchTrackingData(trackingNumber) {
+      try {
+        const response = await fetch(`${scriptURL}?TrackingNumber=${encodeURIComponent(trackingNumber)}`);
+        const result = await response.json();
+        if (result && result.shipment) {
+          populateForm(result.shipment);
         } else {
-          el.value = data[key];
+          alert("Tracking number not found.");
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    // Populate form with retrieved data
+    function populateForm(data) {
+      for (const key in data) {
+        const el = document.getElementById(key);
+        if (el) {
+          if (key === 'log') {
+            el.value = formatLog(data[key]);
+          } else if (key === 'history') {
+            el.value = formatHistory(data[key]);
+          } else {
+            el.value = data[key];
+          }
         }
       }
     }
-  }
 
-  // Format log string
-  function formatLog(log) {
-    if (!log) return '';
-    return log.split('\n').filter(Boolean).map(entry => entry.trim()).join('\n');
-  }
-
-  // Format history JSON into editable structured text
-  function formatHistory(history) {
-    try {
-      const entries = JSON.parse(history);
-      return entries.map(entry =>
-        `Date: ${entry.Date}\nTime: ${entry.Time}\nLocation: ${entry.Location}\nStatus: ${entry.Status}\nUpdatedBy: ${entry.UpdatedBy}\nRemarks: ${entry.Remarks}\n---`
-      ).join('\n');
-    } catch (e) {
-      return history;
+    // Format log string
+    function formatLog(log) {
+      if (!log) return '';
+      return log.split('\n').filter(Boolean).map(entry => entry.trim()).join('\n');
     }
-  }
 
-  // Convert structured history text into JSON string
-  function parseHistory(text) {
-    const entries = text.trim().split('---').map(block => {
-      const obj = {};
-      block.trim().split('\n').forEach(line => {
-        const [key, ...rest] = line.split(':');
-        if (key && rest.length) {
-          obj[key.trim()] = rest.join(':').trim();
+    // Format history JSON into editable structured text
+    function formatHistory(history) {
+      try {
+        const entries = JSON.parse(history);
+        return entries.map(entry =>
+          `Date: ${entry.Date}\nTime: ${entry.Time}\nLocation: ${entry.Location}\nStatus: ${entry.Status}\nUpdatedBy: ${entry.UpdatedBy}\nRemarks: ${entry.Remarks}\n---`
+        ).join('\n');
+      } catch (e) {
+        return history;
+      }
+    }
+
+    // Convert structured history text into JSON string
+    function parseHistory(text) {
+      const entries = text.trim().split('---').map(block => {
+        const obj = {};
+        block.trim().split('\n').forEach(line => {
+          const [key, ...rest] = line.split(':');
+          if (key && rest.length) {
+            obj[key.trim()] = rest.join(':').trim();
+          }
+        });
+        return obj;
+      }).filter(entry => Object.keys(entry).length > 0);
+      return JSON.stringify(entries);
+    }
+
+    // Collect data from form and send it to the Apps Script
+    async function submitForm(event) {
+      event.preventDefault();
+      const formElements = document.querySelectorAll("form [id]");
+      const shipment = {};
+      formElements.forEach(el => {
+        if (el.id === "history") {
+          shipment[el.id] = parseHistory(el.value);
+        } else {
+          shipment[el.id] = el.value.trim();
         }
       });
-      return obj;
-    }).filter(entry => Object.keys(entry).length > 0);
-    return JSON.stringify(entries);
-  }
 
-  // Collect data from form and send it to the Apps Script
-  async function submitForm(event) {
-    event.preventDefault();
-    const formElements = document.querySelectorAll("form [id]");
-    const shipment = {};
-    formElements.forEach(el => {
-      if (el.id === "history") {
-        shipment[el.id] = parseHistory(el.value);
-      } else {
-        shipment[el.id] = el.value.trim();
+      try {
+        const response = await fetch(scriptURL, {
+          method: 'POST',
+          body: JSON.stringify(shipment),
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const result = await response.json();
+        if (result && result.success) {
+          alert("Shipment data saved successfully!");
+        } else {
+          alert("Failed to save data.");
+        }
+      } catch (error) {
+        console.error("Error submitting form:", error);
+        alert("Submission failed.");
       }
-    });
-
-    try {
-      const response = await fetch(scriptURL, {
-        method: 'POST',
-        body: JSON.stringify(shipment),
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const result = await response.json();
-      if (result && result.success) {
-        alert("Shipment data saved successfully!");
-      } else {
-        alert("Failed to save data.");
-      }
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      alert("Submission failed.");
     }
-  }
 
-  // Attach event listeners
-  document.getElementById("searchBtn").addEventListener("click", () => {
-    const trackingNumber = document.getElementById("TrackingNumber").value.trim();
-    if (trackingNumber) {
-      fetchTrackingData(trackingNumber);
+    // Attach event listeners only after DOM is ready
+    const searchBtn = document.getElementById("searchBtn");
+    const shipmentForm = document.getElementById("shipmentForm");
+
+    if (searchBtn) {
+      searchBtn.addEventListener("click", () => {
+        const trackingNumber = document.getElementById("TrackingNumber").value.trim();
+        if (trackingNumber) {
+          fetchTrackingData(trackingNumber);
+        } else {
+          alert("Please enter a tracking number.");
+        }
+      });
     } else {
-      alert("Please enter a tracking number.");
+      console.error("searchBtn element not found!");
+    }
+
+    if (shipmentForm) {
+      shipmentForm.addEventListener("submit", submitForm);
+    } else {
+      console.error("shipmentForm element not found!");
     }
   });
-
-  document.getElementById("shipmentForm").addEventListener("submit", submitForm);
 </script>
+
+
  </body> </html>
