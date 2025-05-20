@@ -10,11 +10,9 @@ async function getTracking(trackingNumber) {
 
     const result = await response.json();
 
-    if (result.success && result.shipment) {
-      const shipment = result.shipment;
-
-      // No need to parse log/history — already arrays
-      displayShipment(shipment);
+    if (result && result.TrackingNumber) {
+      // Assuming the response is the shipment object itself
+      displayShipment(result);
     } else {
       alert("Tracking number not found.");
     }
