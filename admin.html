@@ -202,46 +202,49 @@
   const endpoint = 'https://script.google.com/macros/s/AKfycbxaJNPDvBfowAq9OUojrSm4zi2l1HcUUbYKkJprfeOZUfvIDRjYuiCKK4j2ShANdOxK/exec';
   let history = [];
 
-  function addLogEntry() {
-    const date = document.getElementById('logDate').value;
-    const desc = document.getElementById('logDescription').value;
-    if (!date || !desc) return alert("Fill in both date and description.");
-    const current = document.getElementById('log').value;
-    const entry = `${date}: ${desc}`;
-    document.getElementById('log').value = current ? `${current}\n${entry}` : entry;
-    document.getElementById('logDate').value = '';
-    document.getElementById('logDescription').value = '';
-  }
-
-  function addHistoryEntry() {
-    const entry = {
-      Date: document.getElementById('histDate').value,
-      Time: document.getElementById('histTime').value,
-      Location: document.getElementById('histLocation').value,
-      Status: document.getElementById('histStatus').value,
-      UpdatedBy: document.getElementById('histUpdatedBy').value,
-      Remarks: document.getElementById('histRemarks').value
-    };
-    if (!entry.Date || !entry.Time) return alert("Date and Time are required for history entries.");
-    history.push(entry);
-    displayHistory();
-    document.querySelectorAll('#histDate, #histTime, #histLocation, #histStatus, #histUpdatedBy, #histRemarks').forEach(el => el.value = '');
-  }
-
-  function displayHistory() {
-    const container = document.getElementById('historyList');
-    container.innerHTML = '';
-    [...history].reverse().forEach(entry => {
-      container.innerHTML += `<div class="history-entry">${entry.Date} ${entry.Time} - ${entry.Location}, ${entry.Status}, ${entry.UpdatedBy}, ${entry.Remarks}</div>`;
-    });
-  }
-
   function getValue(id) {
     return document.getElementById(id).value;
   }
 
   function setValue(id, val) {
     document.getElementById(id).value = val || '';
+  }
+
+  function addLogEntry() {
+    const date = getValue('logDate');
+    const desc = getValue('logDescription');
+    if (!date || !desc) return alert("Fill in both date and description.");
+    const entry = `${date}: ${desc}`;
+    const current = getValue('log');
+    setValue('log', current ? `${current}\n${entry}` : entry);
+    setValue('logDate', '');
+    setValue('logDescription', '');
+  }
+
+  function addHistoryEntry() {
+    const entry = {
+      Date: getValue('histDate'),
+      Time: getValue('histTime'),
+      Location: getValue('histLocation'),
+      Status: getValue('histStatus'),
+      UpdatedBy: getValue('histUpdatedBy'),
+      Remarks: getValue('histRemarks')
+    };
+    if (!entry.Date || !entry.Time) return alert("Date and Time are required for history entries.");
+    history.push(entry);
+    displayHistory();
+    ['histDate', 'histTime', 'histLocation', 'histStatus', 'histUpdatedBy', 'histRemarks'].forEach(id => setValue(id, ''));
+  }
+
+  function displayHistory() {
+    const container = document.getElementById('historyList');
+    container.innerHTML = '';
+    [...history].reverse().forEach(entry => {
+      container.innerHTML += `
+        <div class="history-entry">
+          ${entry.Date} ${entry.Time} - ${entry.Location}, ${entry.Status}, ${entry.UpdatedBy}, ${entry.Remarks}
+        </div>`;
+    });
   }
 
   function saveShipment() {
@@ -274,36 +277,59 @@
 
     fetch(endpoint, {
       method: 'POST',
-      body: JSON.stringify({ shipment }),
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ shipment })
     })
     .then(res => res.json())
-    .then(data => alert(data.message || 'Saved!'))
-    .catch(() => alert('Failed to save shipment. Please try again.'));
+    .then(data => {
+      if (data.success) {
+        alert("Shipment saved successfully.");
+      } else {
+        alert(data.message || "Failed to save shipment.");
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Failed to save shipment. Please try again.");
+    });
   }
 
   function loadShipment() {
     const tracking = getValue('TrackingNumber');
     if (!tracking) return alert("Please enter a tracking number.");
+
     fetch(`${endpoint}?tracking=${encodeURIComponent(tracking)}`)
       .then(res => res.json())
       .then(data => {
-        if (!data.success || !data.shipment) return alert("Shipment not found.");
-        const s = data.shipment;
-        Object.keys(s).forEach(k => {
-          if (k !== 'history') setValue(k, s[k]);
-        });
-        try {
-          history = JSON.parse(s.history || '[]');
-        } catch {
-          history = [];
+        if (!data.success || !data.shipment) {
+          alert("Shipment not found.");
+          return;
         }
-        displayHistory();
+
+        const s = data.shipment;
+        Object.keys(s).forEach(key => {
+          if (key === 'history') {
+            try {
+              history = JSON.parse(s.history);
+              displayHistory();
+            } catch (e) {
+              history = [];
+              console.warn("Invalid history format.");
+            }
+          } else {
+            setValue(key, s[key]);
+          }
+        });
+
         document.querySelector('.section:nth-of-type(2)').scrollIntoView({ behavior: 'smooth' });
       })
-      .catch(() => alert('Failed to load shipment data.'));
+      .catch(err => {
+        console.error(err);
+        alert("Failed to load shipment data.");
+      });
   }
 </script>
+
 
 
 </body> </html> 
