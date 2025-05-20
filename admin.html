@@ -241,6 +241,7 @@
       <button type="button" onclick="saveShipment()">Save Shipment</button>
     </div>
   </div>
+
   <script>
   const endpoint = 'https://script.google.com/macros/s/AKfycbxaJNPDvBfowAq9OUojrSm4zi2l1HcUUbYKkJprfeOZUfvIDRjYuiCKK4j2ShANdOxK/exec'; // Replace with your Apps Script URL
   let history = [];
@@ -281,158 +282,122 @@
       return;
     }
     history.push(entry);
-    displayHistory();
-    clearHistoryInputs();
+    displayHistory
+();
+// Clear input fields after adding
+['historyDate','historyTime','historyLocation','historyStatus','historyUpdatedBy','historyRemarks'].forEach(id => setValue(id, ''));
+}
+
+function displayHistory() {
+const container = document.getElementById('historyContainer');
+container.innerHTML = '';
+history.forEach((h, i) => {
+const div = document.createElement('div');
+div.className = 'history-entry';
+div.innerHTML = <strong>Entry ${i + 1}:</strong><br> Date: ${h.Date} Time: ${h.Time}<br> Location: ${h.Location}<br> Status: ${h.Status}<br> Updated By: ${h.UpdatedBy || '-'}<br> Remarks: ${h.Remarks || '-'};
+container.appendChild(div);
+});
+}
+
+async function loadShipment() {
+const trackingNumber = getValue('TrackingNumber');
+if (!trackingNumber) {
+alert('Please enter a tracking number to search.');
+return;
+}
+  try {
+  const url = `${endpoint}?trackingNumber=${encodeURIComponent(trackingNumber)}`;
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Server responded with ${response.status}`);
+
+  const data = await response.json();
+  if (!data.shipment) {
+    alert('Shipment not found.');
+    return;
   }
+  const s = data.shipment;
 
-  function clearHistoryInputs() {
-    setValue('historyDate', '');
-    setValue('historyTime', '');
-    setValue('historyLocation', '');
-    setValue('historyStatus', '');
-    setValue('historyUpdatedBy', '');
-    setValue('historyRemarks', '');
-  }
+  // Set shipment form fields
+  setValue('Status', s.Status);
+  setValue('ShipperName', s.ShipperName);
+  setValue('ShipperPhone', s.ShipperPhone);
+  setValue('ShipperAddress', s.ShipperAddress);
+  setValue('ShipperEmail', s.ShipperEmail);
+  setValue('EstimatedDeliveryDate', s.EstimatedDeliveryDate);
+  setValue('ShippedDate', s.ShippedDate);
+  setValue('ReceiverName', s.ReceiverName);
+  setValue('ReceiverPhone', s.ReceiverPhone);
+  setValue('ReceiverAddress', s.ReceiverAddress);
+  setValue('ReceiverEmail', s.ReceiverEmail);
+  setValue('FlightNumber', s.FlightNumber);
+  setValue('PackageWeight', s.PackageWeight);
+  setValue('PickUpTime', s.PickUpTime);
+  setValue('Departure', s.Departure);
+  setValue('Mode', s.Mode);
+  setValue('Product', s.Product);
+  setValue('Quantity', s.Quantity);
+  setValue('Payment', s.Payment);
+  setValue('TotalFreight', s.TotalFreight);
+  setValue('log', s.log || '');
 
-  function displayHistory() {
-    const container = document.getElementById('historyContainer');
-    container.innerHTML = '';
-    if (history.length === 0) {
-      container.innerHTML = '<p>No history entries.</p>';
-      return;
-    }
-    history.forEach((entry, index) => {
-      const div = document.createElement('div');
-      div.classList.add('history-entry');
-      div.innerHTML = `
-        <strong>Entry ${index + 1}</strong><br/>
-        Date: ${entry.Date} Time: ${entry.Time}<br/>
-        Location: ${entry.Location}<br/>
-        Status: ${entry.Status}<br/>
-        Updated By: ${entry.UpdatedBy || '-'}<br/>
-        Remarks: ${entry.Remarks || '-'}<br/>
-        <button onclick="removeHistoryEntry(${index})">Remove</button>
-      `;
-      container.appendChild(div);
-    });
-  }
+  // Load history array
+  history = s.history || [];
+  displayHistory();
 
-  function removeHistoryEntry(index) {
-    history.splice(index, 1);
-    displayHistory();
-  }
+} catch (error) {
+  console.error(error);
+  alert('Error loading shipment data. Please try again.');
+}
+}
 
-  function saveShipment() {
-    const shipment = {
-      TrackingNumber: getValue('TrackingNumber'),
-      Status: getValue('Status'),
-      ShipperName: getValue('ShipperName'),
-      ShipperPhone: getValue('ShipperPhone'),
-      ShipperAddress: getValue('ShipperAddress'),
-      ShipperEmail: getValue('ShipperEmail'),
-      ReceiverName: getValue('ReceiverName'),
-      ReceiverPhone: getValue('ReceiverPhone'),
-      ReceiverAddress: getValue('ReceiverAddress'),
-      ReceiverEmail: getValue('ReceiverEmail'),
-      EstimatedDeliveryDate: getValue('EstimatedDeliveryDate'),
-      ShippedDate: getValue('ShippedDate'),
-      PickUpTime: getValue('PickUpTime'),
-      FlightNumber: getValue('FlightNumber'),
-      PackageWeight: getValue('PackageWeight'),
-      Departure: getValue('Departure'),
-      Mode: getValue('Mode'),
-      Product: getValue('Product'),
-      Quantity: getValue('Quantity'),
-      Payment: getValue('Payment'),
-      TotalFreight: getValue('TotalFreight'),
-      log: getValue('log'),
-      history: JSON.stringify(history),
-    };
+async function saveShipment() {
+const trackingNumber = getValue('TrackingNumber');
+if (!trackingNumber) {
+alert('Tracking Number is required to save shipment.');
+return;
+}
+  // Collect all shipment data into an object
+const shipmentData = {
+  TrackingNumber: trackingNumber,
+  Status: getValue('Status'),
+  ShipperName: getValue('ShipperName'),
+  ShipperPhone: getValue('ShipperPhone'),
+  ShipperAddress: getValue('ShipperAddress'),
+  ShipperEmail: getValue('ShipperEmail'),
+  EstimatedDeliveryDate: getValue('EstimatedDeliveryDate'),
+  ShippedDate: getValue('ShippedDate'),
+  ReceiverName: getValue('ReceiverName'),
+  ReceiverPhone: getValue('ReceiverPhone'),
+  ReceiverAddress: getValue('ReceiverAddress'),
+  ReceiverEmail: getValue('ReceiverEmail'),
+  FlightNumber: getValue('FlightNumber'),
+  PackageWeight: getValue('PackageWeight'),
+  PickUpTime: getValue('PickUpTime'),
+  Departure: getValue('Departure'),
+  Mode: getValue('Mode'),
+  Product: getValue('Product'),
+  Quantity: getValue('Quantity'),
+  Payment: getValue('Payment'),
+  TotalFreight: getValue('TotalFreight'),
+  log: getValue('log'),
+  history: history
+};
 
-    if (!shipment.TrackingNumber) {
-      alert('Tracking Number is required');
-      return;
-    }
+try {
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    body: JSON.stringify({ shipment: shipmentData }),
+    headers: { 'Content-Type': 'application/json' }
+  });
+  if (!response.ok) throw new Error(`Server responded with ${response.status}`);
+  const result = await response.json();
 
-    fetch(endpoint, {
-      method: 'POST',
-      mode: 'cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(shipment)
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        alert('Shipment saved successfully!');
-      } else {
-        alert('Error saving shipment.');
-        console.error(data);
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      alert('Failed to save shipment.');
-    });
-  }
-
-  function clearForm() {
-    const inputs = document.querySelectorAll('input, textarea');
-    inputs.forEach(input => input.value = '');
-    history = [];
-    displayHistory();
-  }
-
-  function loadShipment() {
-    clearForm();
-    const tracking = getValue('TrackingNumber');
-    if (!tracking) {
-      alert("Please enter a Tracking Number.");
-      return;
-    }
-
-    fetch(`${endpoint}?tracking=${encodeURIComponent(tracking)}`)
-      .then(res => res.json())
-      .then(data => {
-        const s = data; // The whole response is the shipment object
-        setValue('Status', s.Status);
-        setValue('ShipperName', s.ShipperName);
-        setValue('ShipperPhone', s.ShipperPhone);
-        setValue('ShipperAddress', s.ShipperAddress);
-        setValue('ShipperEmail', s.ShipperEmail);
-        setValue('ReceiverName', s.ReceiverName);
-        setValue('ReceiverPhone', s.ReceiverPhone);
-        setValue('ReceiverAddress', s.ReceiverAddress);
-        setValue('ReceiverEmail', s.ReceiverEmail);
-        setValue('EstimatedDeliveryDate', s.EstimatedDeliveryDate);
-        setValue('ShippedDate', s.ShippedDate);
-        setValue('PickUpTime', s.PickUpTime);
-        setValue('FlightNumber', s.FlightNumber);
-        setValue('PackageWeight', s.PackageWeight);
-        setValue('Departure', s.Departure);
-        setValue('Mode', s.Mode);
-        setValue('Product', s.Product);
-        setValue('Quantity', s.Quantity);
-        setValue('Payment', s.Payment);
-        setValue('TotalFreight', s.TotalFreight);
-        setValue('log', s.log);
-
-        history = [];
-        if (s.history) {
-          try {
-            history = JSON.parse(s.history);
-            if (!Array.isArray(history)) history = [];
-          } catch (e) {
-            console.error("Error parsing history", e);
-          }
-        }
-        displayHistory();
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Failed to fetch shipment.");
-      });
-  }
+  alert('Shipment saved successfully.');
+} catch (error) {
+  console.error(error);
+  alert('Error saving shipment. Please try again.');
+}
+}
 </script>
 
-
- </body> </html>
+</body> </html> 
