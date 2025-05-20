@@ -199,94 +199,100 @@
   </div>
 
 <script>
-const endpoint = 'https://script.google.com/macros/s/AKfycbxaJNPDvBfowAq9OUojrSm4zi2l1HcUUbYKkJprfeOZUfvIDRjYuiCKK4j2ShANdOxK/exec';
-let history = [];
+  const endpoint = 'https://script.google.com/macros/s/AKfycbxaJNPDvBfowAq9OUojrSm4zi2l1HcUUbYKkJprfeOZUfvIDRjYuiCKK4j2ShANdOxK/exec';
+  let history = [];
 
-function getValue(id) {
-  return document.getElementById(id).value.trim();
-}
-
-function setValue(id, val) {
-  document.getElementById(id).value = val || '';
-}
-
-function addLogEntry() {
-  const date = getValue('logDate');
-  const desc = getValue('logDescription');
-  if (!date || !desc) return alert("Fill in both date and description.");
-  const entry = `${date}: ${desc}`;
-  const current = getValue('log');
-  setValue('log', current ? `${current}\n${entry}` : entry);
-  setValue('logDate', '');
-  setValue('logDescription', '');
-}
-
-function addHistoryEntry() {
-  const entry = {
-    Date: getValue('histDate'),
-    Time: getValue('histTime'),
-    Location: getValue('histLocation'),
-    Status: getValue('histStatus'),
-    UpdatedBy: getValue('histUpdatedBy'),
-    Remarks: getValue('histRemarks')
-  };
-  if (!entry.Date || !entry.Time) return alert("Date and Time are required for history entries.");
-  history.push(entry);
-  displayHistory();
-  ['histDate', 'histTime', 'histLocation', 'histStatus', 'histUpdatedBy', 'histRemarks'].forEach(id => setValue(id, ''));
-}
-
-function displayHistory() {
-  const container = document.getElementById('historyList');
-  container.innerHTML = '';
-  [...history].reverse().forEach(entry => {
-    container.innerHTML += `
-      <div class="history-entry">
-        ${entry.Date} ${entry.Time} - ${entry.Location}, ${entry.Status}, ${entry.UpdatedBy}, ${entry.Remarks}
-      </div>`;
-  });
-}
-
-function saveShipment() {
-  const saveBtn = document.querySelector('button.btn[onclick="saveShipment()"]');
-  saveBtn.disabled = true;
-
-  const shipment = {
-    TrackingNumber: getValue('TrackingNumber'),
-    Status: getValue('Status'),
-    ShipperName: getValue('ShipperName'),
-    ShipperPhone: getValue('ShipperPhone'),
-    ShipperAddress: getValue('ShipperAddress'),
-    ShipperEmail: getValue('ShipperEmail'),
-    ReceiverName: getValue('ReceiverName'),
-    ReceiverPhone: getValue('ReceiverPhone'),
-    ReceiverAddress: getValue('ReceiverAddress'),
-    ReceiverEmail: getValue('ReceiverEmail'),
-    EstimatedDeliveryDate: getValue('EstimatedDeliveryDate'),
-    ShippedDate: getValue('ShippedDate'),
-    Mode: getValue('Mode'),
-    Product: getValue('Product'),
-    Quantity: getValue('Quantity'),
-    Payment: getValue('Payment'),
-    TotalFreight: getValue('TotalFreight'),
-    log: getValue('log'),
-    history: JSON.stringify(history)
-  };
-
-  if (!shipment.TrackingNumber) {
-    alert("Tracking Number is required!");
-    saveBtn.disabled = false;
-    return;
+  function getValue(id) {
+    const el = document.getElementById(id);
+    return el ? el.value : '';
   }
 
-  fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ shipment })
-  })
-    .then(res => res.json())
+  function setValue(id, val) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.value = val || '';
+    } else {
+      console.warn(`Element with id="${id}" not found.`);
+    }
+  }
+
+  function addLogEntry() {
+    const date = getValue('logDate');
+    const desc = getValue('logDescription');
+    if (!date || !desc) return alert("Fill in both date and description.");
+    const entry = `${date}: ${desc}`;
+    const current = getValue('log');
+    setValue('log', current ? `${current}\n${entry}` : entry);
+    setValue('logDate', '');
+    setValue('logDescription', '');
+  }
+
+  function addHistoryEntry() {
+    const entry = {
+      Date: getValue('histDate'),
+      Time: getValue('histTime'),
+      Location: getValue('histLocation'),
+      Status: getValue('histStatus'),
+      UpdatedBy: getValue('histUpdatedBy'),
+      Remarks: getValue('histRemarks')
+    };
+    if (!entry.Date || !entry.Time) return alert("Date and Time are required for history entries.");
+    history.push(entry);
+    displayHistory();
+    ['histDate', 'histTime', 'histLocation', 'histStatus', 'histUpdatedBy', 'histRemarks'].forEach(id => setValue(id, ''));
+  }
+
+  function displayHistory() {
+    const container = document.getElementById('historyList');
+    container.innerHTML = '';
+    [...history].reverse().forEach(entry => {
+      container.innerHTML += `
+        <div class="history-entry">
+          ${entry.Date} ${entry.Time} - ${entry.Location}, ${entry.Status}, ${entry.UpdatedBy}, ${entry.Remarks}
+        </div>`;
+    });
+  }
+
+  function saveShipment() {
+    const shipment = {
+      TrackingNumber: getValue('TrackingNumber'),
+      Status: getValue('Status'),
+      ShipperName: getValue('ShipperName'),
+      ShipperPhone: getValue('ShipperPhone'),
+      ShipperAddress: getValue('ShipperAddress'),
+      ShipperEmail: getValue('ShipperEmail'),
+      ReceiverName: getValue('ReceiverName'),
+      ReceiverPhone: getValue('ReceiverPhone'),
+      ReceiverAddress: getValue('ReceiverAddress'),
+      ReceiverEmail: getValue('ReceiverEmail'),
+      EstimatedDeliveryDate: getValue('EstimatedDeliveryDate'),
+      ShippedDate: getValue('ShippedDate'),
+      Mode: getValue('Mode'),
+      Product: getValue('Product'),
+      Quantity: getValue('Quantity'),
+      Payment: getValue('Payment'),
+      TotalFreight: getValue('TotalFreight'),
+      log: getValue('log'),
+      history: JSON.stringify(history)
+    };
+
+    if (!shipment.TrackingNumber) {
+      alert("Tracking Number is required!");
+      return;
+    }
+
+    fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ shipment })
+    })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`Network response was not ok: ${res.statusText}`);
+      }
+      return res.json();
+    })
     .then(data => {
-      saveBtn.disabled = false;
       if (data.success) {
         alert("Shipment saved successfully.");
       } else {
@@ -294,55 +300,61 @@ function saveShipment() {
       }
     })
     .catch(err => {
-      console.error(err);
+      console.error("Error saving shipment:", err);
       alert("Failed to save shipment. Please try again.");
-      saveBtn.disabled = false;
     });
-}
+  }
 
-function loadShipment() {
-  const tracking = getValue('TrackingNumber');
-  if (!tracking) return alert("Please enter a tracking number.");
+  function loadShipment() {
+    const tracking = getValue('TrackingNumber');
+    if (!tracking) {
+      alert("Please enter a tracking number.");
+      return;
+    }
 
-  // Clear previous data
-  history = [];
-  displayHistory();
-  setValue('log', '');
-
-  fetch(`${endpoint}?tracking=${encodeURIComponent(tracking)}`)
-    .then(res => res.json())
-    .then(data => {
-      if (!data.success || !data.shipment) {
-        alert("Shipment not found.");
-        return;
-      }
-
-      const s = data.shipment;
-      Object.keys(s).forEach(key => {
-        if (key === 'history') {
-          try {
-            history = JSON.parse(s.history);
-          } catch (e) {
-            history = [];
-            console.warn("Invalid history format.");
-          }
-          displayHistory();
-        } else if (key === 'log') {
-          setValue('log', s.log || '');
-        } else {
-          setValue(key, s[key]);
+    fetch(`${endpoint}?tracking=${encodeURIComponent(tracking)}`)
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`Network response was not ok: ${res.statusText}`);
         }
+        return res.json();
+      })
+      .then(data => {
+        console.log('Load shipment response:', data);
+
+        if (!data.success || !data.shipment) {
+          alert("Shipment not found.");
+          return;
+        }
+
+        const s = data.shipment;
+
+        // Reset history before loading new data
+        history = [];
+
+        Object.keys(s).forEach(key => {
+          if (key === 'history') {
+            try {
+              history = JSON.parse(s.history);
+            } catch (e) {
+              console.warn("Invalid history format. Resetting history.");
+              history = [];
+            }
+            displayHistory();
+          } else {
+            setValue(key, s[key]);
+          }
+        });
+
+        document.querySelector('.section:nth-of-type(2)').scrollIntoView({ behavior: 'smooth' });
+      })
+      .catch(err => {
+        console.error("Error loading shipment:", err);
+        alert("Failed to load shipment data. Check console for details.");
       });
-
-      document.querySelector('.section:nth-of-type(2)').scrollIntoView({ behavior: 'smooth' });
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Failed to load shipment data.");
-    });
-}
-
+  }
 </script>
+
 
 
 
