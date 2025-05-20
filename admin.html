@@ -198,7 +198,7 @@
       <label for="logDescription">Log Description</label>
       <input type="text" id="logDescription" />
 
-      <button onclick="addLogEntry()">Add Log Entry</button>
+      <button type="button" onclick="addLogEntry()">Add Log Entry</button>
 
       <label for="log">Log</label>
       <textarea id="log" readonly></textarea>
@@ -232,13 +232,13 @@
         </div>
       </div>
 
-      <button onclick="addHistoryEntry()">Add History Entry</button>
+      <button type="button" onclick="addHistoryEntry()">Add History Entry</button>
 
       <div id="historyContainer"></div>
     </div>
 
     <div style="text-align:center; margin-bottom: 2rem;">
-      <button onclick="saveShipment()">Save Shipment</button>
+      <button type="button" onclick="saveShipment()">Save Shipment</button>
     </div>
   </div>
 
@@ -262,6 +262,8 @@
         setValue('log', `${currentLog}${date}: ${desc}\n`);
         setValue('logDate', '');
         setValue('logDescription', '');
+      } else {
+        alert("Please enter both Log Date and Description.");
       }
     }
 
@@ -274,110 +276,164 @@
         UpdatedBy: getValue('historyUpdatedBy'),
         Remarks: getValue('historyRemarks')
       };
-      history.push(entry);
-      displayHistory();
 
-      ['historyDate','historyTime','historyLocation','historyStatus','historyUpdatedBy','historyRemarks'].forEach(id => setValue(id, ''));
+      if (!entry.Date || !entry.Time || !entry.Location || !entry.Status) {
+        alert("Please fill in at least Date, Time, Location and Status for History Entry.");
+return;
+}
+        history.push(entry);
+  displayHistory();
+  clearHistoryInputs();
+}
+
+function clearHistoryInputs() {
+  setValue('historyDate', '');
+  setValue('historyTime', '');
+  setValue('historyLocation', '');
+  setValue('historyStatus', '');
+  setValue('historyUpdatedBy', '');
+  setValue('historyRemarks', '');
+}
+
+function displayHistory() {
+  const container = document.getElementById('historyContainer');
+  container.innerHTML = '';
+  if (history.length === 0) {
+    container.innerHTML = '<p>No history entries.</p>';
+    return;
+  }
+  history.forEach((entry, index) => {
+    const div = document.createElement('div');
+    div.classList.add('history-entry');
+    div.innerHTML = `
+      <strong>Entry ${index + 1}</strong><br/>
+      Date: ${entry.Date} Time: ${entry.Time}<br/>
+      Location: ${entry.Location}<br/>
+      Status: ${entry.Status}<br/>
+      Updated By: ${entry.UpdatedBy || '-'}<br/>
+      Remarks: ${entry.Remarks || '-'}<br/>
+      <button onclick="removeHistoryEntry(${index})">Remove</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function removeHistoryEntry(index) {
+  history.splice(index, 1);
+  displayHistory();
+}
+
+function saveShipment() {
+  const shipment = {
+    TrackingNumber: getValue('TrackingNumber'),
+    Status: getValue('Status'),
+    ShipperName: getValue('ShipperName'),
+    ShipperPhone: getValue('ShipperPhone'),
+    ShipperAddress: getValue('ShipperAddress'),
+    ShipperEmail: getValue('ShipperEmail'),
+    ReceiverName: getValue('ReceiverName'),
+    ReceiverPhone: getValue('ReceiverPhone'),
+    ReceiverAddress: getValue('ReceiverAddress'),
+    ReceiverEmail: getValue('ReceiverEmail'),
+    EstimatedDeliveryDate: getValue('EstimatedDeliveryDate'),
+    ShippedDate: getValue('ShippedDate'),
+    PickUpTime: getValue('PickUpTime'),
+    FlightNumber: getValue('FlightNumber'),
+    PackageWeight: getValue('PackageWeight'),
+    Departure: getValue('Departure'),
+    Mode: getValue('Mode'),
+    Product: getValue('Product'),
+    Quantity: getValue('Quantity'),
+    Payment: getValue('Payment'),
+    TotalFreight: getValue('TotalFreight'),
+    log: getValue('log'),
+    history: JSON.stringify(history),
+  };
+
+  if (!shipment.TrackingNumber) {
+    alert('Tracking Number is required');
+    return;
+  }
+
+  fetch(endpoint, {
+    method: 'POST',
+    mode: 'cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(shipment)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert('Shipment saved successfully!');
+    } else {
+      alert('Error saving shipment.');
+      console.error(data);
     }
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Failed to save shipment.');
+  });
+}
 
-    function displayHistory() {
-      const container = document.getElementById('historyContainer');
-      container.innerHTML = '';
-      history.forEach((entry, i) => {
-        const div = document.createElement('div');
-        div.className = 'history-entry';
-        div.innerText = `${entry.Date} ${entry.Time} - ${entry.Location} - ${entry.Status} by ${entry.UpdatedBy} (${entry.Remarks})`;
-        container.appendChild(div);
-      });
-    }
+function clearForm() {
+  const inputs = document.querySelectorAll('input, textarea');
+  inputs.forEach(input => input.value = '');
+  history = [];
+  displayHistory();
+}
 
-    function saveShipment() {
-      const shipment = {
-        TrackingNumber: getValue('TrackingNumber'),
-        Status: getValue('Status'),
-        ShipperName: getValue('ShipperName'),
-        ShipperPhone: getValue('ShipperPhone'),
-        ShipperAddress: getValue('ShipperAddress'),
-        ShipperEmail: getValue('ShipperEmail'),
-        ReceiverName: getValue('ReceiverName'),
-        ReceiverPhone: getValue('ReceiverPhone'),
-        ReceiverAddress: getValue('ReceiverAddress'),
-        ReceiverEmail: getValue('ReceiverEmail'),
-        EstimatedDeliveryDate: getValue('EstimatedDeliveryDate'),
-        ShippedDate: getValue('ShippedDate'),
-        PickUpTime: getValue('PickUpTime'),
-        FlightNumber: getValue('FlightNumber'),
-        PackageWeight: getValue('PackageWeight'),
-        Departure: getValue('Departure'),
-        Mode: getValue('Mode'),
-        Product: getValue('Product'),
-        Quantity: getValue('Quantity'),
-        Payment: getValue('Payment'),
-        TotalFreight: getValue('TotalFreight'),
-        log: getValue('log'),
-        history: JSON.stringify(history)
-      };
+function loadShipment() {
+  clearForm();
+  const tracking = getValue('TrackingNumber');
+  if (!tracking) {
+    alert("Please enter a Tracking Number.");
+    return;
+  }
+  fetch(`${endpoint}?tracking=${encodeURIComponent(tracking)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success && data.shipment) {
+        const s = data.shipment;
+        setValue('Status', s.Status);
+        setValue('ShipperName', s.ShipperName);
+        setValue('ShipperPhone', s.ShipperPhone);
+        setValue('ShipperAddress', s.ShipperAddress);
+        setValue('ShipperEmail', s.ShipperEmail);
+        setValue('ReceiverName', s.ReceiverName);
+        setValue('ReceiverPhone', s.ReceiverPhone);
+        setValue('ReceiverAddress', s.ReceiverAddress);
+        setValue('ReceiverEmail', s.ReceiverEmail);
+        setValue('EstimatedDeliveryDate', s.EstimatedDeliveryDate);
+        setValue('ShippedDate', s.ShippedDate);
+        setValue('PickUpTime', s.PickUpTime);
+        setValue('FlightNumber', s.FlightNumber);
+        setValue('PackageWeight', s.PackageWeight);
+        setValue('Departure', s.Departure);
+        setValue('Mode', s.Mode);
+        setValue('Product', s.Product);
+        setValue('Quantity', s.Quantity);
+        setValue('Payment', s.Payment);
+        setValue('TotalFreight', s.TotalFreight);
+        setValue('log', s.log);
 
-      fetch(endpoint, {
-        method: 'POST',
-        body: JSON.stringify(shipment),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          alert("Shipment saved successfully!");
-        } else {
-          alert("Error saving shipment.");
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Failed to connect to server.");
-      });
-    }
-
-    function loadShipment() {
-      const tracking = getValue('TrackingNumber');
-      if (!tracking) {
-        alert("Enter tracking number.");
-        return;
-      }
-
-      fetch(`${endpoint}?tracking=${encodeURIComponent(tracking)}`)
-        .then(res => res.json())
-        .then(data => {
-          if (!data.success || !data.shipment) {
-            alert("Shipment not found.");
-            return;
+        history = [];
+        if (s.history) {
+          try {
+            history = JSON.parse(s.history);
+            if (!Array.isArray(history)) history = [];
+          } catch (e) {
+            console.error("Error parsing history", e);
           }
-
-          const s = data.shipment;
-          history = [];
-
-          Object.keys(s).forEach(key => {
-            if (key === 'history') {
-              try {
-                history = JSON.parse(s.history || '[]');
-              } catch (e) {
-                console.warn("History parse error.");
-                history = [];
-              }
-              displayHistory();
-            } else {
-              setValue(key, s[key]);
-            }
-          });
-
-          document.querySelector('.section:nth-of-type(2)').scrollIntoView({ behavior: 'smooth' });
-        })
-        .catch(err => {
-          console.error("Load error:", err);
-          alert("Failed to load shipment.");
-        });
-    }
-  </script>
-</body>
-</html>
+        }
+        displayHistory();
+      } else {
+        alert("Shipment not found.");
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Failed to fetch shipment.");
+    });
+}
+</script> </body> </html>
