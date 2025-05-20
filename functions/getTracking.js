@@ -1,26 +1,26 @@
-
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxaJNPDvBfowAq9OUojrSm4zi2l1HcUUbYKkJprfeOZUfvIDRjYuiCKK4j2ShANdOxK/exec';
-
-async function loadShipment(event) {
-  event.preventDefault();
-  const trackingNumber = document.getElementById("searchTrackingNumber").value.trim();
-  if (!trackingNumber) return alert("Enter a tracking number.");
+async function getTracking(trackingNumber) {
+  const proxyUrl = "/.netlify/functions/proxy"; // Or your actual proxy endpoint path
+  const params = new URLSearchParams({ trackingNumber });
 
   try {
-    const response = await fetch(`${GAS_URL}?trackingNumber=${encodeURIComponent(trackingNumber)}`);
+    const response = await fetch(`${proxyUrl}?${params.toString()}`);
     const result = await response.json();
-    if (!result.shipment) return alert("Shipment not found.");
-    populateForm(result.shipment);
-  } catch (err) {
-    console.error("Load error", err);
-    alert("Failed to load shipment.");
+
+    if (result && result.shipment) {
+      displayShipment(result.shipment);
+    } else {
+      alert("Shipment not found.");
+    }
+  } catch (error) {
+    console.error("Error fetching shipment:", error);
+    alert("Failed to load shipment data.");
   }
 }
 
-function populateForm(data) {
-  const keys = Object.keys(data);
-  for (let key of keys) {
-    const el = document.getElementById(key);
-    if (el) el.value = data[key];
+function loadShipment(event) {
+  event.preventDefault();
+  const trackingNumber = document.getElementById("searchTrackingNumber").value.trim();
+  if (trackingNumber) {
+    getTracking(trackingNumber);
   }
 }
