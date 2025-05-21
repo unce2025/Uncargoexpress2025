@@ -194,24 +194,29 @@
   </form>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwPDSYFvy0iburNNHhbsQ6sEPVOW_EMDSLh1mP9A_nxCZ_S3IrVuAvnHaV5rgzJMv6k/exec'; // Replace with your actual Apps Script URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwPDSYFvy0iburNNHhbsQ6sEPVOW_EMDSLh1mP9A_nxCZ_S3IrVuAvnHaV5rgzJMv6k/exec';
 
-    // Fetch tracking data by tracking number
-    async function fetchTrackingData(trackingNumber) {
+    // === Search by Tracking Number ===
+    document.getElementById("searchButton").addEventListener("click", async () => {
+      const trackingNumber = document.getElementById("trackingInput").value.trim();
+      if (!trackingNumber) return alert("Please enter a tracking number.");
+
       try {
         const response = await fetch(`${scriptURL}?TrackingNumber=${encodeURIComponent(trackingNumber)}`);
         const result = await response.json();
+
         if (result && result.shipment) {
           populateForm(result.shipment);
         } else {
           alert("Tracking number not found.");
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Fetch error:", error);
+        alert("Error fetching shipment data.");
       }
-    }
+    });
 
-    // Populate form with retrieved data
+    // === Populate form fields ===
     function populateForm(data) {
       for (const key in data) {
         const el = document.getElementById(key);
@@ -220,6 +225,7 @@
             el.value = formatLog(data[key]);
           } else if (key === 'history') {
             el.value = formatHistory(data[key]);
+            renderHistoryList(JSON.parse(data[key]));
           } else {
             el.value = data[key];
           }
@@ -227,13 +233,11 @@
       }
     }
 
-    // Format log string
+    // === Format and render log/history ===
     function formatLog(log) {
-      if (!log) return '';
-      return log.split('\n').filter(Boolean).map(entry => entry.trim()).join('\n');
+      return log?.split('\n').filter(Boolean).join('\n') || '';
     }
 
-    // Format history JSON into editable structured text
     function formatHistory(history) {
       try {
         const entries = JSON.parse(history);
@@ -245,7 +249,6 @@
       }
     }
 
-    // Convert structured history text into JSON string
     function parseHistory(text) {
       const entries = text.trim().split('---').map(block => {
         const obj = {};
@@ -260,9 +263,62 @@
       return JSON.stringify(entries);
     }
 
-    // Collect data from form and send it to the Apps Script
-    async function submitForm(event) {
-      event.preventDefault();
+    function renderHistoryList(entries) {
+      const list = document.getElementById("historyList");
+      list.innerHTML = "";
+      entries.forEach(entry => {
+        const div = document.createElement("div");
+        div.className = "history-entry";
+        div.textContent = `${entry.Date} ${entry.Time} - ${entry.Location} (${entry.Status}) by ${entry.UpdatedBy}: ${entry.Remarks}`;
+        list.appendChild(div);
+      });
+    }
+
+    // === Add Log Entry ===
+    document.getElementById("addLogBtn").addEventListener("click", () => {
+      const date = document.getElementById("logDate").value;
+      const desc = document.getElementById("logDescription").value.trim();
+      if (date && desc) {
+        const logArea = document.getElementById("log");
+        logArea.value += `${date}: ${desc}\n`;
+        document.getElementById("logDate").value = "";
+        document.getElementById("logDescription").value = "";
+      } else {
+        alert("Please enter both date and description.");
+      }
+    });
+
+    // === Add History Entry ===
+    document.getElementById("addHistBtn").addEventListener("click", () => {
+      const entry = {
+        Date: document.getElementById("histDate").value,
+        Time: document.getElementById("histTime").value,
+        Location: document.getElementById("histLocation").value.trim(),
+        Status: document.getElementById("histStatus").value.trim(),
+        UpdatedBy: document.getElementById("histUpdatedBy").value.trim(),
+        Remarks: document.getElementById("histRemarks").value.trim(),
+      };
+
+      if (entry.Date && entry.Time && entry.Location) {
+        const currentHistory = document.getElementById("history").value;
+        const newEntry = `Date: ${entry.Date}\nTime: ${entry.Time}\nLocation: ${entry.Location}\nStatus: ${entry.Status}\nUpdatedBy: ${entry.UpdatedBy}\nRemarks: ${entry.Remarks}\n---\n`;
+        document.getElementById("history").value = currentHistory + newEntry;
+        renderHistoryList([...JSON.parse(parseHistory(currentHistory)), entry]);
+
+        // Clear fields
+        document.getElementById("histDate").value = "";
+        document.getElementById("histTime").value = "";
+        document.getElementById("histLocation").value = "";
+        document.getElementById("histStatus").value = "";
+        document.getElementById("histUpdatedBy").value = "";
+        document.getElementById("histRemarks").value = "";
+      } else {
+        alert("Please fill in at least Date, Time, and Location.");
+      }
+    });
+
+    // === Save Shipment ===
+    document.getElementById("saveButton").addEventListener("click", async () => {
       const formElements = document.querySelectorAll("form [id]");
       const shipment = {};
       formElements.forEach(el => {
@@ -273,6 +329,12 @@
         }
       });
 
+      if (!shipment["trackingInput"]) {
+        return alert("Tracking number is required.");
+      }
+
+      shipment["TrackingNumber"] = shipment["trackingInput"]; // Use the correct key
+
       try {
         const response = await fetch(scriptURL, {
           method: 'POST',
@@ -280,41 +342,19 @@
           headers: { 'Content-Type': 'application/json' }
         });
         const result = await response.json();
-        if (result && result.success) {
-          alert("Shipment data saved successfully!");
+        if (result.success) {
+          alert("Shipment saved successfully.");
         } else {
-          alert("Failed to save data.");
+          alert("Failed to save shipment.");
         }
       } catch (error) {
-        console.error("Error submitting form:", error);
-        alert("Submission failed.");
+        console.error("Save error:", error);
+        alert("Error saving shipment data.");
       }
-    }
-
-    // Attach event listeners only after DOM is ready
-    const searchBtn = document.getElementById("searchBtn");
-    const shipmentForm = document.getElementById("shipmentForm");
-
-    if (searchBtn) {
-      searchBtn.addEventListener("click", () => {
-        const trackingNumber = document.getElementById("TrackingNumber").value.trim();
-        if (trackingNumber) {
-          fetchTrackingData(trackingNumber);
-        } else {
-          alert("Please enter a tracking number.");
-        }
-      });
-    } else {
-      console.error("searchBtn element not found!");
-    }
-
-    if (shipmentForm) {
-      shipmentForm.addEventListener("submit", submitForm);
-    } else {
-      console.error("shipmentForm element not found!");
-    }
+    });
   });
 </script>
+
 
 
  </body> </html>
