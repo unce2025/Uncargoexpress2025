@@ -172,86 +172,87 @@
     </div>
   </form>
 
-  <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_NrN4dnBf43IRXMw4RjsKff5C5EDbNh9XqCyjsKbyuFTcRWVZE96fGzUDmFbkQ2KW/exec';
+<script>
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_NrN4dnBf43IRXMw4RjsKff5C5EDbNh9XqCyjsKbyuFTcRWVZE96fGzUDmFbkQ2KW/exec';
 
-    async function searchShipment() {
-      const trackingNumber = document.getElementById("trackingNumber").value.trim();
-      if (!trackingNumber) return alert("Please enter a tracking number");
+  async function searchShipment() {
+    const trackingNumber = document.getElementById("trackingNumber").value.trim();
+    if (!trackingNumber) return alert("Please enter a tracking number");
 
-      try {
-        const response = await fetch(`${SCRIPT_URL}?trackingNumber=${encodeURIComponent(trackingNumber)}`);
-        const data = await response.json();
+    try {
+      const response = await fetch(`${SCRIPT_URL}?tracking=${encodeURIComponent(trackingNumber)}`);
+      const data = await response.json();
 
-        if (data && data.shipment) {
-          const s = data.shipment;
-          Object.keys(s).forEach(key => {
-            const input = document.getElementById(key);
-            if (input) input.value = s[key] || "";
-          });
-        } else {
-          alert("Shipment not found.");
-        }
-      } catch (error) {
-        alert("Error fetching shipment data: " + error.message);
-      }
-    }
-
-    async function saveShipment() {
-      const data = getFormData();
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: "POST",
-          body: JSON.stringify({ action: "update", shipment: data }),
-          headers: { "Content-Type": "application/json" },
+      if (data && data.shipment) {
+        const s = data.shipment;
+        Object.keys(s).forEach(key => {
+          const input = document.getElementById(key);
+          if (input) input.value = s[key] || "";
         });
-        const result = await response.json();
-        alert(result.message || "Shipment updated successfully.");
-      } catch (error) {
-        alert("Error saving shipment: " + error.message);
+      } else {
+        alert("Shipment not found.");
       }
+    } catch (error) {
+      alert("Error fetching shipment data: " + error.message);
     }
+  }
 
-    async function addShipment() {
-      const data = getFormData();
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: "POST",
-          body: JSON.stringify({ action: "add", shipment: data }),
-          headers: { "Content-Type": "application/json" },
-        });
-        const result = await response.json();
-        alert(result.message || "Shipment added successfully.");
-      } catch (error) {
-        alert("Error adding shipment: " + error.message);
-      }
+  async function saveShipment() {
+    const data = getFormData();
+    try {
+      const response = await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" },
+      });
+      const result = await response.json();
+      alert(result.message || "Shipment updated successfully.");
+    } catch (error) {
+      alert("Error saving shipment: " + error.message);
     }
+  }
 
-    function getFormData() {
-      return {
-        trackingNumber: document.getElementById("trackingNumber").value,
-        status: document.getElementById("status").value,
-        shipperName: document.getElementById("shipperName").value,
-        shipperPhone: document.getElementById("shipperPhone").value,
-        shipperAddress: document.getElementById("shipperAddress").value,
-        shipperEmail: document.getElementById("shipperEmail").value,
-        receiverName: document.getElementById("receiverName").value,
-        receiverPhone: document.getElementById("receiverPhone").value,
-        receiverAddress: document.getElementById("receiverAddress").value,
-        receiverEmail: document.getElementById("receiverEmail").value,
-        estimatedDeliveryDate: document.getElementById("estimatedDeliveryDate").value,
-        shippedDate: document.getElementById("shippedDate").value,
-        flightNumber: document.getElementById("flightNumber").value,
-        packageWeight: document.getElementById("packageWeight").value,
-        mode: document.getElementById("mode").value,
-        product: document.getElementById("product").value,
-        quantity: document.getElementById("quantity").value,
-        payment: document.getElementById("payment").value,
-        totalFreight: document.getElementById("totalFreight").value,
-        log: document.getElementById("log").value,
-        history: document.getElementById("history").value,
-      };
+  async function addShipment() {
+    const data = getFormData();
+    try {
+      const response = await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" },
+      });
+      const result = await response.json();
+      alert(result.message || "Shipment added successfully.");
+    } catch (error) {
+      alert("Error adding shipment: " + error.message);
     }
-  </script>
+  }
+
+  function getFormData() {
+    return {
+      TrackingNumber: document.getElementById("trackingNumber").value,
+      Status: document.getElementById("status").value,
+      ShipperName: document.getElementById("shipperName").value,
+      ShipperPhone: document.getElementById("shipperPhone").value,
+      ShipperAddress: document.getElementById("shipperAddress").value,
+      ShipperEmail: document.getElementById("shipperEmail").value,
+      ReceiverName: document.getElementById("receiverName").value,
+      ReceiverPhone: document.getElementById("receiverPhone").value,
+      ReceiverAddress: document.getElementById("receiverAddress").value,
+      ReceiverEmail: document.getElementById("receiverEmail").value,
+      EstimatedDeliveryDate: document.getElementById("estimatedDeliveryDate").value,
+      ShippedDate: document.getElementById("shippedDate").value,
+      FlightNumber: document.getElementById("flightNumber").value,
+      PackageWeight: document.getElementById("packageWeight").value,
+      Mode: document.getElementById("mode").value,
+      Product: document.getElementById("product").value,
+      Quantity: document.getElementById("quantity").value,
+      Payment: document.getElementById("payment").value,
+      TotalFreight: document.getElementById("totalFreight").value,
+      log: document.getElementById("log").value,
+      history: document.getElementById("history").value,
+    };
+  }
+</script>
+
 </body>
 </html>
