@@ -1,5 +1,5 @@
 async function addTracking(shipmentData) {
-  const url = 'https://script.google.com/macros/s/AKfycbyQRQQSguXCNysA1De1ln_9R76ETlqUd-FCvu7k5oZxW7ghR6vT6W98b2g_IFwARvl1/exec';
+  const url = 'https://script.google.com/macros/s/AKfycbzsRTYEBO1wgjrzO_qO70rdHzXwruEzOP77n8OoTBbgO7Iomr4avJkajkzAald-l-2B/exec';
 
   try {
     const response = await fetch(url, {
