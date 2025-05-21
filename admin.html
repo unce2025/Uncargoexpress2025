@@ -193,166 +193,155 @@
     </div>
   </form>
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwPDSYFvy0iburNNHhbsQ6sEPVOW_EMDSLh1mP9A_nxCZ_S3IrVuAvnHaV5rgzJMv6k/exec';
+ document.addEventListener("DOMContentLoaded", () => {
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbwPDSYFvy0iburNNHhbsQ6sEPVOW_EMDSLh1mP9A_nxCZ_S3IrVuAvnHaV5rgzJMv6k/exec';
 
-    // === Search by Tracking Number ===
-    document.getElementById("searchButton").addEventListener("click", async () => {
-      const trackingNumber = document.getElementById("trackingInput").value.trim();
-      if (!trackingNumber) return alert("Please enter a tracking number.");
+  // Search by Tracking Number
+  document.getElementById("searchButton").addEventListener("click", async () => {
+    const trackingNumber = document.getElementById("trackingInput").value.trim();
+    if (!trackingNumber) return alert("Please enter a tracking number.");
 
-      try {
-        const response = await fetch(`${scriptURL}?TrackingNumber=${encodeURIComponent(trackingNumber)}`);
-        const result = await response.json();
+    try {
+      const response = await fetch(`${scriptURL}?TrackingNumber=${encodeURIComponent(trackingNumber)}`);
+      const result = await response.json();
 
-        if (result && result.shipment) {
-          populateForm(result.shipment);
-        } else {
-          alert("Tracking number not found.");
-        }
-      } catch (error) {
-        console.error("Fetch error:", error);
-        alert("Error fetching shipment data.");
-      }
-    });
-
-    // === Populate form fields ===
-    function populateForm(data) {
-      for (const key in data) {
-        const el = document.getElementById(key);
-        if (el) {
-          if (key === 'log') {
-            el.value = formatLog(data[key]);
-          } else if (key === 'history') {
-            el.value = formatHistory(data[key]);
-            renderHistoryList(JSON.parse(data[key]));
-          } else {
-            el.value = data[key];
-          }
-        }
-      }
-    }
-
-    // === Format and render log/history ===
-    function formatLog(log) {
-      return log?.split('\n').filter(Boolean).join('\n') || '';
-    }
-
-    function formatHistory(history) {
-      try {
-        const entries = JSON.parse(history);
-        return entries.map(entry =>
-          `Date: ${entry.Date}\nTime: ${entry.Time}\nLocation: ${entry.Location}\nStatus: ${entry.Status}\nUpdatedBy: ${entry.UpdatedBy}\nRemarks: ${entry.Remarks}\n---`
-        ).join('\n');
-      } catch (e) {
-        return history;
-      }
-    }
-
-    function parseHistory(text) {
-      const entries = text.trim().split('---').map(block => {
-        const obj = {};
-        block.trim().split('\n').forEach(line => {
-          const [key, ...rest] = line.split(':');
-          if (key && rest.length) {
-            obj[key.trim()] = rest.join(':').trim();
-          }
-        });
-        return obj;
-      }).filter(entry => Object.keys(entry).length > 0);
-      return JSON.stringify(entries);
-    }
-
-    function renderHistoryList(entries) {
-      const list = document.getElementById("historyList");
-      list.innerHTML = "";
-      entries.forEach(entry => {
-        const div = document.createElement("div");
-        div.className = "history-entry";
-        div.textContent = `${entry.Date} ${entry.Time} - ${entry.Location} (${entry.Status}) by ${entry.UpdatedBy}: ${entry.Remarks}`;
-        list.appendChild(div);
-      });
-    }
-
-    // === Add Log Entry ===
-    document.getElementById("addLogBtn").addEventListener("click", () => {
-      const date = document.getElementById("logDate").value;
-      const desc = document.getElementById("logDescription").value.trim();
-      if (date && desc) {
-        const logArea = document.getElementById("log");
-        logArea.value += `${date}: ${desc}\n`;
-        document.getElementById("logDate").value = "";
-        document.getElementById("logDescription").value = "";
+      if (result && result.shipment) {
+        populateForm(result.shipment);
       } else {
-        alert("Please enter both date and description.");
+        alert("Tracking number not found.");
       }
-    });
-
-    // === Add History Entry ===
-    document.getElementById("addHistBtn").addEventListener("click", () => {
-      const entry = {
-        Date: document.getElementById("histDate").value,
-        Time: document.getElementById("histTime").value,
-        Location: document.getElementById("histLocation").value.trim(),
-        Status: document.getElementById("histStatus").value.trim(),
-        UpdatedBy: document.getElementById("histUpdatedBy").value.trim(),
-        Remarks: document.getElementById("histRemarks").value.trim(),
-      };
-
-      if (entry.Date && entry.Time && entry.Location) {
-        const currentHistory = document.getElementById("history").value;
-        const newEntry = `Date: ${entry.Date}\nTime: ${entry.Time}\nLocation: ${entry.Location}\nStatus: ${entry.Status}\nUpdatedBy: ${entry.UpdatedBy}\nRemarks: ${entry.Remarks}\n---\n`;
-        document.getElementById("history").value = currentHistory + newEntry;
-        renderHistoryList([...JSON.parse(parseHistory(currentHistory)), entry]);
-
-        // Clear fields
-        document.getElementById("histDate").value = "";
-        document.getElementById("histTime").value = "";
-        document.getElementById("histLocation").value = "";
-        document.getElementById("histStatus").value = "";
-        document.getElementById("histUpdatedBy").value = "";
-        document.getElementById("histRemarks").value = "";
-      } else {
-        alert("Please fill in at least Date, Time, and Location.");
-      }
-    });
-
-    // === Save Shipment ===
-    document.getElementById("saveButton").addEventListener("click", async () => {
-      const formElements = document.querySelectorAll("form [id]");
-      const shipment = {};
-      formElements.forEach(el => {
-        if (el.id === "history") {
-          shipment[el.id] = parseHistory(el.value);
-        } else {
-          shipment[el.id] = el.value.trim();
-        }
-      });
-
-      if (!shipment["trackingInput"]) {
-        return alert("Tracking number is required.");
-      }
-
-      shipment["TrackingNumber"] = shipment["trackingInput"]; // Use the correct key
-
-      try {
-        const response = await fetch(scriptURL, {
-          method: 'POST',
-          body: JSON.stringify(shipment),
-          headers: { 'Content-Type': 'application/json' }
-        });
-        const result = await response.json();
-        if (result.success) {
-          alert("Shipment saved successfully.");
-        } else {
-          alert("Failed to save shipment.");
-        }
-      } catch (error) {
-        console.error("Save error:", error);
-        alert("Error saving shipment data.");
-      }
-    });
+    } catch (error) {
+      console.error("Fetch error:", error);
+      alert("Error fetching shipment data.");
+    }
   });
+
+  // Populate form fields from shipment data
+  function populateForm(data) {
+    for (const key in data) {
+      const el = document.getElementById(key);
+      if (el) {
+        if (key === 'log') {
+          el.value = data[key] || '';
+        } else if (key === 'history') {
+          el.value = data[key] || '[]';
+          try {
+            renderHistoryList(JSON.parse(el.value));
+          } catch {
+            renderHistoryList([]);
+          }
+        } else {
+          el.value = data[key] || '';
+        }
+      }
+    }
+  }
+
+  // Add Log Entry
+  document.getElementById("addLogBtn").addEventListener("click", () => {
+    const date = document.getElementById("logDate").value;
+    const desc = document.getElementById("logDescription").value.trim();
+    if (date && desc) {
+      const logArea = document.getElementById("log");
+      logArea.value += `${date}: ${desc}\n`;
+      document.getElementById("logDate").value = "";
+      document.getElementById("logDescription").value = "";
+    } else {
+      alert("Please enter both date and description.");
+    }
+  });
+
+  // Add History Entry
+  document.getElementById("addHistBtn").addEventListener("click", () => {
+    const entry = {
+      Date: document.getElementById("histDate").value,
+      Time: document.getElementById("histTime").value,
+      Location: document.getElementById("histLocation").value.trim(),
+      Status: document.getElementById("histStatus").value.trim(),
+      UpdatedBy: document.getElementById("histUpdatedBy").value.trim(),
+      Remarks: document.getElementById("histRemarks").value.trim(),
+    };
+
+    if (entry.Date && entry.Time && entry.Location) {
+      const historyTextarea = document.getElementById("history");
+      let currentHistory = historyTextarea.value;
+      if (!currentHistory.trim()) currentHistory = "[]";
+
+      let entries;
+      try {
+        entries = JSON.parse(currentHistory);
+      } catch {
+        entries = [];
+      }
+
+      entries.push(entry);
+      historyTextarea.value = JSON.stringify(entries);
+
+      renderHistoryList(entries);
+
+      // Clear fields
+      document.getElementById("histDate").value = "";
+      document.getElementById("histTime").value = "";
+      document.getElementById("histLocation").value = "";
+      document.getElementById("histStatus").value = "";
+      document.getElementById("histUpdatedBy").value = "";
+      document.getElementById("histRemarks").value = "";
+    } else {
+      alert("Please fill in at least Date, Time, and Location.");
+    }
+  });
+
+  // Render history entries list
+  function renderHistoryList(entries) {
+    const list = document.getElementById("historyList");
+    list.innerHTML = "";
+    entries.forEach(entry => {
+      const div = document.createElement("div");
+      div.className = "history-entry";
+      div.textContent = `${entry.Date} ${entry.Time} - ${entry.Location} (${entry.Status}) by ${entry.UpdatedBy}: ${entry.Remarks}`;
+      list.appendChild(div);
+    });
+  }
+
+  // Save Shipment
+  document.getElementById("saveButton").addEventListener("click", async () => {
+    const form = document.getElementById("shipmentForm");
+    const shipment = {};
+
+    // Collect only input, textarea, select with name attribute inside the form
+    const elements = form.querySelectorAll("input[name], textarea[name], select[name]");
+    elements.forEach(el => {
+      if (el.name === "history") {
+        // Store as JSON string (already JSON)
+        shipment[el.name] = el.value || "[]";
+      } else {
+        shipment[el.name] = el.value.trim();
+      }
+    });
+
+    if (!shipment["TrackingNumber"]) {
+      return alert("Tracking number is required.");
+    }
+
+    try {
+      const response = await fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify(shipment),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const result = await response.json();
+      if (result.success) {
+        alert("Shipment saved successfully.");
+      } else {
+        alert("Failed to save shipment.");
+      }
+    } catch (error) {
+      console.error("Save error:", error);
+      alert("Error saving shipment data.");
+    }
+  });
+});
+
 </script>
 
 
