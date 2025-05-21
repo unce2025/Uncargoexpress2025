@@ -38,15 +38,18 @@
       margin-top: 5px;
       border-radius: 5px;
       border: 1px solid #ccc;
+      font-size: 16px;
     }
 
     .row {
       display: flex;
       gap: 20px;
+      flex-wrap: wrap;
     }
 
     .row > div {
       flex: 1;
+      min-width: 250px;
     }
 
     button {
@@ -68,16 +71,19 @@
       display: flex;
       gap: 10px;
       margin-top: 10px;
+      flex-wrap: wrap;
     }
 
     .log-history-container {
       display: flex;
       gap: 20px;
       margin-top: 20px;
+      flex-wrap: wrap;
     }
 
     .log-history-container > div {
       flex: 1;
+      min-width: 250px;
     }
   </style>
 </head>
@@ -167,7 +173,7 @@
   </form>
 
   <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwPDSYFvy0iburNNHhbsQ6sEPVOW_EMDSLh1mP9A_nxCZ_S3IrVuAvnHaV5rgzJMv6k/exec'; // <- Replace with your actual URL
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwPDSYFvy0iburNNHhbsQ6sEPVOW_EMDSLh1mP9A_nxCZ_S3IrVuAvnHaV5rgzJMv6k/exec';
 
     async function searchShipment() {
       const trackingNumber = document.getElementById("trackingNumber").value.trim();
@@ -179,26 +185,10 @@
 
         if (data && data.shipment) {
           const s = data.shipment;
-          document.getElementById("status").value = s.status || "";
-          document.getElementById("shipperName").value = s.shipperName || "";
-          document.getElementById("shipperPhone").value = s.shipperPhone || "";
-          document.getElementById("shipperAddress").value = s.shipperAddress || "";
-          document.getElementById("shipperEmail").value = s.shipperEmail || "";
-          document.getElementById("receiverName").value = s.receiverName || "";
-          document.getElementById("receiverPhone").value = s.receiverPhone || "";
-          document.getElementById("receiverAddress").value = s.receiverAddress || "";
-          document.getElementById("receiverEmail").value = s.receiverEmail || "";
-          document.getElementById("estimatedDeliveryDate").value = s.estimatedDeliveryDate || "";
-          document.getElementById("shippedDate").value = s.shippedDate || "";
-          document.getElementById("flightNumber").value = s.flightNumber || "";
-          document.getElementById("packageWeight").value = s.packageWeight || "";
-          document.getElementById("mode").value = s.mode || "";
-          document.getElementById("product").value = s.product || "";
-          document.getElementById("quantity").value = s.quantity || "";
-          document.getElementById("payment").value = s.payment || "";
-          document.getElementById("totalFreight").value = s.totalFreight || "";
-          document.getElementById("log").value = s.log || "";
-          document.getElementById("history").value = s.history || "";
+          Object.keys(s).forEach(key => {
+            const input = document.getElementById(key);
+            if (input) input.value = s[key] || "";
+          });
         } else {
           alert("Shipment not found.");
         }
@@ -213,9 +203,7 @@
         const response = await fetch(SCRIPT_URL, {
           method: "POST",
           body: JSON.stringify({ action: "update", shipment: data }),
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         });
         const result = await response.json();
         alert(result.message || "Shipment updated successfully.");
@@ -230,9 +218,7 @@
         const response = await fetch(SCRIPT_URL, {
           method: "POST",
           body: JSON.stringify({ action: "add", shipment: data }),
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         });
         const result = await response.json();
         alert(result.message || "Shipment added successfully.");
