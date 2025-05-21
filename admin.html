@@ -5,326 +5,208 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Admin Panel - United Nation Cargo Express</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f9f9f9;
-    color: #022b54;
-    margin: 20px;
-  }
-  h1, h3 {
-    color: #022b54;
-  }
-  label {
-    display: block;
-    margin-top: 10px;
-    font-weight: bold;
-  }
-  input[type="text"], input[type="email"], input[type="date"], input[type="time"], select {
-    width: 100%;
-    padding: 7px;
-    margin-top: 5px;
-    box-sizing: border-box;
-    border: 1px solid #022b54;
-    border-radius: 4px;
-  }
-  button {
-    margin-top: 15px;
-    padding: 10px 15px;
-    background-color: #022b54;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  button:hover {
-    background-color: #014a8f;
-  }
-  .entry-group {
-    margin-bottom: 8px;
-    border: 1px solid #022b54;
-    padding: 8px;
-    border-radius: 4px;
-    background: white;
-  }
-  .entry-group > input {
-    margin-right: 5px;
-  }
-  .entry-group button {
-    background: #b22222;
-  }
-  .flex-row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  .flex-row > * {
-    flex: 1;
-  }
+  body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; }
+  label { display: block; margin-top: 10px; font-weight: bold; }
+  input, textarea { width: 100%; padding: 6px; margin-top: 4px; box-sizing: border-box; }
+  button { margin-top: 15px; padding: 10px 20px; }
 </style>
 </head>
 <body>
 
 <h1>Admin Panel - United Nation Cargo Express</h1>
 
-<!-- Search Section -->
-<div>
-  <label for="searchTrackingNumber">Search Tracking Number:</label>
-  <input type="text" id="searchTrackingNumber" placeholder="Enter tracking number to search" />
-  <button onclick="searchShipment()">Search</button>
-  <button onclick="clearForm()">Clear Form</button>
-</div>
+<form id="adminForm" onsubmit="return false;">
+  <label for="trackingNumber">Tracking Number</label>
+  <input id="trackingNumber" type="text" placeholder="Tracking Number" />
 
-<hr/>
+  <label for="status">Status</label>
+  <input id="status" type="text" placeholder="Status" />
 
-<!-- Shipment Form -->
-<form id="shipmentForm" onsubmit="event.preventDefault(); saveShipment();">
+  <label for="shipperName">Shipper Name</label>
+  <input id="shipperName" type="text" placeholder="Shipper Name" />
 
-  <!-- Basic shipment details -->
-  <label for="TrackingNumber">Tracking Number *</label>
-  <input type="text" id="TrackingNumber" required />
+  <label for="shipperPhone">Shipper Phone</label>
+  <input id="shipperPhone" type="text" placeholder="Shipper Phone" />
 
-  <label for="Status">Status</label>
-  <input type="text" id="Status" />
+  <label for="shipperAddress">Shipper Address</label>
+  <input id="shipperAddress" type="text" placeholder="Shipper Address" />
 
-  <label for="ShipperName">Shipper Name</label>
-  <input type="text" id="ShipperName" />
+  <label for="shipperEmail">Shipper Email</label>
+  <input id="shipperEmail" type="email" placeholder="Shipper Email" />
 
-  <label for="ShipperPhone">Shipper Phone</label>
-  <input type="text" id="ShipperPhone" />
+  <label for="receiverName">Receiver Name</label>
+  <input id="receiverName" type="text" placeholder="Receiver Name" />
 
-  <label for="ShipperAddress">Shipper Address</label>
-  <input type="text" id="ShipperAddress" />
+  <label for="receiverPhone">Receiver Phone</label>
+  <input id="receiverPhone" type="text" placeholder="Receiver Phone" />
 
-  <label for="ShipperEmail">Shipper Email</label>
-  <input type="email" id="ShipperEmail" />
+  <label for="receiverAddress">Receiver Address</label>
+  <input id="receiverAddress" type="text" placeholder="Receiver Address" />
 
-  <label for="ReceiverName">Receiver Name</label>
-  <input type="text" id="ReceiverName" />
+  <label for="receiverEmail">Receiver Email</label>
+  <input id="receiverEmail" type="email" placeholder="Receiver Email" />
 
-  <label for="ReceiverPhone">Receiver Phone</label>
-  <input type="text" id="ReceiverPhone" />
+  <label for="estimatedDeliveryDate">Estimated Delivery Date</label>
+  <input id="estimatedDeliveryDate" type="date" />
 
-  <label for="ReceiverAddress">Receiver Address</label>
-  <input type="text" id="ReceiverAddress" />
+  <label for="shippedDate">Shipped Date</label>
+  <input id="shippedDate" type="date" />
 
-  <label for="ReceiverEmail">Receiver Email</label>
-  <input type="email" id="ReceiverEmail" />
+  <label for="pickUpTime">Pick Up Time</label>
+  <input id="pickUpTime" type="time" />
 
-  <label for="EstimatedDeliveryDate">Estimated Delivery Date</label>
-  <input type="date" id="EstimatedDeliveryDate" />
+  <label for="departure">Departure</label>
+  <input id="departure" type="text" placeholder="Departure" />
 
-  <label for="ShippedDate">Shipped Date</label>
-  <input type="date" id="ShippedDate" />
+  <label for="mode">Mode</label>
+  <input id="mode" type="text" placeholder="Mode" />
 
-  <label for="PickUpTime">Pick Up Time</label>
-  <input type="time" id="PickUpTime" />
+  <label for="product">Product</label>
+  <input id="product" type="text" placeholder="Product" />
 
-  <label for="Departure">Departure</label>
-  <input type="text" id="Departure" />
+  <label for="quantity">Quantity</label>
+  <input id="number" id="quantity" type="number" min="1" placeholder="Quantity" />
 
-  <label for="Mode">Mode</label>
-  <input type="text" id="Mode" />
+  <label for="payment">Payment</label>
+  <input id="payment" type="text" placeholder="Payment" />
 
-  <label for="Product">Product</label>
-  <input type="text" id="Product" />
+  <label for="totalFreight">Total Freight</label>
+  <input id="totalFreight" type="text" placeholder="Total Freight" />
 
-  <label for="Quantity">Quantity</label>
-  <input type="text" id="Quantity" />
+  <label for="log">Log</label>
+  <textarea id="log" rows="4" placeholder="Log details here..."></textarea>
 
-  <label for="Payment">Payment</label>
-  <input type="text" id="Payment" />
+  <label for="history">History</label>
+  <textarea id="history" rows="4" placeholder="History details here..."></textarea>
 
-  <label for="TotalFreight">Total Freight</label>
-  <input type="text" id="TotalFreight" />
-
-  <hr/>
-
-  <!-- Log Entries -->
-  <h3>Log Entries</h3>
-  <div id="logEntries"></div>
-  <button type="button" onclick="addLogEntry()">Add Log Entry</button>
-
-  <hr/>
-
-  <!-- History Entries -->
-  <h3>History Entries</h3>
-  <div id="historyEntries"></div>
-  <button type="button" onclick="addHistoryEntry()">Add History Entry</button>
-
-  <hr/>
-
-  <button type="submit">Save Shipment</button>
+  <button id="searchBtn" type="button">Search Shipment</button>
+  <button id="saveBtn" type="button">Save Shipment</button>
+  <button id="newBtn" type="button">New Shipment</button>
 </form>
 
 <script>
-// Paste your Google Apps Script Web App URL here:
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwPDSYFvy0iburNNHhbsQ6sEPVOW_EMDSLh1mP9A_nxCZ_S3IrVuAvnHaV5rgzJMv6k/exec';
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPDSYFvy0iburNNHhbsQ6sEPVOW_EMDSLh1mP9A_nxCZ_S3IrVuAvnHaV5rgzJMv6k/exec"; // <-- Put your Google Apps Script URL here
 
-// Search shipment by tracking number
-async function searchShipment() {
-  const trackingNumber = document.getElementById('trackingNumber').value.trim();
-  if (!trackingNumber) {
-    alert('Please enter a tracking number to search.');
-    return;
+  // Utility: get form data as object
+  function getFormData() {
+    return {
+      trackingNumber: document.getElementById('trackingNumber').value.trim(),
+      status: document.getElementById('status').value.trim(),
+      shipperName: document.getElementById('shipperName').value.trim(),
+      shipperPhone: document.getElementById('shipperPhone').value.trim(),
+      shipperAddress: document.getElementById('shipperAddress').value.trim(),
+      shipperEmail: document.getElementById('shipperEmail').value.trim(),
+      receiverName: document.getElementById('receiverName').value.trim(),
+      receiverPhone: document.getElementById('receiverPhone').value.trim(),
+      receiverAddress: document.getElementById('receiverAddress').value.trim(),
+      receiverEmail: document.getElementById('receiverEmail').value.trim(),
+      estimatedDeliveryDate: document.getElementById('estimatedDeliveryDate').value,
+      shippedDate: document.getElementById('shippedDate').value,
+      pickUpTime: document.getElementById('pickUpTime').value,
+      departure: document.getElementById('departure').value.trim(),
+      mode: document.getElementById('mode').value.trim(),
+      product: document.getElementById('product').value.trim(),
+      quantity: document.getElementById('quantity').value.trim(),
+      payment: document.getElementById('payment').value.trim(),
+      totalFreight: document.getElementById('totalFreight').value.trim(),
+      log: document.getElementById('log').value.trim(),
+      history: document.getElementById('history').value.trim(),
+    };
   }
 
-  try {
-    const response = await fetch(`${SCRIPT_URL}?trackingNumber=${encodeURIComponent(trackingNumber)}`);
-    if (!response.ok) throw new Error('Shipment not found');
-    const result = await response.json();
+  // Utility: fill form from data object
+  function fillForm(data) {
+    if (!data) return alert('No shipment data found.');
+    document.getElementById('trackingNumber').value = data.trackingNumber || "";
+    document.getElementById('status').value = data.status || "";
+    document.getElementById('shipperName').value = data.shipperName || "";
+    document.getElementById('shipperPhone').value = data.shipperPhone || "";
+    document.getElementById('shipperAddress').value = data.shipperAddress || "";
+    document.getElementById('shipperEmail').value = data.shipperEmail || "";
+    document.getElementById('receiverName').value = data.receiverName || "";
+    document.getElementById('receiverPhone').value = data.receiverPhone || "";
+    document.getElementById('receiverAddress').value = data.receiverAddress || "";
+    document.getElementById('receiverEmail').value = data.receiverEmail || "";
+    document.getElementById('estimatedDeliveryDate').value = data.estimatedDeliveryDate || "";
+    document.getElementById('shippedDate').value = data.shippedDate || "";
+    document.getElementById('pickUpTime').value = data.pickUpTime || "";
+    document.getElementById('departure').value = data.departure || "";
+    document.getElementById('mode').value = data.mode || "";
+    document.getElementById('product').value = data.product || "";
+    document.getElementById('quantity').value = data.quantity || "";
+    document.getElementById('payment').value = data.payment || "";
+    document.getElementById('totalFreight').value = data.totalFreight || "";
+    document.getElementById('log').value = data.log || "";
+    document.getElementById('history').value = data.history || "";
+  }
 
-    if (result.shipment) {
-      fillForm(result.shipment);
-      alert('Shipment loaded. You can now edit and save.');
-    } else {
-      alert('No shipment found with that tracking number.');
+  // Clear form inputs
+  function clearForm() {
+    fillForm({});
+  }
+
+  // Search shipment by tracking number
+  async function searchShipment() {
+    const trackingNumber = document.getElementById('trackingNumber').value.trim();
+    if (!trackingNumber) {
+      alert('Please enter a tracking number to search.');
+      return;
+    }
+    try {
+      const response = await fetch(`${SCRIPT_URL}?trackingNumber=${encodeURIComponent(trackingNumber)}`);
+      const result = await response.json();
+      if (result.shipment) {
+        fillForm(result.shipment);
+        alert('Shipment found and loaded.');
+      } else {
+        alert('Shipment not found.');
+        clearForm();
+        document.getElementById('trackingNumber').value = trackingNumber; // keep tracking number entered
+      }
+    } catch (err) {
+      alert('Error fetching shipment data: ' + err.message);
+    }
+  }
+
+  // Save shipment (add new or update)
+  async function saveShipment() {
+    const data = getFormData();
+    if (!data.trackingNumber) {
+      alert('Tracking Number is required.');
+      return;
+    }
+    try {
+      const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ shipment: data }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const result = await response.json();
+      if (result.success) {
+        alert('Shipment saved successfully.');
+      } else {
+        alert('Failed to save shipment.');
+      }
+    } catch (err) {
+      alert('Error saving shipment: ' + err.message);
+    }
+  }
+
+  // New shipment button clears form
+  function newShipment() {
+    if (confirm('Clear form to add new shipment? Unsaved changes will be lost.')) {
       clearForm();
     }
-  } catch (error) {
-    alert('Error fetching shipment: ' + error.message);
-    clearForm();
-  }
-}
-
-// Fill form inputs with shipment data
-function fillForm(data) {
-  // Basic fields
-  document.getElementById('trackingNumber').value = data.TrackingNumber || '';
-  document.getElementById('status').value = data.Status || '';
-  document.getElementById('shipperName').value = data.ShipperName || '';
-  document.getElementById('shipperPhone').value = data.ShipperPhone || '';
-  document.getElementById('shipperAddress').value = data.ShipperAddress || '';
-  document.getElementById('shipperEmail').value = data.ShipperEmail || '';
-  document.getElementById('receiverName').value = data.ReceiverName || '';
-  document.getElementById('receiverPhone').value = data.ReceiverPhone || '';
-  document.getElementById('receiverAddress').value = data.ReceiverAddress || '';
-  document.getElementById('receiverEmail').value = data.ReceiverEmail || '';
-  document.getElementById('estimatedDeliveryDate').value = data.EstimatedDeliveryDate || '';
-  document.getElementById('shippedDate').value = data.ShippedDate || '';
-  document.getElementById('pickUpTime').value = data.PickUpTime || '';
-  document.getElementById('departure').value = data.Departure || '';
-  document.getElementById('mode').value = data.Mode || '';
-  document.getElementById('product').value = data.Product || '';
-  document.getElementById('quantity').value = data.Quantity || '';
-  document.getElementById('payment').value = data.Payment || '';
-  document.getElementById('totalFreight').value = data.TotalFreight || '';
-
-  // Format and show log and history as human-friendly text
-  document.getElementById('log').value = formatLogOrHistory(data.log);
-  document.getElementById('history').value = formatLogOrHistory(data.history);
-}
-
-// Format log or history string to readable text for clients
-function formatLogOrHistory(text) {
-  if (!text) return '';
-  try {
-    // Assuming log/history stored as JSON array of entries
-    const entries = JSON.parse(text);
-    if (!Array.isArray(entries)) return text;
-
-    return entries
-      .map(entry => {
-        // Customize keys depending on your structure, example:
-        let parts = [];
-        if (entry.Date) parts.push(`Date: ${entry.Date}`);
-        if (entry.Time) parts.push(`Time: ${entry.Time}`);
-        if (entry.Location) parts.push(`Location: ${entry.Location}`);
-        if (entry.Status) parts.push(`Status: ${entry.Status}`);
-        if (entry.UpdatedBy) parts.push(`Updated By: ${entry.UpdatedBy}`);
-        if (entry.Remarks) parts.push(`Remarks: ${entry.Remarks}`);
-        return parts.join(', ');
-      })
-      .join('\n');
-  } catch {
-    // If not JSON, just return raw text
-    return text;
-  }
-}
-
-// Clear all form fields
-function clearForm() {
-  const fields = document.querySelectorAll('#adminForm input, #adminForm textarea');
-  fields.forEach(f => (f.value = ''));
-}
-
-// Save (Add or Update) shipment
-async function saveShipment() {
-  const data = {
-    TrackingNumber: document.getElementById('trackingNumber').value.trim(),
-    Status: document.getElementById('status').value.trim(),
-    ShipperName: document.getElementById('shipperName').value.trim(),
-    ShipperPhone: document.getElementById('shipperPhone').value.trim(),
-    ShipperAddress: document.getElementById('shipperAddress').value.trim(),
-    ShipperEmail: document.getElementById('shipperEmail').value.trim(),
-    ReceiverName: document.getElementById('receiverName').value.trim(),
-    ReceiverPhone: document.getElementById('receiverPhone').value.trim(),
-    ReceiverAddress: document.getElementById('receiverAddress').value.trim(),
-    ReceiverEmail: document.getElementById('receiverEmail').value.trim(),
-    EstimatedDeliveryDate: document.getElementById('estimatedDeliveryDate').value.trim(),
-    ShippedDate: document.getElementById('shippedDate').value.trim(),
-    PickUpTime: document.getElementById('pickUpTime').value.trim(),
-    Departure: document.getElementById('departure').value.trim(),
-    Mode: document.getElementById('mode').value.trim(),
-    Product: document.getElementById('product').value.trim(),
-    Quantity: document.getElementById('quantity').value.trim(),
-    Payment: document.getElementById('payment').value.trim(),
-    TotalFreight: document.getElementById('totalFreight').value.trim(),
-    // Convert log/history back to JSON strings if possible
-    log: tryParseLogHistory(document.getElementById('log').value),
-    history: tryParseLogHistory(document.getElementById('history').value),
-  };
-
-  if (!data.TrackingNumber) {
-    alert('Tracking number is required.');
-    return;
   }
 
-  try {
-    const response = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(data),
-    });
-    const result = await response.json();
-
-    if (result.success) {
-      alert('Shipment saved successfully.');
-    } else {
-      alert('Error saving shipment: ' + (result.message || 'Unknown error'));
-    }
-  } catch (error) {
-    alert('Error saving shipment: ' + error.message);
-  }
-}
-
-// Try to convert client-friendly text back to JSON string for storage
-function tryParseLogHistory(text) {
-  // Simple heuristic: if it looks like multiple lines with "Date: ...", convert to JSON entries
-  const lines = text.trim().split('\n');
-  if (lines.length === 0 || !lines[0].includes('Date:')) return text;
-
-  const entries = lines.map(line => {
-    const obj = {};
-    const parts = line.split(',');
-    parts.forEach(part => {
-      const [key, ...rest] = part.trim().split(':');
-      if (key && rest.length) {
-        obj[key.trim()] = rest.join(':').trim();
-      }
-    });
-    return obj;
+  // Setup event listeners after DOM loads
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('searchBtn').addEventListener('click', searchShipment);
+    document.getElementById('saveBtn').addEventListener('click', saveShipment);
+    document.getElementById('newBtn').addEventListener('click', newShipment);
   });
-
-  return JSON.stringify(entries);
-}
-
-// Attach event listeners (assuming buttons have these IDs)
-document.getElementById('searchBtn').addEventListener('click', searchShipment);
-document.getElementById('saveBtn').addEventListener('click', saveShipment);
-document.getElementById('newBtn').addEventListener('click', clearForm);
-
-
 </script>
 
 </body>
