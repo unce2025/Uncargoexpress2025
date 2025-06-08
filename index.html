@@ -850,33 +850,33 @@ fetch('/.netlify/functions/addTracking', {
       return;
     }
 
-    pageLoading.style.display = 'flex'; // Show loading animation
+    pageLoading.style.display = 'flex'; // Show loading spinner
 
     try {
       const response = await fetch(
-        `https://script.google.com/macros/s/AKfycbyM1ofgZOgcW7wc-AwJu4FC6tACZYefKaxYhMu3_fwDGTvVHEO1QZHBUwBwwp9jP6Qc/exec?trackingNumber=${encodeURIComponent(value)}`
+        `https://script.google.com/macros/s/AKfycbyM1ofgZOgcW7wc-AwJu4FC6tACZYefKaxYhMu3_fwDGTvVHEO1QZHBUwBwwp9jP6Qc/exec?tracking=${encodeURIComponent(value)}`
       );
 
-      const data = await response.json();
+      const result = await response.json();
+      console.log("🔍 Fetched result:", result);
 
-      if (!data || !data.shipment) {
+      if (!result || !result.shipment) {
         alert('The tracking number entered does not match our records. Kindly verify the number and try again.');
-        input.classList.add('error', 'shake');
+        input.classList.add('error');
         input.value = '';
         pageLoading.style.display = 'none';
         return;
       }
 
-      // Redirect to status page
+      // ✅ Redirect to the status page with the tracking number
       window.location.href = `status.html?tracking=${encodeURIComponent(value)}`;
     } catch (error) {
-      console.error('❌ Error fetching shipment:', error);
+      console.error('❌ Error fetching tracking:', error);
       alert('Something went wrong. Please try again later.');
       pageLoading.style.display = 'none';
     }
   });
 </script>
-
 
 
 
