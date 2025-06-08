@@ -839,7 +839,7 @@ fetch('/.netlify/functions/addTracking', {
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    const value = input.value.trim();
+    const value = input.value.trim().toUpperCase();
 
     input.classList.remove('error', 'shake');
 
@@ -849,15 +849,36 @@ fetch('/.netlify/functions/addTracking', {
       return;
     }
 
-    // ✅ Show loading animation
+    // Show loading
     pageLoading.style.display = 'flex';
 
-    // ✅ Wait a bit before redirecting (optional: for animation effect)
-    setTimeout(() => {
-      window.location.href = `status.html?tracking=${encodeURIComponent(value)}`;
-    }, 1500);
+    // Replace with your actual Google Apps Script URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyM1ofgZOgcW7wc-AwJu4FC6tACZYefKaxYhMu3_fwDGTvVHEO1QZHBUwBwwp9jP6Qc/exec?trackingNumber=' + encodeURIComponent(value);
+
+    fetch(scriptURL)
+      .then(response => response.json())
+      .then(data => {
+        if (!data || data.error) {
+          alert('The tracking number entered does not match our records. Kindly verify the number and try again.');
+          input.classList.add('error');
+          input.value = '';
+          pageLoading.style.display = 'none';
+          return;
+        }
+
+        // If tracking number found, redirect to status page
+        setTimeout(() => {
+          window.location.href = `status.html?tracking=${encodeURIComponent(value)}`;
+        }, 1000);
+      })
+      .catch(error => {
+        console.error('Error fetching tracking info:', error);
+        alert('Something went wrong. Please try again later.');
+        pageLoading.style.display = 'none';
+      });
   });
 </script>
+
 
 
 </html>
