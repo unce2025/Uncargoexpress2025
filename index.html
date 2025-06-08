@@ -833,7 +833,7 @@ fetch('/.netlify/functions/addTracking', {
 });
  </script>
 
-  <script>
+<script>
   const form = document.getElementById('trackingForm');
   const input = document.getElementById('trackingNumber');
   const pageLoading = document.getElementById('pageLoading');
@@ -857,13 +857,11 @@ fetch('/.netlify/functions/addTracking', {
         `https://script.google.com/macros/s/AKfycbyM1ofgZOgcW7wc-AwJu4FC6tACZYefKaxYhMu3_fwDGTvVHEO1QZHBUwBwwp9jP6Qc/exec?trackingNumber=${encodeURIComponent(value)}`
       );
 
-      const data = await response.json(); // ✅ THIS defines `data`
-
-      console.log("🔍 Tracking data:", data);
+      const data = await response.json();
 
       if (!data || !data.shipment) {
         alert('The tracking number entered does not match our records. Kindly verify the number and try again.');
-        input.classList.add('error');
+        input.classList.add('error', 'shake');
         input.value = '';
         pageLoading.style.display = 'none';
         return;
@@ -878,6 +876,7 @@ fetch('/.netlify/functions/addTracking', {
     }
   });
 </script>
+
 
 
 
