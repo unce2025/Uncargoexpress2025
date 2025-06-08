@@ -849,19 +849,10 @@ fetch('/.netlify/functions/addTracking', {
       return;
     }
 
-   if (!value) {
-  alert('Please enter your tracking number.');
-  input.classList.add('error');
-  return;
-}
-
-// Redirect to status page with tracking number
-window.location.href = `status.html?tracking=${encodeURIComponent(value)}`;
-
-
+    // ✅ Show loading animation
     pageLoading.style.display = 'flex';
 
-    // FIXED: Add tracking number to the redirect URL
+    // ✅ Wait a bit before redirecting (optional: for animation effect)
     setTimeout(() => {
       window.location.href = `status.html?tracking=${encodeURIComponent(value)}`;
     }, 1500);
