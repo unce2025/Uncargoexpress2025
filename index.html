@@ -825,14 +825,14 @@
     });
   </script>
 
-<script>
+  <script>
   const form = document.getElementById('trackingForm');
   const input = document.getElementById('trackingNumber');
   const pageLoading = document.getElementById('pageLoading');
 
-  form.addEventListener('submit', function (e) {
+  form.addEventListener('submit', async function (e) {
     e.preventDefault();
-    const value = input.value.trim();
+    const value = input.value.trim().toUpperCase();
 
     input.classList.remove('error', 'shake');
 
@@ -842,10 +842,10 @@
       return;
     }
 
-    // Optional: Validate the format (e.g., UN123CE456)
-    const trackingFormat = /^UN\d{3}CE\d{3}$/i;
-    if (!trackingFormat.test(value)) {
-      alert('Invalid tracking number format. Use format like UN123CE456.');
+    // Validate format: UN123CE456
+    const format = /^UN\d{3}CE\d{3}$/;
+    if (!format.test(value)) {
+      alert('Invalid tracking number format. Use something like UN123CE456.');
       input.classList.add('error');
       input.value = '';
       return;
@@ -854,12 +854,31 @@
     // Show loading animation
     pageLoading.style.display = 'flex';
 
-    // Redirect to status page with tracking number
-    setTimeout(() => {
-      window.location.href = `status.html?tracking=${encodeURIComponent(value)}`;
-    }, 1500);
+    // Replace with your own Apps Script web app URL
+    const endpoint = `https://script.google.com/macros/s/AKfycbwVlSgpkawmPOQzFsrIjy8IBAFucMUXaZSZ1lRK6-oNtQw2cRMFN7GDB6tOOcX8VHgD/exec?trackingNumber=${encodeURIComponent(value)}`;
+
+    try {
+      const response = await fetch(endpoint);
+      const result = await response.json();
+
+      if (result.shipment) {
+        // Found: Redirect to status page
+        window.location.href = `status.html?tracking=${encodeURIComponent(value)}`;
+      } else {
+        // Not found
+        pageLoading.style.display = 'none';
+        alert('Tracking number not found. Please check and try again.');
+        input.classList.add('error');
+        input.value = '';
+      }
+    } catch (err) {
+      pageLoading.style.display = 'none';
+      alert('Error checking tracking number. Try again later.');
+      console.error(err);
+    }
   });
 </script>
+
 
 
 </html>
