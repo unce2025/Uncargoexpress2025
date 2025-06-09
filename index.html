@@ -497,7 +497,7 @@
     simulateTyping(() => appendBotReply(botReply));
   }
 
-  function sendMessage() {
+  async function sendMessage() {
     const input = document.getElementById('user-message');
     const msg = input.value.trim();
     if (!msg) return;
@@ -525,35 +525,49 @@
       lastIntent = 'general';
     }
 
-    simulateTyping(() => {
+    simulateTyping(async () => {
       const lowerMsg = msg.toLowerCase();
       const upperMsg = msg.toUpperCase();
       let response = '';
 
-    if (lastIntent === 'track') {
-  const trackingRegex = /^UN\d{3}[A-Z]{2}\d{3}$/;
+      if (lastIntent === 'track') {
+        const trackingRegex = /^UN\d{3}[A-Z]{2}\d{3}$/;
 
-  if (trackingRegex.test(upperMsg)) {
-    // Fetch status from Google Sheet via Apps Script
-    const trackingNumber = upperMsg;
+        if (trackingRegex.test(upperMsg)) {
+          const trackingNumber = upperMsg;
 
-    await fetch(`https://script.google.com/macros/s/AKfycbyanpZSNK1uqclLrsBU4LdfiSeNPydOJtdT1P_1NvzpJgIlsK_OhhLlGypOGO9gCH1-/exec?TrackingNumber=${trackingNumber}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.shipment && data.shipment.Status) {
-          response = `Your shipment with tracking number ${trackingNumber} is currently: ${data.shipment.Status}`;
+          try {
+            const res = await fetch(`https://script.google.com/macros/s/AKfycbyanpZSNK1uqclLrsBU4LdfiSeNPydOJtdT1P_1NvzpJgIlsK_OhhLlGypOGO9gCH1-/exec?TrackingNumber=${trackingNumber}`);
+            const data = await res.json();
+
+            if (data.shipment && data.shipment.Status) {
+              response = `Your shipment with tracking number ${trackingNumber} is currently: ${data.shipment.Status}`;
+            } else {
+              response = `Sorry, no shipment found with tracking number ${trackingNumber}. Please double-check and try again.`;
+            }
+          } catch (err) {
+            response = "There was a problem accessing your shipment data. Please try again later.";
+            console.error(err);
+          }
         } else {
-          response = `Sorry, no shipment found with tracking number ${trackingNumber}. Please double-check and try again.`;
+          response = "Please provide a valid tracking number in this format: UN123CE456";
         }
-      })
-      .catch(err => {
-        response = "There was a problem accessing your shipment data. Please try again later.";
-        console.error(err);
-      });
-  } else {
-    response = "Please provide a valid tracking number in this format: UN123CE456";
-  }
-}
+      } else if (lowerMsg.includes('agent') || lowerMsg.includes('support')) {
+        lastIntent = 'live';
+        response = "A live agent is currently unavailable. Please leave your name and message.";
+      } else if (lastIntent === 'quote') {
+        response = "Thanks! We'll review your quote request and contact you soon.";
+      } else if (lastIntent === 'services') {
+        if (lowerMsg.includes('air')) {
+          response = "Air freight is ideal for fast deliveries. Do you already have origin and destination details?";
+        } else if (lowerMsg.includes('ocean')) {
+          response = "Ocean freight is suited for bulk shipments. What's the pickup and drop-off location?";
+        } else {
+          response = "Thanks! Let us know what service you're interested in.";
+        }
+      } else {
+        response = "Thank you for your message. Please select an option or let us know how we can help.";
+      }
 
       appendBotReply(response);
     });
@@ -563,6 +577,7 @@
     if (event.key === 'Escape') closeChat();
   });
 </script>
+
 
 
 
