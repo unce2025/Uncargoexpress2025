@@ -823,24 +823,16 @@
         });
       });
     });
- 
-
-// When saving data (POST request)
-fetch('/.netlify/functions/addTracking', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(data)
-});
- </script>
+  </script>
 
 <script>
   const form = document.getElementById('trackingForm');
   const input = document.getElementById('trackingNumber');
   const pageLoading = document.getElementById('pageLoading');
 
-  form.addEventListener('submit', async function (e) {
+  form.addEventListener('submit', function (e) {
     e.preventDefault();
-    const value = input.value.trim().toUpperCase();
+    const value = input.value.trim();
 
     input.classList.remove('error', 'shake');
 
@@ -850,34 +842,24 @@ fetch('/.netlify/functions/addTracking', {
       return;
     }
 
-    pageLoading.style.display = 'flex'; // Show loading spinner
-
-    try {
-      const response = await fetch(
-        `https://script.google.com/macros/s/AKfycbyU_rsQlWDSx92qEhJacaFvqpIrP0IH2pkDz7Pn4Y_5GWGFpFj2AKw1jvp9tyR4r48w/exec?tracking=${encodeURIComponent(value)}`
-      );
-
-      const result = await response.json();
-      console.log("🔍 Fetched result:", result);
-
-      if (!result || !result.shipment) {
-        alert('The tracking number entered does not match our records. Kindly verify the number and try again.');
-        input.classList.add('error');
-        input.value = '';
-        pageLoading.style.display = 'none';
-        return;
-      }
-
-      // ✅ Redirect to the status page with the tracking number
-      window.location.href = `status.html?tracking=${encodeURIComponent(value)}`;
-    } catch (error) {
-      console.error('❌ Error fetching tracking:', error);
-      alert('Something went wrong. Please try again later.');
-      pageLoading.style.display = 'none';
+    // Optional: Validate the format (e.g., UN123CE456)
+    const trackingFormat = /^UN\d{3}CE\d{3}$/i;
+    if (!trackingFormat.test(value)) {
+      alert('Invalid tracking number format. Use format like UN123CE456.');
+      input.classList.add('error');
+      input.value = '';
+      return;
     }
+
+    // Show loading animation
+    pageLoading.style.display = 'flex';
+
+    // Redirect to status page with tracking number
+    setTimeout(() => {
+      window.location.href = `status.html?tracking=${encodeURIComponent(value)}`;
+    }, 1500);
   });
 </script>
-
 
 
 </html>
