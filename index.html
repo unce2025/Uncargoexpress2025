@@ -826,59 +826,53 @@
   </script>
 
   <script>
-  const form = document.getElementById('trackingForm');
-  const input = document.getElementById('trackingNumber');
-  const pageLoading = document.getElementById('pageLoading');
+    const form = document.getElementById('trackingForm');
+    const input = document.getElementById('trackingNumber');
+    const pageLoading = document.getElementById('pageLoading');
 
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const value = input.value.trim().toUpperCase();
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const value = input.value.trim().toUpperCase();
 
-    input.classList.remove('error', 'shake');
+      input.classList.remove('error', 'shake');
 
-    if (value === '') {
-      input.classList.add('error', 'shake');
-      input.placeholder = 'Fill out this field';
-      return;
-    }
+      if (value === '') {
+        input.classList.add('error', 'shake');
+        input.placeholder = 'Fill out this field';
+        return;
+      }
 
-    // Validate format: UN123CE456
-    const format = /^UN\d{3}CE\d{3}$/;
-    if (!format.test(value)) {
-      alert('Invalid tracking number format. Use something like UN123CE456.');
-      input.classList.add('error');
-      input.value = '';
-      return;
-    }
-
-    // Show loading animation
-    pageLoading.style.display = 'flex';
-
-    // Replace with your own Apps Script web app URL
-    const endpoint = `https://script.google.com/macros/s/AKfycbwVlSgpkawmPOQzFsrIjy8IBAFucMUXaZSZ1lRK6-oNtQw2cRMFN7GDB6tOOcX8VHgD/exec?trackingNumber=${encodeURIComponent(value)}`;
-
-    try {
-      const response = await fetch(endpoint);
-      const result = await response.json();
-
-      if (result.shipment) {
-        // Found: Redirect to status page
-        window.location.href = `status.html?tracking=${encodeURIComponent(value)}`;
-      } else {
-        // Not found
-        pageLoading.style.display = 'none';
-        alert('Tracking number not found. Please check and try again.');
+      const pattern = /^UN\d{3}CE\d{3}$/;
+      if (!pattern.test(value)) {
+        alert('Please enter a valid tracking number in the format UN123CE456.');
         input.classList.add('error');
         input.value = '';
+        return;
       }
-    } catch (err) {
-      pageLoading.style.display = 'none';
-      alert('Error checking tracking number. Try again later.');
-      console.error(err);
-    }
-  });
-</script>
 
+      pageLoading.style.display = 'block';
+
+      const endpoint = `https://script.google.com/macros/s/AKfycbyanpZSNK1uqclLrsBU4LdfiSeNPydOJtdT1P_1NvzpJgIlsK_OhhLlGypOGO9gCH1-/exec?trackingNumber=${encodeURIComponent(value)}`;
+
+      try {
+        const response = await fetch(endpoint);
+        const result = await response.json();
+
+        if (result.shipment) {
+          window.location.href = `status.html?tracking=${encodeURIComponent(value)}`;
+        } else {
+          pageLoading.style.display = 'none';
+          alert('Tracking number not found.');
+          input.classList.add('error');
+          input.value = '';
+        }
+      } catch (error) {
+        pageLoading.style.display = 'none';
+        alert('Network or script error. Check the console.');
+        console.error(error);
+      }
+    });
+  </script>
 
 
 </html>
